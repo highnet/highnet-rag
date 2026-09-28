@@ -256,7 +256,7 @@ Neutral paper and graphite with one pencil accent, three semantic inks and a dat
 
 ### Data
 
-One colour per retrieval series, for rank columns, chart series and badges: **BM25 Umber** (`data-bm25`), **Vector Blue** (`data-vector`), **Fused Violet** (`data-fused`), **Rerank Green** (`data-rerank`) and **Everything Else** (`data-neutral`). Each series also has a marker shape: a square for BM25, a circle for vector, a diamond for fused (rerank will take a triangle). A rank badge is the coloured marker followed by the rank in graphite, with a screen-reader label naming the series, so colour is never the only cue. The fusion step shows the BM25 and vector rankings side by side from `lg` (stacked below), then the fused list with each passage's rank in both inputs, its RRF score over the two contributions, and a blue-pencil rule, always drawn, where the top-k cut falls. Candidates below the cut fold behind a pencil toggle under that rule; when opened, their rows and rank badges are muted (the marker shapes stay).
+One colour per retrieval series, for rank columns, chart series and badges: **BM25 Umber** (`data-bm25`), **Vector Blue** (`data-vector`), **Fused Violet** (`data-fused`), **Rerank Green** (`data-rerank`) and **Everything Else** (`data-neutral`). Each series also has a marker shape: a square for BM25, a circle for vector, a diamond for fused, a triangle for reranked. A rank badge is the coloured marker followed by the rank in graphite, with a screen-reader label naming the series, so colour is never the only cue. The fusion step shows the BM25 and vector rankings side by side from `lg` (stacked below), then the fused list with each passage's rank in both inputs, its RRF score over the two contributions, and a blue-pencil rule, always drawn, where the top-k cut falls. Candidates below the cut fold behind a pencil toggle under that rule; when opened, their rows and rank badges are muted (the marker shapes stay).
 
 ### Named Rules
 
@@ -368,6 +368,14 @@ The result line: an `=` in blue pencil in the number margin, then a raised-paper
 ### Step Figures
 
 Each step carries one small figure, drawn from that run's trace and placed above the step's tables. Figures are HTML and CSS, not charts: a Bar is a 1px-ruled track in quiet green with filled segments laid end to end and optional 1px graphite tick marks for thresholds. Colour keeps its meaning. The three retrieval series use their data colours (BM25 umber for term weights, vector blue for distances and embedding values, both for fusion contributions); everything else is blue pencil (the part that matters: used requests, passages, input), graphite (the question, output cost), soft graphite (reserved room, uncited passages) or the tier colours on the budget meter. Every figure has a one-line caption in small muted prose that says how to read it, and a text alternative with the same numbers; the citation grid is a real table instead. Nothing animates. On phones a figure folds away with its step.
+
+### Rerank Step
+
+The reranked list keeps the rank table's fixed columns: new rank (rerank-green triangle badge), passage, old rank with an up or down arrow and the size of the move (a dash when it stayed), and relevance as a number over a thin rerank-green bar on a 0 to 1 scale. The same always-drawn blue-pencil top-k cut and folded candidates below it as fusion. On arrival each row slides from its old place to its new one in about 600ms with an exponential ease-out: the signature moment of the reranker. With reduced motion the rows simply appear in their new order.
+
+### Corpus Map
+
+A square plot framed by dashed top and bottom rules, never a filled box. Every chunk of the chosen set is a small soft-graphite dot; the question is a blue-pencil crosshair with a ring and a pencil-voice "your question" label; the retrieved passages are larger blue-pencil dots with their rank numbers set in HTML over the plot, so labels stay readable at any width; the question's five nearest dots on the map are ringed in graphite, which shows when the map and the search disagree. Articles are not colour-coded (35 cannot be told apart): pointing at or tapping a dot darkens every chunk of its article and names it under the plot. Axis captions say what share of the spread each axis keeps. A table with the same positions and map distances sits behind a pencil toggle. Phones get the same plot, scaled to the sheet.
 
 ### Code Excerpt
 

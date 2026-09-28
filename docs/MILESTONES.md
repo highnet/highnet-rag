@@ -66,10 +66,10 @@ Acceptance criteria:
 
 Acceptance criteria:
 
-- [ ] The `rerank` stage (Voyage `rerank-2.5-lite`) emits before/after lists with relevance scores and the rank changes.
-- [ ] `/api/corpus/map` plus a `CorpusMap` canvas: points coloured by document, retrieved chunks highlighted, the query projected with the stored PCA, the explained variance shown honestly.
-- [ ] The map has a keyboard-accessible table alternative; the phone presentation is decided and built.
-- [ ] Reduced motion: rank changes appear without animation.
+- [x] The `rerank` stage (Voyage `rerank-2.5-lite`) emits before/after lists with relevance scores and the rank changes. Off by default (owner's choice); a toggle in the settings strip and `rerank=1` in the link switch it on.
+- [x] `/api/corpus/map` plus a `CorpusMap` plot: retrieved chunks highlighted, the query projected with the stored PCA, the explained variance shown honestly. Changed from "points coloured by document": 35 articles cannot be told apart by colour, so dots stay graphite and pointing at one lights up its whole article.
+- [x] The map has a keyboard-accessible table alternative; phones get the scaled plot (owner's choice).
+- [x] Reduced motion: rank changes appear without animation.
 
 ## M5 · Agentic retrieval
 

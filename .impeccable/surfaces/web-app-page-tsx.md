@@ -33,5 +33,4 @@ Signature interaction: each step is written into the pad as its SSE event arrive
 
 ## Unresolved
 
-- The exact form of the 2D map on phones (a scaled plot or a table first).
 - Whether agentic sub-steps nest under one step or number as 4a, 4b, ...
