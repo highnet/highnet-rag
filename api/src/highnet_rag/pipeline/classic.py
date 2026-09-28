@@ -135,9 +135,7 @@ async def run_classic(
 
     # snippet: bm25 | Skip BM25 in this build
     # 4 · bm25 (not in this build)
-    yield tracer.skipped(
-        "bm25", "This build runs vector search only. Keyword (BM25) search arrives in milestone 2."
-    )
+    yield tracer.skipped("bm25", "Vector-only build; BM25 arrives in milestone 2.")
     # /snippet
 
     # snippet: vector | Vector search
@@ -167,7 +165,7 @@ async def run_classic(
 
     # snippet: fuse,rerank | Skip fusion and reranking in this build
     # 6, 7 · fuse, rerank (not in this build)
-    yield tracer.skipped("fuse", "Fusion only runs in hybrid mode (BM25 + vector).")
+    yield tracer.skipped("fuse", "Runs only in hybrid mode (BM25 + vector).")
     yield tracer.skipped("rerank", "Reranking arrives in milestone 3.")
     # /snippet
 

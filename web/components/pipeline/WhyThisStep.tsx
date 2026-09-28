@@ -11,11 +11,12 @@ import { cn } from '@/lib/utils';
 type WhyThisStepProps = {
   copy: StageCopy;
   layout: 'inline' | 'margin';
+  defaultOpen?: boolean;
   className?: string;
 };
 
 // The blue-pencil note beside each step: plain language first, the technical layer on demand.
-const WhyThisStep = ({ copy, layout, className }: WhyThisStepProps) => {
+const WhyThisStep = ({ copy, layout, defaultOpen = false, className }: WhyThisStepProps) => {
   const details = (
     <Collapsible>
       <CollapsibleTrigger className="group voice-pencil inline-flex cursor-pointer items-center gap-1 text-sm text-primary underline decoration-dotted underline-offset-4 hover:decoration-solid">
@@ -46,7 +47,11 @@ const WhyThisStep = ({ copy, layout, className }: WhyThisStepProps) => {
   }
 
   return (
-    <Collapsible data-slot="why-this-step" className={cn('border-t border-dashed pt-3', className)}>
+    <Collapsible
+      data-slot="why-this-step"
+      defaultOpen={defaultOpen}
+      className={cn('border-t border-dashed pt-3', className)}
+    >
       <CollapsibleTrigger className="group voice-pencil inline-flex min-h-10 cursor-pointer items-center gap-1 text-[15px] text-primary">
         <ChevronRight
           aria-hidden

@@ -35,7 +35,7 @@ const CodeSnippet = ({ snippets }: CodeSnippetProps) => {
                 {snippet.file.replace('api/src/', '')}:{snippet.startLine}–{snippet.endLine}
               </a>
             </figcaption>
-            <pre className="voice-data max-h-80 overflow-auto py-2 text-xs leading-relaxed">
+            <pre className="voice-data overflow-x-auto py-2 text-xs leading-relaxed">
               <code
                 className="hljs language-python"
                 // Pre-highlighted by highlight.js at build time from our own source files.

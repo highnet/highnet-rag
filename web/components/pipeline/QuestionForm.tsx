@@ -81,17 +81,15 @@ const QuestionForm = ({ running, disabled, maxLength, onRun, onStop }: QuestionF
                 type="button"
                 variant="pencil"
                 size="inline"
-                className="min-h-8 text-left whitespace-normal"
+                className="inline min-h-8 text-left leading-8 whitespace-normal"
                 disabled={disabled || running}
                 onClick={() => ask(s)}
               >
                 {s}
-                {i === COPY.suggestions.length - 1 && (
-                  <span className="voice-prose ml-2 text-muted-foreground no-underline">
-                    {COPY.suggestionNote}
-                  </span>
-                )}
               </Button>
+              {i === COPY.suggestions.length - 1 && (
+                <span className="ml-2 text-sm text-muted-foreground">{COPY.suggestionNote}</span>
+              )}
             </li>
           ))}
         </ul>

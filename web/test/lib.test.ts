@@ -27,7 +27,7 @@ describe('copy helpers', () => {
   it('pluralises and fills in values', () => {
     expect(COPY.unused(1)).toBe('1 passage was not cited.');
     expect(COPY.unused(3)).toBe('3 passages were not cited.');
-    expect(COPY.showCode(1)).toBe('Show the code');
+    expect(COPY.showCode(1)).toBe('Show the code (1 excerpt)');
     expect(COPY.showCode(2)).toBe('Show the code (2 excerpts)');
     expect(COPY.workingNote(11)).toContain('11 steps');
     expect(COPY.budgetDegraded('$16', '$20')).toContain('$16 of this month’s $20');
@@ -79,33 +79,27 @@ describe('step summaries', () => {
         rate_limit: { remaining_minute: 19, limit_minute: 20 },
         budget: { tier: 'normal' },
       }),
-      '19/20 left this minute · budget normal',
+      '19/20 per min · budget normal',
     ],
-    [
-      ev('embed_query', { dims: 1024, model: 'voyage-3.5-lite' }),
-      '1024 dimensions · voyage-3.5-lite',
-    ],
+    [ev('embed_query', { dims: 1024, model: 'voyage-3.5-lite' }), '1024 dimensions'],
     [ev('map_project', { x: 0.1234, y: -0.5 }), 'x 0.123, y -0.500'],
     [ev('map_project', { error: { type: 'L', message: 'No PCA' } }, 'warning'), 'No PCA'],
     [ev('vector', { results: [] }, 'warning'), 'No passages found'],
-    [ev('vector', { results: [{ chunk_id: 7, distance: 0.12345 }] }), 'Closest: Normans · 0.1235'],
-    [ev('vector', { results: [{ chunk_id: 8, distance: 0.2 }] }), 'Closest: #8 · 0.2000'],
+    [ev('vector', { results: [{ chunk_id: 7, distance: 0.12345 }] }), '0.1235 · Normans'],
+    [ev('vector', { results: [{ chunk_id: 8, distance: 0.2 }] }), '0.2000 · #8'],
     [
       ev('select_context', { chunks: [{}, {}], context_tokens_approx: 1500 }),
       '2 passages · ~1,500 tokens',
     ],
     [
       ev('prompt', { input_tokens: 1200, worst_case_cost_usd: 0.0062 }),
-      '1,200 tokens in · worst case $0.0062',
+      '1,200 in · $0.0062 worst case',
     ],
     [
       ev('generate', { usage: { output_tokens: 33 }, stop_reason: 'end_turn' }),
-      '33 tokens out · end_turn',
+      '33 out · end_turn',
     ],
-    [
-      ev('generate', { usage: { output_tokens: 1 }, stop_reason: null }),
-      '1 tokens out · unknown stop',
-    ],
+    [ev('generate', { usage: { output_tokens: 1 }, stop_reason: null }), '1 out · unknown stop'],
     [ev('citations', { abstained: true, citations: [] }), 'No answer in the passages'],
     [ev('citations', { abstained: false, citations: [{}] }), '1 citation'],
     [ev('citations', { abstained: false, citations: [{}, {}] }), '2 citations'],

@@ -175,23 +175,26 @@
     font-feature-settings: inherit;
     font-variation-settings: inherit;
   }
+  /* One pencil: keywords in blue pencil, everything else graphite, told apart by weight
+     and Recursive's casual axis, never by the data palette. */
   .hljs-keyword,
   .hljs-built_in,
   .hljs-literal {
     color: var(--blue-pencil);
     font-weight: 600;
   }
-  .hljs-string,
-  .hljs-subst {
-    color: var(--data-rerank);
-  }
-  .hljs-number {
-    color: var(--data-bm25);
-  }
   .hljs-title,
   .hljs-title.function_,
   .hljs-title.class_ {
-    color: var(--data-fused);
+    font-weight: 600;
+  }
+  .hljs-string,
+  .hljs-subst,
+  .hljs-number {
+    font-variation-settings:
+      'MONO' 1,
+      'CASL' 1,
+      'slnt' 0;
   }
   .hljs-comment {
     color: var(--graphite-muted);
@@ -199,11 +202,6 @@
       'MONO' 1,
       'CASL' 0.5,
       'slnt' -7;
-  }
-  .hljs-meta,
-  .hljs-params,
-  .hljs-attr {
-    color: var(--graphite);
   }
 }
 

@@ -52,7 +52,12 @@ const StepSheet = ({
       {children && <div className="mt-3">{children}</div>}
       <div className="mt-3 space-y-1 border-t border-dashed pt-2">
         {status !== 'pending' && (
-          <WhyThisStep copy={copy} layout="inline" className="border-t-0 pt-0 lg:hidden" />
+          <WhyThisStep
+            copy={copy}
+            layout="inline"
+            defaultOpen={!wide}
+            className="border-t-0 pt-0 lg:hidden"
+          />
         )}
         {status !== 'pending' && <CodeSnippet snippets={snippets} />}
       </div>
@@ -123,7 +128,7 @@ const StepSheet = ({
                 {copy.title}
               </Typography>
               {summary && (
-                <span className="voice-data block truncate text-xs text-muted-foreground">
+                <span className="voice-data line-clamp-2 block text-xs text-muted-foreground">
                   {summary}
                 </span>
               )}
@@ -140,7 +145,7 @@ const StepSheet = ({
           <CollapsibleContent className="px-3 pb-3">
             {readout}
             {status === 'pending' ? (
-              <WhyThisStep copy={copy} layout="inline" className="mt-2" />
+              <WhyThisStep copy={copy} layout="inline" defaultOpen className="mt-2" />
             ) : (
               details
             )}
