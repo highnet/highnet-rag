@@ -43,9 +43,11 @@ const Bar = ({ segments, max, marks = [], size = 'md', className }: BarProps) =>
         className,
       )}
     >
-      {segments.map(({ key, value, tone }) => (
-        <div key={key} className={segmentVariants({ tone })} style={{ width: pct(value, max) }} />
-      ))}
+      {segments
+        .filter((s) => s.value > 0)
+        .map(({ key, value, tone }) => (
+          <div key={key} className={segmentVariants({ tone })} style={{ width: pct(value, max) }} />
+        ))}
       {marks.map((mark) => (
         <div
           key={mark}

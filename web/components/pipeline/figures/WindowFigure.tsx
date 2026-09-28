@@ -1,3 +1,4 @@
+import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import { cn } from '@/lib/utils';
 import type { PromptData } from '@/lib/stage-data';
@@ -27,12 +28,21 @@ const SWATCH: Record<LegendItem['tone'], string> = {
 
 const Legend = ({ items }: LegendProps) => {
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1">
       {items.map((item) => (
-        <li key={item.label} className="flex items-center gap-1.5">
+        <Typography
+          key={item.label}
+          as="li"
+          variant="small"
+          color="muted"
+          className="flex items-center gap-1.5"
+        >
           <span aria-hidden className={cn('size-2.5 border border-input', SWATCH[item.tone])} />
-          {item.label} <span className="voice-data text-foreground">{item.value}</span>
-        </li>
+          {item.label}
+          <Typography variant="data" as="span">
+            {item.value}
+          </Typography>
+        </Typography>
       ))}
     </ul>
   );
@@ -49,10 +59,16 @@ const WindowFigure = ({ data }: WindowFigureProps) => {
       caption={window ? F.caption : F.captionNoWindow}
       alt={F.alt(
         data.input_tokens.toLocaleString('en'),
+        [
+          `${parts.system.toLocaleString('en')} ${F.parts.system}`,
+          `${parts.passages.toLocaleString('en')} ${F.parts.passages}`,
+          `${parts.question.toLocaleString('en')} ${F.parts.question}`,
+        ].join(', '),
+        data.max_tokens.toLocaleString('en'),
         window ? `, ${F.share(shareText)} of ${window.toLocaleString('en')}` : '',
       )}
     >
-      {window ? (
+      {window && (
         <div className="space-y-1.5">
           <Bar
             max={window}
@@ -73,8 +89,6 @@ const WindowFigure = ({ data }: WindowFigureProps) => {
             ]}
           />
         </div>
-      ) : (
-        <p className="text-xs text-muted-foreground">{F.noWindow}</p>
       )}
       <div className={cn('space-y-1.5', window && 'border-t border-dashed pt-2')}>
         <Bar

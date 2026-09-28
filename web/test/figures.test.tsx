@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { Bm25Figure } from '@/components/pipeline/figures/Bm25Figure';
 import { CitationGrid } from '@/components/pipeline/figures/CitationGrid';
 import { ContextFigure } from '@/components/pipeline/figures/ContextFigure';
 import { CostFigure } from '@/components/pipeline/figures/CostFigure';
@@ -10,6 +11,7 @@ import { RequestFigure } from '@/components/pipeline/figures/RequestFigure';
 import { WindowFigure } from '@/components/pipeline/figures/WindowFigure';
 import { COPY } from '@/content/copy';
 import type {
+  Bm25Data,
   CitationsData,
   ContextData,
   EmbedData,
@@ -67,10 +69,11 @@ describe('step figures', () => {
     expect(screen.getByText(F.window.share('<0.1%'))).toBeInTheDocument();
     tiny.unmount();
     render(<WindowFigure data={prompt(null, 100)} />);
-    expect(screen.getByText(F.window.noWindow)).toBeInTheDocument();
     expect(screen.getByText(F.window.captionNoWindow)).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: 'The request uses 100 input tokens.' }),
+      screen.getByRole('img', {
+        name: 'The request uses 100 input tokens: about 90 system prompt, 1,200 passages, 10 question; 1,024 reserved for the answer.',
+      }),
     ).toBeInTheDocument();
   });
 
@@ -119,6 +122,25 @@ describe('step figures', () => {
       />,
     );
     expect(screen.getByText(F.context.caption)).toBeInTheDocument();
+  });
+
+  it('lists dropped stop words only when there are some', () => {
+    render(
+      <Bm25Figure
+        data={
+          {
+            searched: 10,
+            words: [{ word: 'Normandy', term: 'normandy' }],
+            terms: [{ term: 'normandy', chunks: 2, idf: 1.5 }],
+          } as Bm25Data
+        }
+      />,
+    );
+    expect(
+      screen.getByRole('img', {
+        name: 'Search terms and their weights: normandy idf 1.50, in 2 of 10 chunks.',
+      }),
+    ).toBeInTheDocument();
   });
 
   it('splits a free answer into two zero-cost parts', () => {

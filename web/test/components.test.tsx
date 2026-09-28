@@ -54,7 +54,11 @@ describe('keyword search and fusion', () => {
     expect(screen.getByText('"normandy" OR "located"')).toBeInTheDocument();
     expect(screen.getByText('7.50')).toBeInTheDocument();
     expect(screen.getByText(/idf 1\.20 · in 3 of 12 chunks/)).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: /normandy 1\.20, located 0\.80/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', {
+        name: /normandy idf 1\.20, in 3 of 12 chunks; located idf 0\.80.*Dropped stop words: Where, is\./,
+      }),
+    ).toBeInTheDocument();
     expect(screen.getByText('BM25 rank 1')).toBeInTheDocument();
     body(
       ev(
@@ -181,7 +185,7 @@ describe('stage bodies', () => {
       }),
     );
     expect(screen.getByRole('img', { name: /0\.5000, -0\.2500/ })).toBeInTheDocument();
-    expect(screen.getByText('-0.250')).toBeInTheDocument();
+    expect(screen.getAllByText('-0.250').length).toBeGreaterThan(0);
     body(ev('map_project', { x: 1, y: 2, explained_variance: [0.1, 0.05], neighbours_2d: [3] }));
     expect(screen.getByText(/15\.0%/)).toBeInTheDocument();
     body(ev('map_project', { error: { type: 'L', message: 'No PCA stored' } }, 'warning'));

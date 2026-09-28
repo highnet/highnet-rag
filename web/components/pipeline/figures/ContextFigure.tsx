@@ -1,3 +1,6 @@
+import { Check } from 'lucide-react';
+
+import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { ContextData } from '@/lib/stage-data';
 
@@ -19,12 +22,15 @@ const ContextFigure = ({ data, cited }: ContextFigureProps) => {
       rank: c.rank,
       left: before + c.approx_tokens / 2,
       wide: c.approx_tokens / total > 0.05,
+      cited: cited.has(c.chunk_id),
     };
   });
   return (
     <Figure
       caption={cited.size > 0 ? `${F.caption} ${F.citedNote}` : F.caption}
-      alt={F.alt(data.chunks.map((c) => `[${c.rank}] ~${c.approx_tokens}`).join(', '))}
+      alt={F.alt(
+        data.chunks.map((c) => F.part(c.rank, c.approx_tokens, cited.has(c.chunk_id))).join(', '),
+      )}
     >
       <Bar
         max={total}
@@ -34,17 +40,21 @@ const ContextFigure = ({ data, cited }: ContextFigureProps) => {
           tone: cited.has(c.chunk_id) ? 'pencil' : 'soft',
         }))}
       />
-      <div className="voice-data relative h-4 text-xs text-muted-foreground">
+      {/* A cited passage always gets its label and a tick, so the state never rests on colour. */}
+      <div className="relative h-4">
         {labels
-          .filter((l) => l.wide)
+          .filter((l) => l.wide || l.cited)
           .map((l) => (
-            <span
+            <Typography
               key={l.rank}
-              className="absolute -translate-x-1/2"
+              variant="label"
+              color="muted"
+              as="span"
+              className="absolute inline-flex -translate-x-1/2 items-center gap-0.5 whitespace-nowrap"
               style={{ left: pct(l.left, total) }}
             >
-              [{l.rank}]
-            </span>
+              [{l.rank}]{l.cited && <Check aria-hidden className="size-3 text-primary" />}
+            </Typography>
           ))}
       </div>
     </Figure>

@@ -113,9 +113,13 @@ export const COPY = {
     bm25: {
       stopWord: 'stop word, dropped',
       caption:
-        'Words in blue pencil became search terms. A longer bar means a rarer word, which counts more when it matches.',
+        'Underlined words became search terms; grey words were dropped. A longer bar means a rarer word, which counts more when it matches.',
       inChunks: (n: number, of: string) => `in ${n.toLocaleString('en')} of ${of} chunks`,
-      alt: (terms: string) => `Search terms and their weights: ${terms}.`,
+      inChunksShort: (n: number, of: string) => `${n.toLocaleString('en')}/${of}`,
+      term: (term: string, idf: string, n: number, of: string) =>
+        `${term} idf ${idf}, in ${n.toLocaleString('en')} of ${of} chunks`,
+      alt: (terms: string, dropped: string) =>
+        `Search terms and their weights: ${terms}.${dropped ? ` Dropped stop words: ${dropped}.` : ''}`,
     },
     distance: {
       full: 'full scale',
@@ -127,7 +131,9 @@ export const COPY = {
     },
     context: {
       caption: 'The context, passage by passage: wider means more tokens.',
-      citedNote: 'Blue: cited in the answer.',
+      citedNote: 'Ticked (blue): cited in the answer.',
+      part: (rank: number, tokens: number, cited: boolean) =>
+        `[${rank}] ~${tokens} tokens${cited ? ', cited' : ''}`,
       alt: (parts: string) => `Context passages by estimated tokens: ${parts}.`,
     },
     window: {
@@ -135,13 +141,13 @@ export const COPY = {
       reserved: 'room for the answer',
       window: (n: string) => `${n}-token context window`,
       share: (pct: string) => `${pct} of the window`,
-      noWindow: 'This model’s window size is not recorded, so only the input is drawn.',
       parts: { system: 'system prompt', passages: 'passages', question: 'question' },
       caption:
         'Top: how much of the model’s window this request fills. Bottom: what the input is made of (split estimated from word counts; the total is exact).',
       captionNoWindow:
-        'What the input is made of (split estimated from word counts; the total is exact).',
-      alt: (tokens: string, share: string) => `The request uses ${tokens} input tokens${share}.`,
+        'This model’s window size is not recorded, so only the input is drawn: what it is made of (split estimated from word counts; the total is exact).',
+      alt: (tokens: string, parts: string, reserved: string, share: string) =>
+        `The request uses ${tokens} input tokens: about ${parts}; ${reserved} reserved for the answer${share}.`,
     },
     cost: {
       input: 'input',

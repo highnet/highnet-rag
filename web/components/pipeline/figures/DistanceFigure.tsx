@@ -1,3 +1,4 @@
+import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { VectorData } from '@/lib/stage-data';
 import { cn } from '@/lib/utils';
@@ -14,10 +15,13 @@ type AxisProps = { from: number; to: number; ticks: number[]; label: string };
 
 const Axis = ({ from, to, ticks, label }: AxisProps) => {
   return (
-    <div className="voice-data relative h-5 text-xs text-muted-foreground">
+    <div className="relative h-5">
       {ticks.map((t) => (
-        <span
+        <Typography
           key={t}
+          variant="label"
+          color="muted"
+          as="span"
           className={cn(
             'absolute top-0',
             t === from ? '' : t === to ? '-translate-x-full' : '-translate-x-1/2',
@@ -25,7 +29,7 @@ const Axis = ({ from, to, ticks, label }: AxisProps) => {
           style={{ left: pct(t - from, to - from) }}
         >
           {t.toFixed(to - from < 0.1 ? 4 : 1)}
-        </span>
+        </Typography>
       ))}
       <span className="sr-only">{label}</span>
     </div>
@@ -42,11 +46,7 @@ const DistanceFigure = ({ data }: DistanceFigureProps) => {
   const lo = Math.max(min - pad, 0);
   const hi = max + pad;
   return (
-    <Figure
-      caption={F.caption}
-      alt={F.alt(data.results.length, min.toFixed(4), max.toFixed(4))}
-      className="max-w-xl"
-    >
+    <Figure caption={F.caption} alt={F.alt(data.results.length, min.toFixed(4), max.toFixed(4))}>
       <div className="space-y-1">
         <div className="relative h-3">
           <div className="absolute inset-x-0 top-1/2 h-px bg-input" />

@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 
+import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { Bm25Data } from '@/lib/stage-data';
 import { cn } from '@/lib/utils';
@@ -18,9 +19,15 @@ const Bm25Figure = ({ data }: Bm25FigureProps) => {
   return (
     <Figure
       caption={F.caption}
-      alt={F.alt(data.terms.map((t) => `${t.term} ${t.idf.toFixed(2)}`).join(', '))}
+      alt={F.alt(
+        data.terms.map((t) => F.term(t.term, t.idf.toFixed(2), t.chunks, searched)).join('; '),
+        data.words
+          .filter((w) => !w.term)
+          .map((w) => w.word)
+          .join(', '),
+      )}
     >
-      <p className="text-base leading-relaxed">
+      <Typography variant="body">
         {data.words.map((w, i) => (
           <Fragment key={i}>
             {i > 0 && ' '}
@@ -28,7 +35,7 @@ const Bm25Figure = ({ data }: Bm25FigureProps) => {
               title={w.term ? undefined : F.stopWord}
               className={cn(
                 w.term
-                  ? 'font-semibold text-primary underline decoration-primary underline-offset-4'
+                  ? 'font-semibold text-foreground underline decoration-chart-2 decoration-2 underline-offset-4'
                   : 'text-muted-foreground',
               )}
             >
@@ -36,16 +43,21 @@ const Bm25Figure = ({ data }: Bm25FigureProps) => {
             </span>
           </Fragment>
         ))}
-      </p>
+      </Typography>
       {data.terms.length > 0 && (
-        <div className="grid grid-cols-[auto_minmax(3rem,1fr)] items-center gap-x-3 gap-y-1.5 text-sm sm:grid-cols-[auto_minmax(4rem,1fr)_auto]">
+        <div className="grid grid-cols-[auto_minmax(3rem,1fr)_auto] items-center gap-x-3 gap-y-1.5 text-sm">
           {data.terms.map((t) => (
             <div key={t.term} className="contents">
               <span className="voice-data">{t.term}</span>
               <Bar max={maxIdf} segments={[{ key: 'idf', value: t.idf, tone: 'bm25' }]} />
-              <span className="voice-data col-span-2 text-xs text-muted-foreground sm:col-span-1 sm:text-right">
-                idf {t.idf.toFixed(2)} · {F.inChunks(t.chunks, searched)}
-              </span>
+              <Typography variant="label" color="muted" as="span" className="text-right">
+                <span className="sm:hidden">
+                  {t.idf.toFixed(2)} · {F.inChunksShort(t.chunks, searched)}
+                </span>
+                <span className="max-sm:hidden">
+                  idf {t.idf.toFixed(2)} · {F.inChunks(t.chunks, searched)}
+                </span>
+              </Typography>
             </div>
           ))}
         </div>

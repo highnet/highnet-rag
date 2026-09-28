@@ -1,3 +1,4 @@
+import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { EmbedData } from '@/lib/stage-data';
 import { cn } from '@/lib/utils';
@@ -28,11 +29,27 @@ const EmbedFigure = ({ data }: EmbedFigureProps) => {
           </div>
         ))}
       </div>
-      <div className="voice-data flex gap-1.5 text-center text-xs text-muted-foreground">
-        {values.map((value, i) => (
-          <span key={i} className="flex-1 truncate">
-            {value.toFixed(3)}
-          </span>
+      {/* One row of values from sm; on phones they alternate between two rows so each has room. */}
+      <div className="grid gap-y-0.5 sm:grid-rows-1">
+        {[0, 1].map((row) => (
+          <div key={row} className={cn('relative h-4', row === 1 && 'sm:hidden')}>
+            {values.map((value, i) => (
+              <Typography
+                key={i}
+                variant="label"
+                color="muted"
+                as="span"
+                className={cn(
+                  'absolute -translate-x-1/2 whitespace-nowrap',
+                  i % 2 !== row && 'max-sm:hidden',
+                  row === 1 && 'sm:hidden',
+                )}
+                style={{ left: `${((i + 0.5) / values.length) * 100}%` }}
+              >
+                {value.toFixed(3)}
+              </Typography>
+            ))}
+          </div>
         ))}
       </div>
     </Figure>
