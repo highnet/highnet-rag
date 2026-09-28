@@ -78,7 +78,9 @@ def main() -> None:
     p = sub.add_parser("ingest", help="build corpus.sqlite: load, chunk, embed, store, PCA")
     p.add_argument("--source", default="data/squad/dev-v2.0.json")
     p.add_argument("--out", default="data/corpus.sqlite")
-    p.add_argument("--chunk-sets", default="small,medium,large", help="comma list of small,medium,large")
+    p.add_argument(
+        "--chunk-sets", default="small,medium,large", help="comma list of small,medium,large"
+    )
     p.add_argument("--limit", type=int, default=0, help="only the first N articles (testing)")
     p.add_argument("--batch-size", type=int, default=128, help="texts per embedding request")
     p.add_argument("--fake", action="store_true", help="offline hashed embeddings, no API cost")
