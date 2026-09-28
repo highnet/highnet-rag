@@ -15,3 +15,6 @@ api/
 evals/
 .venv/
 uv.lock
+
+# Written by `highnet-rag schema` (Python); CI diffs it byte for byte.
+web/lib/generated/trace.schema.json

@@ -12,7 +12,10 @@
           "type": "string"
         }
       },
-      "required": ["run_id", "text"],
+      "required": [
+        "run_id",
+        "text"
+      ],
       "title": "AnswerDelta",
       "type": "object"
     },
@@ -24,7 +27,11 @@
           "type": "string"
         },
         "status": {
-          "enum": ["ok", "error", "limited"],
+          "enum": [
+            "ok",
+            "error",
+            "limited"
+          ],
           "title": "Status",
           "type": "string"
         },
@@ -45,7 +52,14 @@
           "type": "integer"
         }
       },
-      "required": ["run_id", "status", "ms", "tokens", "cost_usd", "stages"],
+      "required": [
+        "run_id",
+        "status",
+        "ms",
+        "tokens",
+        "cost_usd",
+        "stages"
+      ],
       "title": "RunDone",
       "type": "object"
     },
@@ -82,7 +96,12 @@
         },
         "status": {
           "default": "ok",
-          "enum": ["ok", "skipped", "error", "warning"],
+          "enum": [
+            "ok",
+            "skipped",
+            "error",
+            "warning"
+          ],
           "title": "Status",
           "type": "string"
         },
