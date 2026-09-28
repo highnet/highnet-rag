@@ -100,7 +100,7 @@ const StepSheet = ({
               <StatusMark status={status} />
             </div>
           </header>
-          {(children || status !== 'pending') && details}
+          {status !== 'pending' && details}
         </article>
       ) : (
         <Collapsible

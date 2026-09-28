@@ -82,7 +82,8 @@ const PipelineExplorer = () => {
   const running = trace.status === 'running';
 
   const runQuestion = (q: string) => {
-    trace.run({ q, k, chunkSet: DEFAULT_CHUNK_SET, mode: config?.modes[0] ?? 'vector' });
+    if (!config) return; // the form is disabled until the API has answered
+    trace.run({ q, k, chunkSet: DEFAULT_CHUNK_SET, mode: config.modes[0] });
   };
 
   return (
