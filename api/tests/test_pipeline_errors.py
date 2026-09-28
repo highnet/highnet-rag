@@ -72,10 +72,12 @@ class ScriptedAnswer(FakeAnswerModel):
         yield FinalAnswer(blocks=blocks, stop_reason="max_tokens", input_tokens=10, output_tokens=5)
 
 
-def app_with(settings: Settings, *, corpus=None, answer=None) -> TestClient:
+def app_with(settings: Settings, *, corpus=None, answer=None, reranker=None) -> TestClient:
     providers = build_providers(settings)
     if answer is not None:
         providers.answer = answer
+    if reranker is not None:
+        providers.reranker = reranker
     return TestClient(create_app(settings, providers=providers, corpus=corpus))
 
 
@@ -152,3 +154,30 @@ def test_nothing_found_by_either_search_is_a_warning_at_each_step(
     assert t["bm25"]["status"] == "warning" and t["bm25"]["data"]["fts_query"] == ""
     assert t["fuse"]["status"] == "warning" and t["fuse"]["data"]["results"] == []
     assert t["select_context"]["data"]["chunks"] == []
+
+
+def test_a_failed_rerank_keeps_the_previous_order_and_says_so(make_settings) -> None:
+    class BrokenReranker:
+        provider = "fake"
+        model = "fake-broken"
+
+        async def rerank(self, query: str, documents: list[str], top_k: int):
+            raise RuntimeError("reranker timed out")
+
+    with app_with(make_settings(), reranker=BrokenReranker()) as c:
+        events = run(c, rerank="true", k=2)
+    t = traces(events)
+    assert t["rerank"]["status"] == "warning"
+    assert t["rerank"]["data"]["fallback"] == "Kept the fuse order."
+    assert t["select_context"]["data"]["ranking"] == "fuse"
+    assert events[-1][1]["status"] == "ok"
+
+
+def test_rerank_is_skipped_when_there_is_nothing_to_rerank(make_settings, corpus_path) -> None:
+    class EmptyCorpus(SqliteCorpusStore):
+        def knn(self, vector, chunk_set_id: int, k: int):
+            return []
+
+    with app_with(make_settings(), corpus=EmptyCorpus(corpus_path)) as c:
+        events = run(c, q="What is the?", rerank="true")
+    assert traces(events)["rerank"]["data"]["reason"] == "No candidates to rerank."

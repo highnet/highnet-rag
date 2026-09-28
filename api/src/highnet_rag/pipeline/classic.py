@@ -22,7 +22,7 @@ from highnet_rag.trace import AnswerDelta, RunDone, StageClock, TraceEvent, Trac
 Event = TraceEvent | AnswerDelta | RunDone
 MAP_NEIGHBOURS = 5
 HYBRID_DEPTH_FACTOR = 2
-SCORE_NAMES = {"bm25": "bm25", "vector": "distance", "fuse": "rrf"}
+SCORE_NAMES = {"bm25": "bm25", "vector": "distance", "fuse": "rrf", "rerank": "relevance"}
 
 
 def doc_titles(corpus: CorpusStore, hits: list[Hit]) -> dict[int, str]:
@@ -151,9 +151,10 @@ async def run_classic(
             yield tracer.event("map_project", clock, {"error": error}, status="warning")
     # /snippet
 
-    # Hybrid mode fetches deeper lists so fusion has candidates to promote; the other modes
-    # fetch exactly top-k.
-    depth = params.k * HYBRID_DEPTH_FACTOR if params.mode == "hybrid" else params.k
+    # Fusion and reranking need candidates beyond top-k to promote, so hybrid mode and the
+    # reranker fetch deeper lists; otherwise each search fetches exactly top-k.
+    deep = params.mode == "hybrid" or params.rerank
+    depth = params.k * HYBRID_DEPTH_FACTOR if deep else params.k
     lists: dict[str, list[Hit]] = {}
 
     # snippet: bm25 | Keyword search
@@ -245,7 +246,7 @@ async def run_classic(
     if params.mode != "hybrid":
         yield tracer.skipped("fuse", "Runs only in hybrid mode (BM25 + vector).")
         ranking = params.mode
-        selected = [(h.chunk_id, h.score) for h in lists[params.mode][: params.k]]
+        candidates = [(h.chunk_id, h.score) for h in lists[params.mode]]
     else:
         fused = rrf(lists)
         titles = {cid: t for hits in lists.values() for cid, t in doc_titles(corpus, hits).items()}
@@ -271,12 +272,61 @@ async def run_classic(
             status="ok" if fused else "warning",
         )
         ranking = "fuse"
-        selected = [(f.chunk_id, f.score) for f in fused[: params.k]]
+        candidates = [(f.chunk_id, f.score) for f in fused]
+    selected = candidates[: params.k]
     # /snippet
 
-    # snippet: rerank | Skip reranking in this build
-    # 7 · rerank (not in this build)
-    yield tracer.skipped("rerank", "Reranking arrives in a later milestone.")
+    # snippet: rerank | Rerank the candidates
+    # 7 · rerank: a cross-encoder reads the question with each candidate and scores it again.
+    clock = StageClock()
+    if not params.rerank:
+        yield tracer.skipped("rerank", "Off. Switch the reranker on to reorder the candidates.")
+    elif budget.tier != "normal":
+        yield tracer.skipped("rerank", "Paused: this month's budget is past its 80% mark.")
+    elif not candidates:
+        yield tracer.skipped("rerank", "No candidates to rerank.")
+    else:
+        reranker = providers.reranker
+        passages = {c.id: c for c in corpus.chunks([cid for cid, _ in candidates])}
+        try:
+            reranked = await reranker.rerank(
+                params.q, [passages[cid].text for cid, _ in candidates], len(candidates)
+            )
+        except Exception as exc:
+            # Reranking only reorders: on failure, keep the order we already have and say so.
+            error = {"type": type(exc).__name__, "message": str(exc)}
+            data = {"error": error, "fallback": f"Kept the {ranking} order."}
+            yield tracer.event("rerank", clock, data, status="warning")
+        else:
+            cost = cost_usd(reranker.model, settings, reranked.tokens)
+            spend("rerank", reranker.provider, reranker.model, reranked.tokens, 0, cost)
+            before = {cid: i + 1 for i, (cid, _) in enumerate(candidates)}
+            order = [(candidates[r.index][0], r.relevance) for r in reranked.results]
+            yield tracer.event(
+                "rerank",
+                clock,
+                {
+                    "provider": reranker.provider,
+                    "model": reranker.model,
+                    "input": ranking,
+                    "kept": params.k,
+                    "retries": reranked.retries,
+                    "results": [
+                        {
+                            "chunk_id": cid,
+                            "rank": i + 1,
+                            "before_rank": before[cid],
+                            "relevance": round(relevance, 4),
+                            "doc_title": passages[cid].doc_title,
+                        }
+                        for i, (cid, relevance) in enumerate(order)
+                    ],
+                },
+                tokens=reranked.tokens,
+                cost_usd=cost,
+            )
+            ranking = "rerank"
+            selected = order[: params.k]
     # /snippet
 
     # snippet: select_context | Choose the context

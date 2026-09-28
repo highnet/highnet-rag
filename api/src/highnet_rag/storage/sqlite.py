@@ -179,6 +179,10 @@ class SqliteCorpusStore:
         )
         return [MapPoint(r["id"], r["doc_id"], r["x"], r["y"]) for r in rows]
 
+    def documents(self) -> dict[int, str]:
+        rows = self._conn.execute("SELECT id, title FROM documents ORDER BY id")
+        return {r["id"]: r["title"] for r in rows}
+
     def projection(self, chunk_set_id: int) -> Projection:
         if chunk_set_id not in self._projections:
             r = self._conn.execute(
