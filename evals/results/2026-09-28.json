@@ -1,0 +1,376 @@
+{
+  "schema_version": 1,
+  "run": {
+    "started_at": "2026-09-28T20:33:40+00:00",
+    "finished_at": "2026-09-28T20:34:32+00:00",
+    "duration_s": 52.0,
+    "git_sha": "fc55cf2b5c3704b8e334973f8ea2fac76d08a772",
+    "illustrative": false,
+    "corpus_build_id": "5032bec50e35",
+    "corpus_built_at": "2026-09-28T17:32:45+00:00",
+    "embed": {
+      "provider": "voyage",
+      "model": "voyage-3.5-lite"
+    },
+    "rerank": {
+      "provider": "voyage",
+      "model": "rerank-2.5-lite"
+    },
+    "answer": {
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5"
+    },
+    "judge": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-5"
+    }
+  },
+  "golden": [
+    {
+      "name": "squad_auto",
+      "questions": 150,
+      "answerable": 105,
+      "unanswerable": 45
+    },
+    {
+      "name": "owner",
+      "questions": 0,
+      "answerable": 0,
+      "unanswerable": 0
+    },
+    {
+      "name": "compound",
+      "questions": 10,
+      "answerable": 10,
+      "unanswerable": 0
+    }
+  ],
+  "retrieval": {
+    "depth": 10,
+    "ks": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "questions": 105,
+    "unmatched": {
+      "small": 0,
+      "medium": 0,
+      "large": 0
+    },
+    "configs": [
+      {
+        "mode": "bm25",
+        "chunk_set": "small",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.7238,
+          "3": 0.8,
+          "5": 0.8381,
+          "10": 0.8857
+        },
+        "mrr": 0.7726,
+        "mean_ms": 3.8,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "bm25",
+        "chunk_set": "small",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9238,
+          "3": 0.9524,
+          "5": 0.9714,
+          "10": 0.9714
+        },
+        "mrr": 0.9413,
+        "mean_ms": 160.6,
+        "cost_usd": 0.003725
+      },
+      {
+        "mode": "vector",
+        "chunk_set": "small",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.6667,
+          "3": 0.8476,
+          "5": 0.8857,
+          "10": 0.9524
+        },
+        "mrr": 0.7669,
+        "mean_ms": 5.7,
+        "cost_usd": 3e-6
+      },
+      {
+        "mode": "vector",
+        "chunk_set": "small",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9333,
+          "3": 0.9619,
+          "5": 0.981,
+          "10": 0.981
+        },
+        "mrr": 0.9524,
+        "mean_ms": 164.8,
+        "cost_usd": 0.003733
+      },
+      {
+        "mode": "hybrid",
+        "chunk_set": "small",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.7048,
+          "3": 0.8667,
+          "5": 0.9238,
+          "10": 0.9524
+        },
+        "mrr": 0.7992,
+        "mean_ms": 10.6,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "hybrid",
+        "chunk_set": "small",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9333,
+          "3": 0.9619,
+          "5": 0.9905,
+          "10": 1.0
+        },
+        "mrr": 0.9557,
+        "mean_ms": 181.1,
+        "cost_usd": 0.005928
+      },
+      {
+        "mode": "bm25",
+        "chunk_set": "medium",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.7429,
+          "3": 0.8952,
+          "5": 0.9333,
+          "10": 0.9714
+        },
+        "mrr": 0.8302,
+        "mean_ms": 3.9,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "bm25",
+        "chunk_set": "medium",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9429,
+          "3": 0.981,
+          "5": 0.9905,
+          "10": 1.0
+        },
+        "mrr": 0.9641,
+        "mean_ms": 176.1,
+        "cost_usd": 0.009683
+      },
+      {
+        "mode": "vector",
+        "chunk_set": "medium",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.6381,
+          "3": 0.819,
+          "5": 0.9048,
+          "10": 0.9714
+        },
+        "mrr": 0.7471,
+        "mean_ms": 2.0,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "vector",
+        "chunk_set": "medium",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9429,
+          "3": 0.981,
+          "5": 0.9905,
+          "10": 0.9905
+        },
+        "mrr": 0.9627,
+        "mean_ms": 163.2,
+        "cost_usd": 0.009843
+      },
+      {
+        "mode": "hybrid",
+        "chunk_set": "medium",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.7619,
+          "3": 0.9238,
+          "5": 0.9619,
+          "10": 0.9905
+        },
+        "mrr": 0.8499,
+        "mean_ms": 6.2,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "hybrid",
+        "chunk_set": "medium",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9429,
+          "3": 0.981,
+          "5": 0.9905,
+          "10": 1.0
+        },
+        "mrr": 0.9637,
+        "mean_ms": 190.7,
+        "cost_usd": 0.014766
+      },
+      {
+        "mode": "bm25",
+        "chunk_set": "large",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.7524,
+          "3": 0.9048,
+          "5": 0.9429,
+          "10": 0.981
+        },
+        "mrr": 0.8404,
+        "mean_ms": 3.8,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "bm25",
+        "chunk_set": "large",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9524,
+          "3": 0.9714,
+          "5": 0.9905,
+          "10": 0.9905
+        },
+        "mrr": 0.9662,
+        "mean_ms": 195.8,
+        "cost_usd": 0.019314
+      },
+      {
+        "mode": "vector",
+        "chunk_set": "large",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.6095,
+          "3": 0.8476,
+          "5": 0.9143,
+          "10": 0.9619
+        },
+        "mrr": 0.7406,
+        "mean_ms": 1.3,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "vector",
+        "chunk_set": "large",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9524,
+          "3": 0.9714,
+          "5": 0.981,
+          "10": 0.9905
+        },
+        "mrr": 0.9659,
+        "mean_ms": 185.3,
+        "cost_usd": 0.019578
+      },
+      {
+        "mode": "hybrid",
+        "chunk_set": "large",
+        "rerank": false,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.6952,
+          "3": 0.9524,
+          "5": 0.9714,
+          "10": 1.0
+        },
+        "mrr": 0.8215,
+        "mean_ms": 6.4,
+        "cost_usd": 0.0
+      },
+      {
+        "mode": "hybrid",
+        "chunk_set": "large",
+        "rerank": true,
+        "questions": 105,
+        "errors": 0,
+        "recall": {
+          "1": 0.9619,
+          "3": 0.981,
+          "5": 0.9905,
+          "10": 1.0
+        },
+        "mrr": 0.9754,
+        "mean_ms": 206.4,
+        "cost_usd": 0.029307
+      }
+    ]
+  },
+  "answers": null,
+  "compound": null,
+  "cost": {
+    "total_usd": 0.11588,
+    "by_model": [
+      {
+        "provider": "voyage",
+        "model": "rerank-2.5-lite",
+        "calls": 945,
+        "input_tokens": 5793107,
+        "output_tokens": 0,
+        "cost_usd": 0.115877
+      },
+      {
+        "provider": "voyage",
+        "model": "voyage-3.5-lite",
+        "calls": 105,
+        "input_tokens": 1259,
+        "output_tokens": 0,
+        "cost_usd": 3e-6
+      }
+    ]
+  }
+}
