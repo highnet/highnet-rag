@@ -6,7 +6,7 @@ import { Notice } from '@/components/site/Notice';
 import { Button } from '@/components/ui/Button';
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
-import { STAGE_ORDER, STAGES } from '@/content/stages';
+import { AGENT_STAGE_ORDER, STAGE_ORDER, STAGES } from '@/content/stages';
 import { fetchConfig, type ApiConfig } from '@/lib/api';
 import { formatMs, formatUsd } from '@/lib/format';
 import type { TraceEvent } from '@/lib/generated/trace';
@@ -74,7 +74,8 @@ const PipelineExplorer = () => {
   };
 
   const context = useMemo(() => {
-    const byStage = new Map(trace.events.map((e) => [e.stage, e]));
+    // Top-level steps only: an agent's nested searches have their own bm25 and vector events.
+    const byStage = new Map(trace.events.filter((e) => !e.parent).map((e) => [e.stage, e]));
     const contextData = byStage.get('select_context')?.data as ContextData | undefined;
     const citations = byStage.get('citations')?.data as CitationsData | undefined;
     const chunks = new Map<number, ContextChunk>(
@@ -112,6 +113,10 @@ const PipelineExplorer = () => {
   const config = configState.status === 'ready' ? configState.config : null;
   const tier = config?.budget.tier ?? 'normal';
   const running = trace.status === 'running';
+  // The steps drawn follow the run on screen, or the settings before the first run.
+  const agentOn = settings?.agentic === true && tier === 'normal';
+  const agentView = trace.input ? trace.input.agentic && tier === 'normal' : agentOn;
+  const order = agentView ? AGENT_STAGE_ORDER : STAGE_ORDER;
 
   const runQuestion = (q: string) => {
     if (!settings) return; // the form is disabled until the API has answered
@@ -131,7 +136,8 @@ const PipelineExplorer = () => {
     (ran.mode !== settings.mode ||
       ran.k !== settings.k ||
       ran.chunkSet !== settings.chunkSet ||
-      ran.rerank !== settings.rerank);
+      ran.rerank !== settings.rerank ||
+      ran.agentic !== settings.agentic);
 
   return (
     <div className="space-y-8 md:space-y-10">
@@ -176,6 +182,9 @@ const PipelineExplorer = () => {
           running={running}
           disabled={!config || tier === 'stopped'}
           maxLength={config?.max_query_chars ?? 500}
+          suggestions={agentOn ? COPY.agentSuggestions : COPY.suggestions}
+          suggestionsLabel={agentOn ? COPY.agentTryLabel : COPY.tryLabel}
+          lastNote={agentOn ? undefined : COPY.suggestionNote}
           onRun={runQuestion}
           onStop={trace.cancel}
         />
@@ -185,6 +194,7 @@ const PipelineExplorer = () => {
             settings={settings}
             disabled={running}
             stale={stale && !running}
+            agentPaused={tier !== 'normal'}
             onChange={changeSettings}
           />
         )}
@@ -197,10 +207,10 @@ const PipelineExplorer = () => {
             {COPY.workingLabel}
           </Typography>
           <Typography variant="small" color="muted" as="span">
-            {COPY.workingNote(STAGE_ORDER.length)}
+            {COPY.workingNote(order.length)}
           </Typography>
         </div>
-        <StepList events={trace.events} runStatus={trace.status} context={context} />
+        <StepList order={order} events={trace.events} runStatus={trace.status} context={context} />
       </section>
 
       {context.citations && <AnswerResult citations={context.citations} done={trace.done} />}

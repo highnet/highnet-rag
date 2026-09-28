@@ -8,6 +8,17 @@ export type StageCopy = {
   detail: string;
 };
 
+// Agentic mode replaces the single retrieval pass with a plan and a loop of searches.
+export const AGENT_STAGE_ORDER: Stage[] = [
+  'request',
+  'agent_plan',
+  'agent_step',
+  'select_context',
+  'prompt',
+  'generate',
+  'citations',
+];
+
 export const STAGE_ORDER: Stage[] = [
   'request',
   'embed_query',
@@ -89,13 +100,15 @@ export const STAGES: Record<Stage, StageCopy> = {
       'Passages that were retrieved but never cited are listed too: they cost tokens without helping the answer.',
   },
   agent_plan: {
-    title: 'Plan the search',
-    why: 'The agent rewrites the question into the searches it needs.',
-    detail: 'Arrives in milestone 5.',
+    title: 'Plan the searches',
+    why: 'A question that joins two facts needs two searches. Claude reads the question, says how it will split it, and writes a short query for each part.',
+    detail:
+      'The agent works through tool calls: search runs the whole retrieval pipeline with your settings, answer says the passages are enough. Its instructions and the caps on searches and tokens are shown here.',
   },
   agent_step: {
-    title: 'Agent step',
-    why: 'One search the agent chose to run.',
-    detail: 'Arrives in milestone 5.',
+    title: 'Search, step by step',
+    why: 'Each search is a full retrieval run of its own. Claude reads what came back and decides whether to search again or answer.',
+    detail:
+      'Every search is numbered (3a, 3b, …) and keeps its own stages, tokens and cost. The loop stops when Claude calls answer, or at the first cap it would cross, and says which.',
   },
 };

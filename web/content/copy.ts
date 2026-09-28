@@ -20,6 +20,20 @@ export const COPY = {
     'Who won the 2018 FIFA World Cup?',
   ],
   suggestionNote: '(not in the corpus)',
+  // Compound questions for agentic mode: each needs facts from two articles.
+  agentSuggestions: [
+    'Which was founded first, Harvard University or the University of Chicago?',
+    'How many years after the Yuan dynasty was proclaimed did the Black Death reach Europe?',
+    "Which came first, Newcomen's atmospheric steam engine or the discovery of oxygen?",
+    'Was the IPCC established before or after the new Scottish Parliament first met?',
+    'How many years after the Duchy of Normandy began did Kublai Khan establish the Yuan dynasty?',
+    'Did the French and Indian War end before or after oxygen was discovered?',
+    'How many years after Harvard was founded did the French and Indian War begin?',
+    'How many years before the IPCC was established did the 1973 oil crisis begin?',
+    'Which happened first: Warsaw becoming capital of the Polish–Lithuanian Commonwealth, or the end of the French Wars of Religion?',
+    'Which is older, the University of Chicago or the IPCC, and by how many years?',
+  ],
+  agentTryLabel: 'Agentic mode is on. Try a question that joins two articles:',
   settings: {
     topK: 'Passages (top-k)',
     fewer: 'Fewer passages',
@@ -42,6 +56,14 @@ export const COPY = {
       on: 'A reranker reads each candidate with the question and reorders them.',
     },
     rerankShort: 'rerank',
+    agent: 'Agent',
+    agentOptions: { off: 'off', on: 'on' },
+    agentDescription: {
+      off: 'One search, straight to the answer.',
+      on: 'Claude plans and runs several searches, then answers.',
+      paused: 'Paused: this month’s budget is past its 80% mark.',
+    },
+    agentShort: 'agent',
   },
   workingLabel: 'The working',
   workingNote: (n: number) => `${n} steps, in the order they run`,
@@ -55,6 +77,9 @@ export const COPY = {
     closest: (distance: string, title: string) => `${distance} · ${title}`,
     bm25Top: (score: string, title: string) => `${score} · ${title}`,
     fused: (kept: number, both: number) => `${kept} kept · ${both} found by both searches`,
+    planned: (n: number) => (n === 1 ? '1 search planned' : `${n} searches planned`),
+    searched: (n: number, found: number) =>
+      `${n} ${n === 1 ? 'search' : 'searches'} · ${found} passages found`,
     reranked: (moved: number, kept: number) =>
       moved === 0 ? `top ${kept} unchanged` : `${moved} of the top ${kept} changed places`,
     context: (n: number, tokens: string) => `${n} passages · ~${tokens} tokens`,
@@ -105,10 +130,13 @@ export const COPY = {
       n === 1 ? 'Show the 1 candidate below the cut' : `Show the ${n} candidates below the cut`,
     hideDropped: 'Hide the candidates below the cut',
     contributions: (bm25: string, vector: string) => `${bm25} + ${vector}`,
-    rankings: { bm25: 'BM25', vector: 'vector', fuse: 'fused', rerank: 'reranked' } as Record<
-      string,
-      string
-    >,
+    rankings: {
+      bm25: 'BM25',
+      vector: 'vector',
+      fuse: 'fused',
+      rerank: 'reranked',
+      agent: 'agent’s combined',
+    } as Record<string, string>,
     context: (n: number, ranking: string, tokens: string) =>
       `The top ${n} of the ${ranking} ranking, about ${tokens} tokens of context.`,
   },
@@ -171,6 +199,26 @@ export const COPY = {
       output: 'output',
       caption: 'Where this answer’s cost went: reading the prompt versus writing the answer.',
       alt: (input: string, output: string) => `Input cost ${input}, output cost ${output}.`,
+    },
+    agent: {
+      plan: 'Plan',
+      queries: 'Planned searches',
+      caps: (steps: number, tokens: string) => `up to ${steps} searches · ${tokens} tokens`,
+      instructions: 'Show the agent’s instructions',
+      hideInstructions: 'Hide the instructions',
+      searches: 'Searches',
+      tokens: 'Tokens',
+      meterCaption:
+        'How much of each cap this run used: searches out of the maximum, and the agent’s tokens out of its budget.',
+      query: 'query',
+      answered: (n: number) =>
+        `Enough evidence: answered from the ${n} ${n === 1 ? 'passage' : 'passages'} found.`,
+      noTool: 'Claude replied without calling a tool.',
+      stopped: 'Stopped',
+      top: 'Top passages',
+      showStages: (n: number) => `Show every stage of this search (${n})`,
+      hideStages: 'Hide the stages',
+      running: 'Searching…',
     },
     rerank: {
       caption:

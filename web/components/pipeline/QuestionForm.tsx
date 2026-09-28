@@ -10,6 +10,9 @@ import { COPY } from '@/content/copy';
 
 type QuestionFormProps = {
   initialQuestion?: string;
+  suggestions?: readonly string[];
+  suggestionsLabel?: string;
+  lastNote?: string;
   running: boolean;
   disabled: boolean;
   maxLength: number;
@@ -19,6 +22,9 @@ type QuestionFormProps = {
 
 const QuestionForm = ({
   initialQuestion = '',
+  suggestions = COPY.suggestions,
+  suggestionsLabel = COPY.tryLabel,
+  lastNote,
   running,
   disabled,
   maxLength,
@@ -80,10 +86,10 @@ const QuestionForm = ({
       </form>
       <div className="space-y-0.5">
         <Typography variant="small" color="muted" as="p">
-          {COPY.tryLabel}
+          {suggestionsLabel}
         </Typography>
         <ul className="grid gap-x-6 sm:grid-cols-2">
-          {COPY.suggestions.map((s, i) => (
+          {suggestions.map((s, i) => (
             <li key={s}>
               <Button
                 type="button"
@@ -95,8 +101,8 @@ const QuestionForm = ({
               >
                 {s}
               </Button>
-              {i === COPY.suggestions.length - 1 && (
-                <span className="ml-2 text-sm text-muted-foreground">{COPY.suggestionNote}</span>
+              {lastNote && i === suggestions.length - 1 && (
+                <span className="ml-2 text-sm text-muted-foreground">{lastNote}</span>
               )}
             </li>
           ))}

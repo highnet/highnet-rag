@@ -42,6 +42,8 @@ export const stepSummary = (event: TraceEvent): string => {
       const top = (data as VectorData).results[0];
       return top ? S.closest(top.distance.toFixed(4), top.doc_title) : S.noResults;
     }
+    case 'agent_plan':
+      return S.planned((data as { queries: string[] }).queries.length);
     case 'rerank': {
       const d = data as RerankData;
       if (d.fallback) return d.fallback;

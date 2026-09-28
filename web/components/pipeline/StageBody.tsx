@@ -17,6 +17,7 @@ import type {
 } from '@/lib/stage-data';
 import { Typography } from '@/components/ui/Typography';
 
+import { AgentPlanView, type AgentPlanData } from './stages/AgentPlanView';
 import { Bm25View } from './stages/Bm25View';
 import { CitationsView } from './stages/CitationsView';
 import { ContextView } from './stages/ContextView';
@@ -70,6 +71,8 @@ const StageBody = ({ event, context }: StageBodyProps) => {
       return <Bm25View data={data as Bm25Data} />;
     case 'vector':
       return <VectorView data={data as VectorData} />;
+    case 'agent_plan':
+      return <AgentPlanView data={data as AgentPlanData} />;
     case 'rerank':
       return <RerankView data={data as RerankData} />;
     case 'fuse':

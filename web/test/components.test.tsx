@@ -246,7 +246,7 @@ describe('stage bodies', () => {
   });
 
   it('renders nothing for stages without a view', () => {
-    const { container } = body(ev('agent_plan', {}));
+    const { container } = body(ev('agent_step', {}));
     expect(container).toBeEmptyDOMElement();
   });
 });
@@ -274,7 +274,7 @@ describe('step sheets on phones', () => {
     fireEvent.click(row);
     expect(screen.getByText('details')).toBeInTheDocument();
     fireEvent.click(screen.getByText(/Show the code/));
-    expect(screen.getAllByText(/classic\.py:\d+–\d+/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/search\.py:\d+–\d+/).length).toBeGreaterThan(0);
     fireEvent.click(row);
     expect(screen.queryByText('details')).not.toBeInTheDocument();
   });

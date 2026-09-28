@@ -196,7 +196,8 @@ async def run_agent(
             yield tracer.event(
                 "agent_step",
                 StageClock(),
-                {"tool": "search", "input": {"query": query}, "note": turn.text},
+                # The turn's text belongs to its first step only (the plan holds turn one's).
+                {"tool": "search", "input": {"query": query}, "note": turn.text if charge else ""},
                 label=label,
                 **charge,
             )

@@ -15,14 +15,22 @@ type SettingsStripProps = {
   settings: RunSettings;
   disabled: boolean;
   stale: boolean;
+  agentPaused: boolean;
   onChange: (settings: RunSettings) => void;
 };
 
 const S = COPY.settings;
 
 // Only settings that change something in this build are shown; more join per milestone.
-const SettingsStrip = ({ config, settings, disabled, stale, onChange }: SettingsStripProps) => {
-  const { mode, k, chunkSet, rerank } = settings;
+const SettingsStrip = ({
+  config,
+  settings,
+  disabled,
+  stale,
+  agentPaused,
+  onChange,
+}: SettingsStripProps) => {
+  const { mode, k, chunkSet, rerank, agentic } = settings;
   const set = config.chunk_sets.find((s) => s.name === chunkSet);
   const modeLabel = S.modes[mode]?.label ?? mode;
 
@@ -35,6 +43,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
           <span className="voice-data">
             {modeLabel} · k={k}
             {rerank && ` · ${S.rerankShort}`} · {chunkSet}
+            {agentic && ` · ${S.agentShort}`}
           </span>
         </span>
         <ChevronDown
@@ -143,6 +152,36 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
             />
           </div>
         )}
+
+        <div className="space-y-1.5">
+          <Typography variant="small" color="muted" as="span" id="agent-label" className="block">
+            {S.agent}
+          </Typography>
+          <SegmentedControl
+            name="agent"
+            labelledBy="agent-label"
+            describedBy="agent-description"
+            value={agentic && !agentPaused ? 'on' : 'off'}
+            disabled={disabled || agentPaused}
+            onChange={(value) => onChange({ ...settings, agentic: value === 'on' })}
+            options={[
+              { value: 'off', label: S.agentOptions.off },
+              { value: 'on', label: S.agentOptions.on },
+            ]}
+          />
+          <Typography
+            variant="small"
+            color={agentPaused ? 'warning' : 'muted'}
+            id="agent-description"
+            className="max-w-[28ch]"
+          >
+            {agentPaused
+              ? S.agentDescription.paused
+              : agentic
+                ? S.agentDescription.on
+                : S.agentDescription.off}
+          </Typography>
+        </div>
 
         {stale && (
           <Typography variant="marginNote" className="sm:basis-full">
