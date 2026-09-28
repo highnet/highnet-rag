@@ -15,6 +15,7 @@ import type {
   CitationsData,
   ContextChunk,
   ContextData,
+  RequestData,
   VectorData,
 } from '@/lib/stage-data';
 import { useTraceStream } from '@/lib/use-trace-stream';
@@ -94,6 +95,7 @@ const PipelineExplorer = () => {
       streamedAnswer: trace.answer,
       bm25: ok('bm25') as Bm25Data | undefined,
       vector: ok('vector') as VectorData | undefined,
+      chunkSet: (byStage.get('request')?.data as RequestData | undefined)?.settings?.chunk_set,
     };
   }, [trace.events, trace.answer]);
 
@@ -126,7 +128,10 @@ const PipelineExplorer = () => {
   const stale =
     ran !== null &&
     settings !== null &&
-    (ran.mode !== settings.mode || ran.k !== settings.k || ran.chunkSet !== settings.chunkSet);
+    (ran.mode !== settings.mode ||
+      ran.k !== settings.k ||
+      ran.chunkSet !== settings.chunkSet ||
+      ran.rerank !== settings.rerank);
 
   return (
     <div className="space-y-8 md:space-y-10">

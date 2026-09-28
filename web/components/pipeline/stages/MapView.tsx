@@ -1,11 +1,13 @@
 import { Typography } from '@/components/ui/Typography';
-import type { MapData } from '@/lib/stage-data';
+import type { ContextChunk, MapData } from '@/lib/stage-data';
+
+import { CorpusMap } from '../figures/CorpusMap';
 
 import { Facts } from './Facts';
 
-type MapViewProps = { data: MapData };
+type MapViewProps = { data: MapData; chunkSet?: string; retrieved: ContextChunk[] };
 
-const MapView = ({ data }: MapViewProps) => {
+const MapView = ({ data, chunkSet, retrieved }: MapViewProps) => {
   if (data.error) {
     return <Typography color="warning">{data.error.message}</Typography>;
   }
@@ -23,9 +25,16 @@ const MapView = ({ data }: MapViewProps) => {
           { term: 'Nearest on map', value: data.neighbours_2d.map((id) => `#${id}`).join(' ') },
         ]}
       />
-      <Typography variant="small" color="muted">
-        The drawn map of the whole corpus arrives in milestone 4; these are its coordinates.
-      </Typography>
+      {chunkSet && (
+        <CorpusMap
+          key={chunkSet}
+          chunkSet={chunkSet}
+          query={{ x: data.x, y: data.y }}
+          explained={data.explained_variance}
+          neighbours={data.neighbours_2d}
+          retrieved={retrieved}
+        />
+      )}
     </div>
   );
 };

@@ -13,6 +13,7 @@ import type {
   SkippedData,
   Bm25Data,
   FuseData,
+  RerankData,
   VectorData,
 } from '@/lib/stage-data';
 
@@ -40,6 +41,12 @@ export const stepSummary = (event: TraceEvent): string => {
     case 'vector': {
       const top = (data as VectorData).results[0];
       return top ? S.closest(top.distance.toFixed(4), top.doc_title) : S.noResults;
+    }
+    case 'rerank': {
+      const d = data as RerankData;
+      if (d.fallback) return d.fallback;
+      const moved = d.results.slice(0, d.kept).filter((r) => r.before_rank !== r.rank);
+      return S.reranked(moved.length, Math.min(d.kept, d.results.length));
     }
     case 'fuse': {
       const d = data as FuseData;

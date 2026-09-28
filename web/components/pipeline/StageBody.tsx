@@ -10,6 +10,7 @@ import type {
   GenerateData,
   MapData,
   PromptData,
+  RerankData,
   RequestData,
   SkippedData,
   VectorData,
@@ -25,6 +26,7 @@ import { GenerateView } from './stages/GenerateView';
 import { MapView } from './stages/MapView';
 import { PromptView } from './stages/PromptView';
 import { RequestView } from './stages/RequestView';
+import { RerankView } from './stages/RerankView';
 import { SkippedView } from './stages/SkippedView';
 import { VectorView } from './stages/VectorView';
 
@@ -34,6 +36,7 @@ export type RunContext = {
   streamedAnswer: string;
   bm25?: Bm25Data;
   vector?: VectorData;
+  chunkSet?: string;
 };
 
 type StageBodyProps = {
@@ -56,11 +59,19 @@ const StageBody = ({ event, context }: StageBodyProps) => {
     case 'embed_query':
       return <EmbedView data={data as EmbedData} />;
     case 'map_project':
-      return <MapView data={data as MapData} />;
+      return (
+        <MapView
+          data={data as MapData}
+          chunkSet={context.chunkSet}
+          retrieved={[...context.chunks.values()]}
+        />
+      );
     case 'bm25':
       return <Bm25View data={data as Bm25Data} />;
     case 'vector':
       return <VectorView data={data as VectorData} />;
+    case 'rerank':
+      return <RerankView data={data as RerankData} />;
     case 'fuse':
       return <FuseView data={data as FuseData} bm25={context.bm25} vector={context.vector} />;
     case 'select_context':
