@@ -12,9 +12,10 @@ primary_region = "fra"
   BUDGET_MONTHLY_USD = "20"
   RATE_LIMIT_PER_MIN = "20"
   RATE_LIMIT_PER_DAY = "200"
-  # The Vercel production domain (edit once known) plus Vercel preview deployments.
-  CORS_ORIGINS = "https://highnet-rag.vercel.app"
-  CORS_ORIGIN_REGEX = '^https://highnet-rag(-[a-z0-9-]+)?\.vercel\.app$'
+  # Vercel team "highnet's projects": the stable project domain, plus every deployment and
+  # branch URL of the project (highnet-<hash>-… and highnet-rag-git-<branch>-…).
+  CORS_ORIGINS = "https://highnet-rag.vercel.app,https://highnet-rag-highnets-projects.vercel.app"
+  CORS_ORIGIN_REGEX = '^https://highnet-[a-z0-9-]+-highnets-projects\.vercel\.app$'
 
 [http_service]
   internal_port = 8080
