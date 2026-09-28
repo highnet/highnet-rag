@@ -91,6 +91,6 @@ Changing any of this needs the owner's approval.
 
 ## Open items (not blocking milestone 1)
 
-- The owner writes about 20 golden questions before milestone 5.
+- The owner writes about 20 golden questions before milestone 6.
 - Confirm Voyage and Claude prices at build time; they live in one pricing table, overridable by env var.
-- Settle the phone form of the 2D map (scaled plot or table first) during milestone 3.
+- Settle the phone form of the 2D map (scaled plot or table first) during milestone 4.

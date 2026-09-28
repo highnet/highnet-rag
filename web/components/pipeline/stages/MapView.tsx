@@ -24,7 +24,7 @@ const MapView = ({ data }: MapViewProps) => {
         ]}
       />
       <Typography variant="small" color="muted">
-        The drawn map of the whole corpus arrives in milestone 3; these are its coordinates.
+        The drawn map of the whole corpus arrives in milestone 4; these are its coordinates.
       </Typography>
     </div>
   );

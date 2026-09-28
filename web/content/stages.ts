@@ -91,11 +91,11 @@ export const STAGES: Record<Stage, StageCopy> = {
   agent_plan: {
     title: 'Plan the search',
     why: 'The agent rewrites the question into the searches it needs.',
-    detail: 'Arrives in milestone 4.',
+    detail: 'Arrives in milestone 5.',
   },
   agent_step: {
     title: 'Agent step',
     why: 'One search the agent chose to run.',
-    detail: 'Arrives in milestone 4.',
+    detail: 'Arrives in milestone 5.',
   },
 };
