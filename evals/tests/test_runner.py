@@ -89,6 +89,7 @@ async def test_a_full_fake_run(corpus_path: Path, squad_path: Path) -> None:
         assert config.recall["1"] <= config.recall["10"]
 
     answers = results.answers
+    assert answers is not None and results.compound is not None
     assert answers.config.chunk_set == "medium" and answers.config.k == 5
     assert answers.answerable.questions == 6 and answers.unanswerable.questions == 3
     assert answers.answerable.evidence_in_context.of == 4  # rows without a gold span are skipped
@@ -126,12 +127,14 @@ async def test_failures_are_counted_not_hidden(corpus_path: Path, squad_path: Pa
     assert all(c.errors == 0 for c in bm25)
     assert all(c.errors == c.questions + c.errors and c.questions == 0 for c in vector)
     # The default configuration is hybrid, so every answer run fails at the embedding.
+    assert results.answers is not None and results.compound is not None
     assert results.answers.answerable.errors == results.answers.answerable.questions
     assert all(c.errors == c.questions for c in results.compound)
 
 
 async def test_judge_failures_are_errors(corpus_path: Path, squad_path: Path) -> None:
     results = await evaluator(corpus_path, judge=FailingJudge()).run(golden_for(squad_path))
+    assert results.answers is not None and results.compound is not None
     answerable = results.answers.answerable
     assert answerable.errors > 0
     assert results.compound[0].errors == 2
@@ -151,6 +154,7 @@ async def test_empty_answers_are_not_graded(corpus_path: Path, squad_path: Path)
     providers = Providers(fake.embedder, fake.reranker, SilentModel())
     ev = evaluator(corpus_path, providers=providers)
     results = await ev.run(golden_for(squad_path))
+    assert results.answers is not None
     assert results.answers.answerable.faithfulness is None
     assert results.answers.answerable.fully_supported.of == 0
     assert results.answers.answerable.fully_supported.value is None
