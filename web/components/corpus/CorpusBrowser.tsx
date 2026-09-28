@@ -57,7 +57,8 @@ const CorpusBrowser = () => {
   const listRef = useRef<HTMLUListElement>(null);
   const selectedId = selection?.docId;
 
-  // Keep the chosen article in view in the scrolling list (a linked one can be far down).
+  // Keep the chosen article in view in the scrolling list (a linked one can be far down); the
+  // list snaps to whole rows, so no row is left cut at its top edge.
   useEffect(() => {
     listRef.current?.querySelector('[data-current]')?.scrollIntoView?.({ block: 'nearest' });
   }, [selectedId]);
@@ -160,12 +161,12 @@ const CorpusBrowser = () => {
               </Typography>
               <ul
                 ref={listRef}
-                className="mt-1.5 max-h-[calc(100vh-10rem)] space-y-0.5 overflow-y-auto border-b pr-1 pb-1"
+                className="mt-1.5 max-h-[calc(100vh-10rem)] snap-y snap-mandatory space-y-0.5 overflow-y-auto border-b pr-1 pb-1"
               >
                 {list.data.documents.map((d) => {
                   const current = d.id === selection.docId;
                   return (
-                    <li key={d.id}>
+                    <li key={d.id} className="snap-start">
                       <a
                         href={hrefFor({ ...selection, docId: d.id })}
                         aria-current={current ? 'page' : undefined}

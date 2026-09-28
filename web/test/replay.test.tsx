@@ -134,6 +134,8 @@ describe('replayed questions', () => {
     withConfig({ illustrative: true });
     render(<PipelineExplorer />);
     expect(await screen.findByText(R.noticeIllustrative)).toBeInTheDocument();
+    expect(screen.getByText(R.introIllustrative)).toBeInTheDocument();
+    expect(screen.queryByText(R.intro)).not.toBeInTheDocument();
     expect(screen.queryByText(COPY.illustrative)).not.toBeInTheDocument();
     expect(screen.queryByText(R.notice('2026-09-28'))).not.toBeInTheDocument();
   });

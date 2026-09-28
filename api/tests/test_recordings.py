@@ -14,7 +14,7 @@ from highnet_rag.providers import build_providers
 from highnet_rag.providers.base import FinalAnswer
 from highnet_rag.providers.cache import CachedAnswerModel
 from highnet_rag.providers.fake import FakeAnswerModel
-from highnet_rag.recordings import RecorderState, combo_key, grid, record
+from highnet_rag.recordings import RecorderState, combo_key, grid, record, replay_note
 from highnet_rag.storage.base import DemoQuestion, Recording
 from highnet_rag.storage.sqlite import SqliteCorpusStore, SqliteRecordingStore
 
@@ -152,6 +152,7 @@ def test_replay_streams_the_recording_after_a_live_request_check(
         request = events[0][1]
         assert request["stage"] == "request" and request["seq"] == 1
         assert request["data"]["recording"]["recorded_at"]
+        assert "offline stand-ins" in request["data"]["recording"]["note"]
         run_ids = {data["run_id"] for _, data in events}
         assert len(run_ids) == 1 and request["data"]["run_id"] in run_ids
         assert {name for name, _ in events} == {"trace", "answer_delta", "done"}
@@ -189,3 +190,17 @@ def test_live_mode_needs_a_question(client: TestClient) -> None:
 def test_params_key_is_stable() -> None:
     params = QueryParams(q="x", mode="bm25", k=3, chunk_set="small", rerank=True)
     assert combo_key(params) == "bm25|3|small|1|0"
+
+
+def test_replay_note_names_the_recorded_models() -> None:
+    def data(provider: str, model: str) -> dict[str, Any]:
+        return {
+            "models": {
+                "embed": {"provider": "voyage", "model": "voyage-3.5-lite"},
+                "answer": {"provider": provider, "model": model},
+            }
+        }
+
+    real = replay_note(data("anthropic", "claude-haiku-4-5"))
+    assert "real models (voyage-3.5-lite, claude-haiku-4-5)" in real
+    assert "offline stand-ins" in replay_note(data("fake", "fake-extractive"))

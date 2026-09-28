@@ -29,9 +29,20 @@ RECORDED_KS = (3, 5, 10)
 # A replay keeps the recorded pace, but no pause longer than this (model waits included).
 MAX_GAP_MS = 1500
 REPLAY_NOTE = (
-    "Replayed from a recording made with the real models; no model is called for this run. "
+    "Replayed from a recording made with {models}; no model is called for this run. "
     "The rate limit and budget below are checked now."
 )
+STAND_INS = "the offline stand-ins, so its scores, tokens and answer are illustrative"
+
+
+def replay_note(request_data: dict[str, Any]) -> str:
+    """Name the models the run was recorded with, from its own request event."""
+    models = request_data["models"]
+    if "fake" in {models["embed"]["provider"], models["answer"]["provider"]}:
+        return REPLAY_NOTE.format(models=STAND_INS)
+    return REPLAY_NOTE.format(
+        models=f"the real models ({models['embed']['model']}, {models['answer']['model']})"
+    )
 
 
 def combo_key(params: QueryParams) -> str:
@@ -199,7 +210,10 @@ async def replay(
         "run_id": tracer.run_id,
         "rate_limit": rate.as_dict(),
         "budget": budget.as_dict(),
-        "recording": {"recorded_at": recording.recorded_at, "note": REPLAY_NOTE},
+        "recording": {
+            "recorded_at": recording.recorded_at,
+            "note": replay_note(first["data"]["data"]),
+        },
     }
     if rate.limited:
         data["error"] = {

@@ -189,7 +189,11 @@ const PipelineExplorer = () => {
     <div className="space-y-8 md:space-y-10">
       <section aria-labelledby="sheet-title" className="space-y-4 md:space-y-5">
         <Typography color="muted" className="max-w-[68ch]">
-          {replay ? COPY.replay.intro : COPY.intro}
+          {replay
+            ? config.illustrative
+              ? COPY.replay.introIllustrative
+              : COPY.replay.intro
+            : COPY.intro}
         </Typography>
         <PipelineDiagram order={order} statusOf={stepStatuses(order, trace.events, trace.status)} />
         <Typography variant="sheetTitle" id="sheet-title">
