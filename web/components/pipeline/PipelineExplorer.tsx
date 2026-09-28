@@ -19,10 +19,12 @@ import type {
   RequestData,
   VectorData,
 } from '@/lib/stage-data';
+import { stepStatuses } from '@/lib/step-status';
 import { useTraceStream } from '@/lib/use-trace-stream';
 import { parseUrlState, type RunSettings, writeUrlState } from '@/lib/url-state';
 
 import { AnswerResult } from './AnswerResult';
+import { PipelineDiagram } from './PipelineDiagram';
 import { QuestionForm } from './QuestionForm';
 import { SettingsStrip } from './SettingsStrip';
 import { StepList } from './StepList';
@@ -147,6 +149,7 @@ const PipelineExplorer = () => {
         <Typography color="muted" className="max-w-[68ch]">
           {COPY.intro}
         </Typography>
+        <PipelineDiagram order={order} statusOf={stepStatuses(order, trace.events, trace.status)} />
         <Typography variant="sheetTitle" id="sheet-title">
           <span className="voice-data mr-3 align-[0.2em] text-sm font-normal tracking-normal text-muted-foreground">
             {COPY.sheetLabel} ·

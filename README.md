@@ -86,6 +86,8 @@ The Vercel project `highnet-rag` (team "highnet's projects") is linked to this r
 
 ## Changelog
 
+- **Corpus page and formulas.** `/corpus` shows every article with its chunk boundaries at each size. Each step now has one line of relational algebra; tap a symbol for its definition. Retrieval eval results (recall@k, MRR for all 18 configurations) are published on `/evals`.
+- **The whole pipeline, drawn.** The top of the page now shows a diagram of the system: the corpus built ahead of time, then every step a question takes, linked to its step below and filling in as the run streams.
 - **Evals (milestone 6, part 2).** A new `/evals` page shows recall@1/3/5/10 and MRR for every search mode, chunk size and reranker setting, measured offline over 105 SQuAD questions with known answers. Answer quality is marked as not measured until a full run is paid for. An answer on the pipeline page links to its own configuration's row.
 - **Explanations up front.** The page opens with a short paragraph on what the site does, and every step opens with a plain-language paragraph: what the step does, why RAG needs it, and what to look for in its figure. The technical layer stays one click away under "Under the hood".
 - **Milestone 5: agentic retrieval.** Switch the agent on and ask a question that joins two articles (ten suggestions are offered). Claude states a plan, writes one search per fact, runs each through the full retrieval pipeline, reads the results and decides whether to search again or answer. Each search is a numbered sub-step (3a, 3b, …) with its own stages, tokens and cost; the caps on searches and tokens are drawn as meters, and any cap that stops the loop says so.

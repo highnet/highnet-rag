@@ -50,3 +50,38 @@ export const fetchCorpusMap = (chunkSet: string): Promise<CorpusMapData> => {
 };
 
 export const clearMapCache = () => mapCache.clear();
+
+export type CorpusDocuments = {
+  chunk_sets: { name: string; target_tokens: number; overlap_tokens: number }[];
+  documents: {
+    id: number;
+    title: string;
+    source_url: string;
+    chars: number;
+    chunks: Record<string, number>;
+  }[];
+};
+
+export type CorpusDocument = {
+  id: number;
+  title: string;
+  source_url: string;
+  text: string;
+  chunk_set: string;
+  chunks: { id: number; ord: number; start: number; end: number; approx_tokens: number }[];
+};
+
+const getJson = async <T>(path: string, signal?: AbortSignal): Promise<T> => {
+  const response = await fetch(apiUrl(path), { signal });
+  if (!response.ok) throw new Error(`The API answered ${response.status}.`);
+  return (await response.json()) as T;
+};
+
+export const fetchCorpusDocuments = (signal?: AbortSignal) =>
+  getJson<CorpusDocuments>('/api/corpus/documents', signal);
+
+export const fetchCorpusDocument = (id: number, chunkSet: string, signal?: AbortSignal) =>
+  getJson<CorpusDocument>(
+    `/api/corpus/documents/${id}?chunk_set=${encodeURIComponent(chunkSet)}`,
+    signal,
+  );

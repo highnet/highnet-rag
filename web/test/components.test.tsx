@@ -257,6 +257,7 @@ describe('step sheets on phones', () => {
     render(
       <ol>
         <StepSheet
+          anchor="s"
           number={5}
           copy={STAGES.vector}
           status="error"
@@ -283,8 +284,15 @@ describe('step sheets on phones', () => {
     globalThis.__wide = false;
     render(
       <ol>
-        <StepSheet number={1} copy={STAGES.request} status="pending" snippets={[]} />
-        <StepSheet number={4} copy={STAGES.bm25} status="skipped" summary="skipped" snippets={[]} />
+        <StepSheet anchor="s" number={1} copy={STAGES.request} status="pending" snippets={[]} />
+        <StepSheet
+          anchor="s"
+          number={4}
+          copy={STAGES.bm25}
+          status="skipped"
+          summary="skipped"
+          snippets={[]}
+        />
       </ol>,
     );
     fireEvent.click(screen.getByRole('button', { name: /Check the request/ }));
@@ -309,7 +317,7 @@ describe('step sheets on phones', () => {
     globalThis.__wide = true;
     render(
       <ol>
-        <StepSheet number={2} copy={STAGES.embed_query} status="error" snippets={[]} />
+        <StepSheet anchor="s" number={2} copy={STAGES.embed_query} status="error" snippets={[]} />
       </ol>,
     );
     expect(screen.getByRole('article')).toHaveClass('border-destructive');
@@ -318,7 +326,14 @@ describe('step sheets on phones', () => {
   it('render the narrow layout on the server', () => {
     const html = renderToStaticMarkup(
       <ol>
-        <StepSheet number={1} copy={STAGES.request} status="ok" summary="ok" snippets={[]} />
+        <StepSheet
+          anchor="s"
+          number={1}
+          copy={STAGES.request}
+          status="ok"
+          summary="ok"
+          snippets={[]}
+        />
       </ol>,
     );
     expect(html).toContain('aria-expanded="false"');

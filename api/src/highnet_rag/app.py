@@ -132,6 +132,65 @@ def create_app(
         build = deps.corpus.meta().get("build_id", "")
         return JSONResponse(body, headers={"ETag": f'"{build}-{chunk_set}"'})
 
+    # The corpus page: every article, and one article's text with its chunk boundaries.
+    @app.get("/api/corpus/documents")
+    def corpus_documents(deps: DepsDep) -> JSONResponse:
+        sets = deps.corpus.chunk_sets()
+        counts: dict[int, dict[str, int]] = {}
+        for chunk_set in sets:
+            for span in deps.corpus.spans(chunk_set.id):
+                per_doc = counts.setdefault(span.doc_id, {})
+                per_doc[chunk_set.name] = per_doc.get(chunk_set.name, 0) + 1
+        body = {
+            "chunk_sets": [
+                {
+                    "name": s.name,
+                    "target_tokens": s.target_tokens,
+                    "overlap_tokens": s.overlap_tokens,
+                }
+                for s in sets
+            ],
+            "documents": [
+                {
+                    "id": d.id,
+                    "title": d.title,
+                    "source_url": d.source_url,
+                    "chars": d.chars,
+                    "chunks": counts.get(d.id, {}),
+                }
+                for d in deps.corpus.document_list()
+            ],
+        }
+        build = deps.corpus.meta().get("build_id", "")
+        return JSONResponse(body, headers={"ETag": f'"{build}-documents"'})
+
+    @app.get("/api/corpus/documents/{doc_id}")
+    def corpus_document(deps: DepsDep, doc_id: int, chunk_set: str = "medium") -> dict[str, object]:
+        match = next((s for s in deps.corpus.chunk_sets() if s.name == chunk_set), None)
+        if match is None:
+            raise HTTPException(404, detail=f"Unknown chunk set {chunk_set!r}")
+        doc = next((d for d in deps.corpus.document_list() if d.id == doc_id), None)
+        if doc is None:
+            raise HTTPException(404, detail="Document not found")
+        ids = [s.chunk_id for s in deps.corpus.spans(match.id) if s.doc_id == doc_id]
+        return {
+            "id": doc.id,
+            "title": doc.title,
+            "source_url": doc.source_url,
+            "text": deps.corpus.document_text(doc_id),
+            "chunk_set": chunk_set,
+            "chunks": [
+                {
+                    "id": c.id,
+                    "ord": c.ord,
+                    "start": c.start_char,
+                    "end": c.end_char,
+                    "approx_tokens": c.approx_tokens,
+                }
+                for c in sorted(deps.corpus.chunks(ids), key=lambda c: c.ord)
+            ],
+        }
+
     @app.get("/api/chunks/{chunk_id}")
     def chunk(deps: DepsDep, chunk_id: int) -> dict[str, object]:
         found = deps.corpus.chunks([chunk_id])
