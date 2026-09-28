@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, createEvent, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CorpusMap } from '@/components/pipeline/figures/CorpusMap';
@@ -141,6 +141,11 @@ describe('corpus map', () => {
     fireEvent.pointerMove(svg, { clientX: 500, clientY: 500 }); // nowhere near a dot
     expect(screen.queryByText(M.pointed('Normans', 11))).not.toBeInTheDocument();
     fireEvent.pointerDown(svg, { clientX: cx, clientY: cy });
+    // A finger lifting fires pointerleave too: the tapped article stays lit.
+    const lift = createEvent.pointerLeave(svg);
+    Object.defineProperty(lift, 'pointerType', { value: 'touch' });
+    fireEvent(svg, lift);
+    expect(screen.getByText(M.pointed('Normans', 11))).toBeInTheDocument();
     fireEvent.pointerLeave(svg);
     expect(screen.queryByText(M.pointed('Normans', 11))).not.toBeInTheDocument();
   });

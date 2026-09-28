@@ -147,7 +147,8 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
           className="absolute inset-0 size-full touch-none"
           onPointerMove={pick}
           onPointerDown={pick}
-          onPointerLeave={() => setPointed(null)}
+          // A finger lifting also 'leaves'; only a mouse moving away should clear the highlight.
+          onPointerLeave={(event) => event.pointerType !== 'touch' && setPointed(null)}
         >
           {dots}
           {pointedDoc !== null &&
@@ -218,7 +219,7 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
                 key={c.chunk_id}
                 variant="label"
                 as="span"
-                className="pointer-events-none absolute translate-x-1.5 -translate-y-full text-primary"
+                className="pointer-events-none absolute translate-x-1.5 -translate-y-full bg-card/85 px-0.5 leading-none text-primary"
                 style={{ left: `${scale.x(x)}%`, top: `${scale.y(y)}%` }}
               >
                 {c.rank}
@@ -229,7 +230,7 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
           variant="marginNote"
           as="span"
           className={cn(
-            'pointer-events-none absolute translate-y-1 text-sm whitespace-nowrap',
+            'pointer-events-none absolute translate-y-2 bg-card/85 px-1 text-sm leading-tight whitespace-nowrap',
             scale.x(query.x) > 70 ? '-translate-x-[calc(100%+12px)]' : 'translate-x-3',
           )}
           style={{ left: `${scale.x(query.x)}%`, top: `${scale.y(query.y)}%` }}
