@@ -8,7 +8,7 @@ export const COPY = {
   intro:
     'Ask about any of the 35 Wikipedia articles in the corpus. Every step between your question and the answer is written out below as it runs, with its timing, tokens and cost.',
   questionLabel: 'Your question',
-  questionPlaceholder: 'e.g. In what country is Normandy located?',
+  questionPlaceholder: 'Ask about the corpus…',
   run: 'Run',
   running: 'Running…',
   stop: 'Stop',
@@ -32,6 +32,9 @@ export const COPY = {
   workingNote: (n: number) => `${n} steps, in the order they run`,
   why: 'Why this step?',
   underTheHood: 'Under the hood',
+  showCode: (n: number) => (n === 1 ? 'Show the code' : `Show the code (${n} excerpts)`),
+  hideCode: 'Hide the code',
+  expandStep: 'Show details',
   showPrompt: 'Show the full request',
   hidePrompt: 'Hide the full request',
   showPassage: 'Read passage',

@@ -1,5 +1,7 @@
 import { STAGE_ORDER, STAGES } from '@/content/stages';
 import type { TraceEvent } from '@/lib/generated/trace';
+import { snippetsFor } from '@/lib/snippets';
+import { stepSummary } from '@/lib/step-summary';
 import type { RunStatus } from '@/lib/use-trace-stream';
 
 import { StageBody, type RunContext } from './StageBody';
@@ -22,7 +24,7 @@ const StepList = ({ events, runStatus, context }: StepListProps) => {
   return (
     <ol
       aria-labelledby="working-title"
-      className="relative space-y-4 md:before:absolute md:before:inset-y-0 md:before:left-14 md:before:w-px md:before:bg-border lg:before:left-16"
+      className="relative space-y-2 md:space-y-4 md:before:absolute md:before:inset-y-0 md:before:left-14 md:before:w-px md:before:bg-border lg:before:left-16"
     >
       {STAGE_ORDER.map((stage, index) => {
         const event = byStage.get(stage);
@@ -38,6 +40,8 @@ const StepList = ({ events, runStatus, context }: StepListProps) => {
             number={index + 1}
             copy={STAGES[stage]}
             status={status}
+            summary={event ? stepSummary(event, context.chunks) : undefined}
+            snippets={snippetsFor(stage)}
             measure={
               event ? { ms: event.ms, tokens: event.tokens, costUsd: event.cost_usd } : undefined
             }

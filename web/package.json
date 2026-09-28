@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "format": "prettier --write .",
-    "gen:types": "cd .. && uv run highnet-rag schema && cd web && json2ts -i lib/generated/trace.schema.json -o lib/generated/trace.ts --bannerComment \"/* Generated from api/src/highnet_rag/trace.py by \\`npm run gen:types\\`. Do not edit. */\" --unreachableDefinitions --additionalProperties false && prettier --write lib/generated"
+    "gen:types": "cd .. && uv run highnet-rag schema && cd web && json2ts -i lib/generated/trace.schema.json -o lib/generated/trace.ts --bannerComment \"/* Generated from api/src/highnet_rag/trace.py by \\`npm run gen:types\\`. Do not edit. */\" --unreachableDefinitions --additionalProperties false && prettier --write lib/generated",
+    "gen:snippets": "node scripts/gen-snippets.mjs && prettier --write lib/generated/snippets.json",
+    "prebuild": "npm run gen:snippets"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -35,6 +37,7 @@
     "eslint-config-next": "16.3.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
+    "highlight.js": "^11.12.0",
     "jsdom": "^30.1.1",
     "json-schema-to-typescript": "^16.0.0",
     "prettier": "^3.9.9",

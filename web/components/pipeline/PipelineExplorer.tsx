@@ -86,8 +86,8 @@ const PipelineExplorer = () => {
   };
 
   return (
-    <div className="space-y-10">
-      <section aria-labelledby="sheet-title" className="space-y-5">
+    <div className="space-y-8 md:space-y-10">
+      <section aria-labelledby="sheet-title" className="space-y-4 md:space-y-5">
         <div className="space-y-2">
           <Typography variant="sheetTitle" id="sheet-title">
             <span className="voice-data mr-3 align-[0.2em] text-sm font-normal tracking-normal text-muted-foreground">
@@ -141,7 +141,7 @@ const PipelineExplorer = () => {
         {trace.connectionError && <Notice tone="warning">{trace.connectionError}</Notice>}
       </section>
 
-      <section aria-labelledby="working-title" className="space-y-4">
+      <section aria-labelledby="working-title" className="space-y-3 md:space-y-4">
         <div className="flex items-baseline gap-3 border-b pb-2">
           <Typography variant="label" as="h2" id="working-title">
             {COPY.workingLabel}

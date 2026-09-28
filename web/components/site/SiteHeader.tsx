@@ -5,7 +5,7 @@ import { ThemeToggle } from './ThemeToggle';
 
 const SiteHeader = () => {
   return (
-    <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 pt-5 pb-2 md:px-8">
+    <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 pt-4 pb-1 md:pt-5 md:pb-2 md:px-8">
       <div className="flex min-w-0 items-baseline gap-3">
         <Typography variant="data" as="span" className="text-base font-semibold">
           {COPY.siteName}

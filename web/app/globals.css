@@ -166,6 +166,47 @@
   font-variant-numeric: tabular-nums slashed-zero;
 }
 
+/* highlight.js tokens, coloured from the pad's own palette (all AA on paper and card). */
+@layer components {
+  .hljs {
+    color: var(--graphite);
+    /* Preflight resets code's font settings; keep the pre's Recursive MONO voice. */
+    font-family: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+  }
+  .hljs-keyword,
+  .hljs-built_in,
+  .hljs-literal {
+    color: var(--blue-pencil);
+    font-weight: 600;
+  }
+  .hljs-string,
+  .hljs-subst {
+    color: var(--data-rerank);
+  }
+  .hljs-number {
+    color: var(--data-bm25);
+  }
+  .hljs-title,
+  .hljs-title.function_,
+  .hljs-title.class_ {
+    color: var(--data-fused);
+  }
+  .hljs-comment {
+    color: var(--graphite-muted);
+    font-variation-settings:
+      'MONO' 1,
+      'CASL' 0.5,
+      'slnt' -7;
+  }
+  .hljs-meta,
+  .hljs-params,
+  .hljs-attr {
+    color: var(--graphite);
+  }
+}
+
 /* The engineering pad: a faint 20px grid, never louder than the content on it. */
 @utility grid-bg {
   background-color: var(--background);
