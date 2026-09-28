@@ -73,14 +73,14 @@ Acceptance criteria:
 
 ## M5 · Agentic retrieval
 
-**Demo:** ask a compound question ("Which came first, the founding of … or …?"). The agent plans, rewrites the question into sub-queries, searches twice, and answers with citations from both articles. Every tool call is a numbered sub-step (4a, 4b, …).
+**Demo:** ask a compound question ("Which came first, the founding of … or …?"). The agent plans, rewrites the question into sub-queries, searches twice, and answers with citations from both articles. Every tool call is a numbered sub-step (3a, 3b, …) nested in one "Search, step by step" sheet (owner's choice).
 
 Acceptance criteria:
 
-- [ ] Manual Claude tool-use loop with `search` and `answer` tools. `agent_plan` and `agent_step` stages each carry `parent`; the loop is capped by `AGENT_MAX_STEPS` and a token cap, and both caps are visible in the trace.
-- [ ] Agentic mode is disabled in the `degraded` budget tier, with an explanation.
-- [ ] About 10 compound demo questions are written, reviewed by the owner, and offered as suggestions in agentic mode.
-- [ ] Tests: the agent loop with a scripted fake Claude (multi-step, max-steps cutoff, tool error).
+- [x] Manual Claude tool-use loop with `search` and `answer` tools. Each search's retrieval stages carry `parent` = their `agent_step` label; the loop is capped by `AGENT_MAX_STEPS`, `AGENT_TOKEN_CAP`, a per-turn output cap, a turn limit and the budget guard, and every cap (and which one stopped the loop) is visible in the trace. The context, prompt and answer stages run as usual on the passages found.
+- [x] Agentic mode is disabled in the `degraded` budget tier, with an explanation (the classic pipeline answers instead).
+- [x] 10 compound demo questions are written, reviewed by the owner, offered as suggestions in agentic mode, and stored in `evals/golden/compound.jsonl`.
+- [x] Tests: the agent loop with a scripted fake Claude (multi-step, max-steps cutoff, token and budget caps, tool errors, failed searches, model failures).
 
 ## M6 · Evals dashboard and finish
 

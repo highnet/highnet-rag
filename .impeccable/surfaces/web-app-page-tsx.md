@@ -33,4 +33,4 @@ Signature interaction: each step is written into the pad as its SSE event arrive
 
 ## Unresolved
 
-- Whether agentic sub-steps nest under one step or number as 4a, 4b, ...
+- Settled: agentic searches nest inside one "Search, step by step" sheet, numbered 3a, 3b, ... (owner).
