@@ -38,6 +38,7 @@ async def run_classic(
         state.finish_run(tracer.run_id, done.status, done.ms, done.cost_usd)
         return done
 
+    # snippet: request | Check the request
     # 1 · request: rate limit and budget decisions happen here, in the open.
     clock = StageClock()
     rate = rate_state(state, ip_hash, settings)
@@ -71,7 +72,9 @@ async def run_classic(
         return
     assert chunk_set is not None
     yield tracer.event("request", clock, request_data)
+    # /snippet
 
+    # snippet: embed_query | Embed the question
     # 2 · embed_query
     clock = StageClock()
     try:
@@ -104,7 +107,9 @@ async def run_classic(
         tokens=embedded.tokens,
         cost_usd=cost,
     )
+    # /snippet
 
+    # snippet: map_project | Project onto the map
     # 3 · map_project: the same PCA fitted at ingest places the query on the corpus map.
     clock = StageClock()
     try:
@@ -126,12 +131,16 @@ async def run_classic(
         # The map is explanatory, not load-bearing: report it as a warning and carry on.
         error = {"type": type(exc).__name__, "message": str(exc)}
         yield tracer.event("map_project", clock, {"error": error}, status="warning")
+    # /snippet
 
+    # snippet: bm25 | Skip BM25 in this build
     # 4 · bm25 (not in this build)
     yield tracer.skipped(
         "bm25", "This build runs vector search only. Keyword (BM25) search arrives in milestone 2."
     )
+    # /snippet
 
+    # snippet: vector | Vector search
     # 5 · vector
     clock = StageClock()
     try:
@@ -154,11 +163,15 @@ async def run_classic(
         },
         status="ok" if hits else "warning",
     )
+    # /snippet
 
+    # snippet: fuse,rerank | Skip fusion and reranking in this build
     # 6, 7 · fuse, rerank (not in this build)
     yield tracer.skipped("fuse", "Fusion only runs in hybrid mode (BM25 + vector).")
     yield tracer.skipped("rerank", "Reranking arrives in milestone 3.")
+    # /snippet
 
+    # snippet: select_context | Choose the context
     # 8 · select_context
     clock = StageClock()
     chunks = corpus.chunks([h.chunk_id for h in hits])
@@ -184,7 +197,9 @@ async def run_classic(
             ],
         },
     )
+    # /snippet
 
+    # snippet: prompt | Count tokens and guard the budget
     # 9 · prompt: the exact request body, its token count and the worst-case cost.
     clock = StageClock()
     answer = providers.answer
@@ -219,7 +234,9 @@ async def run_classic(
         yield finish("limited")
         return
     yield tracer.event("prompt", clock, prompt_data)
+    # /snippet
 
+    # snippet: generate | Stream the answer
     # 10 · generate (answer text also streams as answer_delta events)
     clock = StageClock()
     final: FinalAnswer | None = None
@@ -255,7 +272,9 @@ async def run_classic(
         tokens=final.input_tokens + final.output_tokens,
         cost_usd=cost,
     )
+    # /snippet
 
+    # snippet: citations | Map citations back to chunks
     # 11 · citations: map cited documents back to chunks.
     clock = StageClock()
     abstained = NOT_FOUND in final.text
@@ -293,4 +312,5 @@ async def run_classic(
         },
         status="warning" if not citations and not abstained else "ok",
     )
+    # /snippet
     yield finish()

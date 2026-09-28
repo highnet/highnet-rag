@@ -49,6 +49,7 @@ class VoyageEmbedder:
         self.model = model
         self.dims = dims
 
+    # snippet: embed_query | Voyage embeddings request
     async def embed(self, texts: list[str], input_type: InputType) -> Embeddings:
         body = await self._client.post(
             "/embeddings",
@@ -62,6 +63,8 @@ class VoyageEmbedder:
         rows = sorted(body["data"], key=lambda d: d["index"])
         vectors = np.asarray([r["embedding"] for r in rows], dtype=np.float32)
         return Embeddings(vectors=vectors, tokens=int(body["usage"]["total_tokens"]))
+
+    # /snippet
 
 
 class VoyageReranker:

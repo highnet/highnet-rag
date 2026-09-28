@@ -38,6 +38,7 @@ class ClaudeAnswerModel:
         )
         return result.input_tokens
 
+    # snippet: generate | Claude streaming call
     async def stream_answer(
         self, system: str, messages: list[dict[str, Any]], max_tokens: int
     ) -> AsyncIterator[str | FinalAnswer]:
@@ -69,3 +70,5 @@ class ClaudeAnswerModel:
             output_tokens=usage.output_tokens,
             cache_read_input_tokens=usage.cache_read_input_tokens or 0,
         )
+
+    # /snippet

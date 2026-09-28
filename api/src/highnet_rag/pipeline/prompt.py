@@ -6,6 +6,7 @@ from highnet_rag.storage.base import Chunk
 
 NOT_FOUND = "I can't find this in the retrieved passages."
 
+# snippet: prompt | The prompt
 SYSTEM_PROMPT = f"""You answer questions using only the documents in the user's message. \
 Each document is a passage retrieved from a small corpus of English Wikipedia articles \
 (the SQuAD 2.0 dev set). Cite the passages that support each claim. Do not use outside \
@@ -26,3 +27,6 @@ def build_messages(question: str, chunks: list[Chunk]) -> list[dict[str, Any]]:
     return [
         {"role": "user", "content": [*documents, {"type": "text", "text": f"Question: {question}"}]}
     ]
+
+
+# /snippet

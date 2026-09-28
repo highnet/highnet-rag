@@ -121,6 +121,7 @@ class SqliteCorpusStore:
         # FTS5 bm25() is lower-is-better (negative); flip the sign so higher = more relevant.
         return [Hit(r["rowid"], i + 1, -float(r["score"])) for i, r in enumerate(rows)]
 
+    # snippet: vector | sqlite-vec nearest neighbours
     def knn(self, vector: np.ndarray, chunk_set_id: int, k: int) -> list[Hit]:
         rows = self._conn.execute(
             "SELECT chunk_id, distance FROM chunk_vec "
@@ -128,6 +129,8 @@ class SqliteCorpusStore:
             (vector.astype(np.float32).tobytes(), k, chunk_set_id),
         )
         return [Hit(r["chunk_id"], i + 1, float(r["distance"])) for i, r in enumerate(rows)]
+
+    # /snippet
 
     def chunks(self, ids: list[int]) -> list[Chunk]:
         if not ids:

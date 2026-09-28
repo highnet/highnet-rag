@@ -54,6 +54,7 @@ def hash_ip(ip: str, settings: Settings) -> str:
     return hashlib.sha256(salted.encode()).hexdigest()[:16]
 
 
+# snippet: request | Budget tiers
 def budget_state(state: StateStore, settings: Settings) -> BudgetState:
     spent = state.month_spend()
     cap = settings.budget_monthly_usd
@@ -64,6 +65,9 @@ def budget_state(state: StateStore, settings: Settings) -> BudgetState:
     else:
         tier = "normal"
     return BudgetState(spent, cap, tier)
+
+
+# /snippet
 
 
 def rate_state(state: StateStore, ip_hash: str, settings: Settings) -> RateState:
