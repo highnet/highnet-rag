@@ -1,6 +1,6 @@
 // Shapes of `TraceEvent.data` per stage. They mirror the payloads built in
-// api/src/highnet_rag/pipeline/classic.py; milestone 2 moves them into Pydantic models so
-// they are generated alongside lib/generated/trace.ts instead of written by hand.
+// api/src/highnet_rag/pipeline/classic.py and are kept in step with it by the SSE fixture
+// tests. Generating them from per-stage Pydantic models is still to do.
 
 export type ProviderModel = { provider: string; model: string };
 
@@ -35,24 +35,50 @@ export type MapData = {
   error?: StageError;
 };
 
+export type RankedHit = { chunk_id: number; rank: number; doc_title: string };
+
+export type Bm25Data = {
+  fts_query: string;
+  terms: string[];
+  chunk_set: string;
+  searched: number;
+  depth: number;
+  results: (RankedHit & { score: number })[];
+};
+
 export type VectorData = {
   metric: string;
   chunk_set: string;
   searched: number;
-  results: { chunk_id: number; rank: number; distance: number }[];
+  depth: number;
+  results: (RankedHit & { distance: number })[];
 };
+
+export type FusedHit = RankedHit & {
+  score: number;
+  from: { bm25_rank: number | null; vector_rank: number | null };
+  contributions: { bm25?: number; vector?: number };
+};
+
+export type FuseData = { method: string; k: number; kept: number; results: FusedHit[] };
 
 export type ContextChunk = {
   chunk_id: number;
   rank: number;
   doc_id: number;
   doc_title: string;
-  distance: number;
+  score: number;
   approx_tokens: number;
   text: string;
 };
 
-export type ContextData = { top_k: number; context_tokens_approx: number; chunks: ContextChunk[] };
+export type ContextData = {
+  top_k: number;
+  ranking: 'bm25' | 'vector' | 'fuse';
+  score_name: 'bm25' | 'distance' | 'rrf';
+  context_tokens_approx: number;
+  chunks: ContextChunk[];
+};
 
 export type PromptData = ProviderModel & {
   max_tokens: number;

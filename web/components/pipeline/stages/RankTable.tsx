@@ -1,45 +1,50 @@
-import type { ContextChunk } from '@/lib/stage-data';
+import { cn } from '@/lib/utils';
+
+import { RankBadge, type Series } from './RankBadge';
+
+export type RankRow = { chunk_id: number; rank: number; doc_title: string; value: string };
 
 type RankTableProps = {
   caption: string;
-  rows: Pick<ContextChunk, 'chunk_id' | 'rank' | 'doc_title' | 'distance'>[];
+  series: Series;
+  valueLabel: string;
+  rows: RankRow[];
+  compact?: boolean;
 };
 
 // Fixed columns; only the values change between runs, so rankings can be compared by eye.
-const RankTable = ({ caption, rows }: RankTableProps) => {
+const RankTable = ({ caption, series, valueLabel, rows, compact }: RankTableProps) => {
   return (
-    <div>
-      <table className="w-full border-collapse text-sm">
-        <caption className="sr-only">{caption}</caption>
-        <thead>
-          <tr className="voice-data border-b text-left text-xs text-muted-foreground">
-            <th scope="col" className="w-10 py-1.5 pr-3 font-medium">
-              rank
-            </th>
-            <th scope="col" className="py-1.5 pr-3 font-medium">
-              passage
-            </th>
-            <th scope="col" className="w-20 py-1.5 text-right font-medium">
-              distance
-            </th>
+    <table className="w-full border-collapse text-sm">
+      <caption className="sr-only">{caption}</caption>
+      <thead>
+        <tr className="voice-data border-b text-left text-xs text-muted-foreground">
+          <th scope="col" className="w-12 py-1.5 pr-3 font-medium">
+            rank
+          </th>
+          <th scope="col" className="py-1.5 pr-3 font-medium">
+            passage
+          </th>
+          <th scope="col" className="w-20 py-1.5 text-right font-medium">
+            {valueLabel}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.chunk_id} className="border-b border-dashed last:border-b-0">
+            <td className={cn('pr-3', compact ? 'py-1' : 'py-2')}>
+              <RankBadge series={series} rank={row.rank} />
+            </td>
+            <td className={cn('pr-3', compact ? 'py-1' : 'py-2')}>
+              {row.doc_title}{' '}
+              <span className="voice-data text-xs text-muted-foreground">#{row.chunk_id}</span>
+            </td>
+            <td className={cn('voice-data text-right', compact ? 'py-1' : 'py-2')}>{row.value}</td>
           </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.chunk_id} className="border-b border-dashed last:border-b-0">
-              <td className="voice-data py-2 pr-3 text-chart-1">{row.rank}</td>
-              <td className="py-2 pr-3">
-                <a href={`#chunk-${row.chunk_id}`} className="hover:text-primary hover:underline">
-                  {row.doc_title}
-                </a>{' '}
-                <span className="voice-data text-xs text-muted-foreground">#{row.chunk_id}</span>
-              </td>
-              <td className="voice-data py-2 text-right">{row.distance.toFixed(4)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

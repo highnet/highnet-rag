@@ -40,7 +40,7 @@ const StepList = ({ events, runStatus, context }: StepListProps) => {
             number={index + 1}
             copy={STAGES[stage]}
             status={status}
-            summary={event ? stepSummary(event, context.chunks) : undefined}
+            summary={event ? stepSummary(event) : undefined}
             snippets={snippetsFor(stage)}
             measure={
               event ? { ms: event.ms, tokens: event.tokens, costUsd: event.cost_usd } : undefined

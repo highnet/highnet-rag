@@ -36,7 +36,7 @@ const Notice = ({ tone, children, className }: NoticeProps) => {
       className={cn(noticeVariants({ tone }), className)}
     >
       <Icon aria-hidden className={cn('mt-0.5 size-4 shrink-0', ICON_TONES[key])} />
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="max-w-[80ch] min-w-0 flex-1">{children}</div>
     </div>
   );
 };

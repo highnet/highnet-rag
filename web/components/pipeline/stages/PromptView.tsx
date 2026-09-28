@@ -29,7 +29,7 @@ const PromptView = ({ data }: PromptViewProps) => {
         ]}
       />
       <blockquote className="border-l border-input pl-3">
-        <Typography variant="small" color="muted">
+        <Typography variant="small" color="muted" className="max-w-[72ch]">
           {data.system}
         </Typography>
       </blockquote>

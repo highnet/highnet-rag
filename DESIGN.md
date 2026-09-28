@@ -216,7 +216,7 @@ components:
 
 Each query is worked out like a calculation on pale-green engineering paper. The question is written at the top of the sheet, every pipeline stage is one numbered step below it, and the answer is the last line, marked with an `=` in the number margin. Graphite ink carries every fact and number. Blue pencil, the draughtsman's non-photo blue, is the one voice of annotation and action: "Why this step?" notes, the running step, links, focus and the Run button. Red means a failure and nothing else.
 
-The mood is calm and exact. A faint 20px grid covers the whole page and gives numbers and passages a place to sit, but it is never louder than what is written on it. There are no gradients, glass, glows or illustrations; the trace data is the imagery. The dark theme is the same pad under a drafting lamp: a green-black ground, pale graphite and a brighter blue pencil. It is a change of lighting, not a different world.
+The mood is calm and exact. The page is plain pale-green paper with no ruled pattern (the owner removed the original 20px grid); structure comes from the sheets, the step track and the dashed rules alone. There are no gradients, glass, glows or illustrations; the trace data is the imagery. The dark theme is the same pad under a drafting lamp: a green-black ground, pale graphite and a brighter blue pencil. It is a change of lighting, not a different world.
 
 Motion is sparse and has one job: steps are written into the pad as their trace events arrive. A streaming answer shows a blinking blue-pencil caret. Under `prefers-reduced-motion`, every animation and transition collapses to an instant change.
 
@@ -240,9 +240,9 @@ Neutral paper and graphite with one pencil accent, three semantic inks and a dat
 
 ### Neutral
 
-- **Paper** (`paper`): the page ground, under the grid. Also the text colour on the primary button.
+- **Paper** (`paper`): the page ground, plain. Also the text colour on the primary button.
 - **Raised Paper** (`paper-raised`): a sheet laid on the pad: step sheets, the answer sheet, notices, inputs and quiet buttons.
-- **Grid Green** (`grid`): the 20px squares and the disabled primary button fill. Decorative only.
+- **Grid Green** (`grid`): quiet fills (`muted`) and the disabled primary button fill. The name is historical; no grid is drawn.
 - **Sheet Rule** (`rule`): every sheet edge, divider and table rule, solid or dashed; also the scrollbar thumb. Decorative, so below 3:1 on purpose.
 - **Input Rule** (`rule-input`): the border of interactive controls (input and quiet button), at least 3:1 for WCAG 1.4.11.
 - **Graphite** (`graphite`): body text, headings and values.
@@ -256,7 +256,7 @@ Neutral paper and graphite with one pencil accent, three semantic inks and a dat
 
 ### Data
 
-One colour per retrieval series, for rank columns, chart series and badges: **BM25 Umber** (`data-bm25`), **Vector Blue** (`data-vector`), **Fused Violet** (`data-fused`), **Rerank Green** (`data-rerank`) and **Everything Else** (`data-neutral`). In milestone 1 only Vector Blue is drawn, on the rank numbers of the vector results table. Each series must also carry a text label, so colour is never the only cue.
+One colour per retrieval series, for rank columns, chart series and badges: **BM25 Umber** (`data-bm25`), **Vector Blue** (`data-vector`), **Fused Violet** (`data-fused`), **Rerank Green** (`data-rerank`) and **Everything Else** (`data-neutral`). Each series also has a marker shape: a square for BM25, a circle for vector, a diamond for fused (rerank will take a triangle). A rank badge is the coloured marker followed by the rank in graphite, with a screen-reader label naming the series, so colour is never the only cue. The fusion step shows the BM25 and vector rankings side by side from `lg` (stacked below), then the fused list with each passage's rank in both inputs, its RRF score over the two contributions, and a blue-pencil rule where the top-k cut falls; rows below the cut are muted.
 
 ### Named Rules
 
@@ -294,7 +294,7 @@ One colour per retrieval series, for rank columns, chart series and badges: **BM
 
 ## Layout
 
-The page is one centred column capped at 72rem, with 16px side padding on phones and 32px from `md`. The whole body carries the 20px grid, offset by 1px so its lines meet the page edge cleanly. Spacing follows Tailwind's 4px steps rather than snapping to the grid: sheets are padded 16px by 20px, steps are 8px apart on phones and 16px from `md`, and the question block and the working are 32px apart (40px from `md`).
+The page is one centred column capped at 72rem, with 16px side padding on phones and 32px from `md`. The body is flat paper. Spacing follows Tailwind's 4px steps: sheets are padded 16px by 20px, steps are 8px apart on phones and 16px from `md`, and the question block and the working are 32px apart (40px from `md`).
 
 Every step and the answer share one three-track grid, so numbers, sheets and notes line up down the page:
 
@@ -306,7 +306,7 @@ Motion belongs to the step. When a trace event arrives, the step is written in t
 
 ## Elevation & Depth
 
-The pad is flat and has no shadows. A sheet sits above the grid through a 1px rule and a raised-paper fill; a pending step is only a dashed outline on the bare grid. The answer sheet is set apart by a stronger outline, 1px graphite at 70%, not by lifting it. There are no overlays in this build.
+The pad is flat and has no shadows. A sheet sits on the paper through a 1px rule and a raised-paper fill; a pending step is only a dashed outline on the bare paper. The answer sheet is set apart by a stronger outline, 1px graphite at 70%, not by lifting it. There are no overlays in this build.
 
 ### Named Rules
 
@@ -378,7 +378,7 @@ Opened by a pencil action with a code icon. Each excerpt has a caption over a da
 - **Do** show states with an SVG mark and a word as well as colour, in both themes.
 - **Do** put new colours in both `:root` and `.dark` under one name, and reach them through the shadcn aliases.
 - **Do** write a new step in with the staged write-in motion and let reduced motion make it instant.
-- **Do** keep the grid faint enough that a screenshot without it would read the same.
+- **Don't** bring back a background pattern (grid, dots, lines); the owner rejected it. The paper stays plain.
 
 ### Don't:
 

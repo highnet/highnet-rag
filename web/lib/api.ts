@@ -5,6 +5,7 @@ export const apiUrl = (path: string) => `${API_BASE}${path}`;
 
 export type ApiConfig = {
   modes: string[];
+  default_mode: string;
   top_k: { default: number; max: number };
   chunk_sets: { name: string; target_tokens: number; chunks: number }[];
   models: {

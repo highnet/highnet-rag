@@ -1,17 +1,44 @@
 {
-  "modes": ["vector"],
-  "top_k": { "default": 5, "max": 10 },
+  "modes": ["bm25", "vector", "hybrid"],
+  "default_mode": "hybrid",
+  "top_k": {
+    "default": 5,
+    "max": 10
+  },
   "chunk_sets": [
-    { "name": "small", "target_tokens": 100, "chunks": 2619 },
-    { "name": "medium", "target_tokens": 250, "chunks": 1008 },
-    { "name": "large", "target_tokens": 500, "chunks": 503 }
+    {
+      "name": "small",
+      "target_tokens": 100,
+      "chunks": 2619
+    },
+    {
+      "name": "medium",
+      "target_tokens": 250,
+      "chunks": 1008
+    },
+    {
+      "name": "large",
+      "target_tokens": 500,
+      "chunks": 503
+    }
   ],
   "models": {
-    "embed": { "provider": "fake", "model": "fake-hashed-bow" },
-    "answer": { "provider": "fake", "model": "fake-extractive" }
+    "embed": {
+      "provider": "fake",
+      "model": "fake-hashed-bow"
+    },
+    "answer": {
+      "provider": "fake",
+      "model": "fake-extractive"
+    }
   },
   "illustrative": true,
-  "budget": { "spent_usd": 0.0, "cap_usd": 20.0, "remaining_usd": 20.0, "tier": "normal" },
+  "budget": {
+    "spent_usd": 0.0,
+    "cap_usd": 20.0,
+    "remaining_usd": 20.0,
+    "tier": "normal"
+  },
   "corpus": {
     "build_id": "3b618ea1795f",
     "built_at": "2026-09-28T14:55:13+00:00",
