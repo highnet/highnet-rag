@@ -1,3 +1,4 @@
 # Written by `highnet-rag schema` (Python); CI diffs it byte for byte.
 lib/generated/trace.schema.json
 test/fixtures/map.json
+lib/generated/evals.schema.json

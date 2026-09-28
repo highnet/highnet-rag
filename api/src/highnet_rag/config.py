@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     claude_model_judge: str = "claude-sonnet-5"
     demo_mode: bool = False
     max_answer_tokens: int = 1024
+    # The SDK's own retries on 429/5xx. Keep it low for live questions; eval runs raise it.
+    anthropic_max_retries: int = 2
 
     voyage_base_url: str = "https://api.voyageai.com/v1"
     voyage_embed_model: str = "voyage-3.5-lite"

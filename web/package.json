@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage",
     "format": "prettier --write .",
-    "gen:types": "cd .. && uv run highnet-rag schema && cd web && json2ts -i lib/generated/trace.schema.json -o lib/generated/trace.ts --bannerComment \"/* Generated from api/src/highnet_rag/trace.py by \\`npm run gen:types\\`. Do not edit. */\" --unreachableDefinitions --additionalProperties false && prettier --write lib/generated/trace.ts",
+    "gen:types": "cd .. && uv run highnet-rag schema && uv run highnet-rag-evals schema && cd web && json2ts -i lib/generated/trace.schema.json -o lib/generated/trace.ts --bannerComment \"/* Generated from api/src/highnet_rag/trace.py by \\`npm run gen:types\\`. Do not edit. */\" --unreachableDefinitions --additionalProperties false && json2ts -i lib/generated/evals.schema.json -o lib/generated/evals.ts --bannerComment \"/* Generated from evals/src/highnet_rag_evals/results.py by \\`npm run gen:types\\`. Do not edit. */\" --unreachableDefinitions --additionalProperties false && prettier --write lib/generated/trace.ts lib/generated/evals.ts",
     "gen:snippets": "node scripts/gen-snippets.mjs && prettier --write lib/generated/snippets.json",
     "prebuild": "npm run gen:snippets"
   },

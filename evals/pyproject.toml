@@ -6,6 +6,9 @@ requires-python = ">=3.12"
 license = "MIT"
 dependencies = ["highnet-rag"]
 
+[project.scripts]
+highnet-rag-evals = "highnet_rag_evals.cli:main"
+
 [tool.uv.sources]
 highnet-rag = { workspace = true }
 

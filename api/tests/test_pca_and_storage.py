@@ -51,3 +51,15 @@ def test_store_edge_cases(corpus_path: Path, tmp_path: Path) -> None:
     assert store.chunks([]) == []
     with pytest.raises(LookupError):
         store.projection(999)
+    with pytest.raises(LookupError):
+        store.document_text(999)
+
+
+def test_spans_place_chunks_in_their_article(corpus_path: Path) -> None:
+    store = SqliteCorpusStore(corpus_path)
+    small = next(s for s in store.chunk_sets() if s.name == "small")
+    spans = store.spans(small.id)
+    assert len(spans) == small.chunk_count
+    for span in spans[:5]:
+        (chunk,) = store.chunks([span.chunk_id])
+        assert store.document_text(span.doc_id)[span.start : span.end] == chunk.text

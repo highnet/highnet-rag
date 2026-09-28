@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import sqlite_vec
 
-from highnet_rag.storage.base import Chunk, ChunkSet, Hit, MapPoint, Projection
+from highnet_rag.storage.base import Chunk, ChunkSet, Hit, MapPoint, Projection, Span
 
 CORPUS_SCHEMA = """
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -182,6 +182,20 @@ class SqliteCorpusStore:
     def documents(self) -> dict[int, str]:
         rows = self._conn.execute("SELECT id, title FROM documents ORDER BY id")
         return {r["id"]: r["title"] for r in rows}
+
+    def spans(self, chunk_set_id: int) -> list[Span]:
+        rows = self._conn.execute(
+            "SELECT id, doc_id, start_char, end_char FROM chunks WHERE chunk_set_id = ? "
+            "ORDER BY id",
+            (chunk_set_id,),
+        )
+        return [Span(r["id"], r["doc_id"], r["start_char"], r["end_char"]) for r in rows]
+
+    def document_text(self, doc_id: int) -> str:
+        row = self._conn.execute("SELECT text FROM documents WHERE id = ?", (doc_id,)).fetchone()
+        if row is None:
+            raise LookupError(f"No document {doc_id}")
+        return row["text"]
 
     def projection(self, chunk_set_id: int) -> Projection:
         if chunk_set_id not in self._projections:

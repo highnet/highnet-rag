@@ -1,0 +1,70 @@
+name: Evals
+
+# Runs the offline evals against the live corpus with the real models, then pushes the results
+# to a new branch (evals/run-<id>) for review. By default it measures retrieval only (Voyage
+# calls, a few cents); `full` adds answers graded by the judge (about $2.50 to $3.50). It only
+# runs by hand, and eval spend is not counted against the visitor budget.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: Only the first N questions per golden set (0 = all)
+        default: "0"
+      full:
+        description: Also generate and grade answers (about $2.50 to $3.50)
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency: evals
+
+jobs:
+  evals:
+    name: Run evals
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+      # Patient retries: one rate-limited call should not turn into a failed question.
+      ANTHROPIC_MAX_RETRIES: "8"
+      VOYAGE_MAX_RETRIES: "8"
+      VOYAGE_MAX_RETRY_WAIT_SECONDS: "30"
+      SCOPE: ${{ inputs.full && ' ' || '--retrieval-only' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --no-dev
+      - name: Download the live corpus
+        run: scripts/download-corpus.sh data/corpus.sqlite
+      - name: Smoke test (one question per set; stops on any error)
+        run: |
+          uv run highnet-rag-evals run --corpus data/corpus.sqlite --out /tmp/smoke --limit 1 $SCOPE
+          jq -e '[.retrieval.configs[].errors, .answers.answerable.errors // 0,
+                  .answers.unanswerable.errors // 0, (.compound // [])[].errors] | add == 0' \
+            /tmp/smoke/latest.json
+      - name: Run the evals
+        run: |
+          uv run highnet-rag-evals run --corpus data/corpus.sqlite --limit "${{ inputs.limit }}" \
+            --concurrency 4 $SCOPE | tee evals-run.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: |
+            evals/results/
+            evals-run.log
+      - name: Push the results to a branch
+        run: |
+          branch="evals/run-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add evals/results
+          git commit -m "Eval results from run ${{ github.run_id }}" \
+            -m "$(tail -n 8 evals-run.log)"
+          git push origin "$branch"
+          echo "Pushed $branch" >> "$GITHUB_STEP_SUMMARY"
