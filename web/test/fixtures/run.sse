@@ -1,0 +1,108 @@
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":1,"stage":"request","status":"ok","parent":null,"label":"1","data":{"run_id":"394240cbb8d64745ad8f594076909a18","settings":{"q":"In what country is Normandy located?","mode":"vector","k":3,"chunk_set":"medium"},"models":{"embed":{"provider":"fake","model":"fake-hashed-bow"},"answer":{"provider":"fake","model":"fake-extractive"}},"rate_limit":{"remaining_minute":20,"remaining_day":196,"limit_minute":20,"limit_day":200},"budget":{"spent_usd":0.0,"cap_usd":20.0,"remaining_usd":20.0,"tier":"normal"}},"ms":6,"tokens":0,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":2,"stage":"embed_query","status":"ok","parent":null,"label":"2","data":{"provider":"fake","model":"fake-hashed-bow","input_type":"query","dims":1024,"vector_preview":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"norm":1.0},"ms":3,"tokens":8,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":3,"stage":"map_project","status":"ok","parent":null,"label":"3","data":{"x":-0.02746,"y":0.01875,"explained_variance":[0.0161,0.015],"neighbours_2d":[3461,2792,2726,3207,2700]},"ms":0,"tokens":0,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":4,"stage":"bm25","status":"skipped","parent":null,"label":"4","data":{"reason":"This build runs vector search only. Keyword (BM25) search arrives in milestone 2."},"ms":0,"tokens":0,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":5,"stage":"vector","status":"ok","parent":null,"label":"5","data":{"metric":"cosine","chunk_set":"medium","searched":1008,"results":[{"chunk_id":2643,"rank":1,"distance":0.84631},{"chunk_id":2786,"rank":2,"distance":0.85465},{"chunk_id":2624,"rank":3,"distance":0.8635}]},"ms":4,"tokens":0,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":6,"stage":"fuse","status":"skipped","parent":null,"label":"6","data":{"reason":"Fusion only runs in hybrid mode (BM25 + vector)."},"ms":0,"tokens":0,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":7,"stage":"rerank","status":"skipped","parent":null,"label":"7","data":{"reason":"Reranking arrives in milestone 3."},"ms":0,"tokens":0,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":8,"stage":"select_context","status":"ok","parent":null,"label":"8","data":{"top_k":3,"context_tokens_approx":624,"chunks":[{"chunk_id":2643,"rank":1,"doc_id":1,"doc_title":"Normans","distance":0.84631,"approx_tokens":208,"text":"These centres were in contact with the so-called \"Winchester school\", which channeled a pure Carolingian artistic tradition to Normandy. In the final decade of the 11th and first of the 12th century, Normandy experienced a golden age of illustrated manuscripts, but it was brief and the major scriptoria of Normandy ceased to function after the midpoint of the century.\n\nThe French Wars of Religion in the 16th century and French Revolution in the 18th successively destroyed much of what existed in the way of the architectural and artistic remnant of this Norman creativity. The former, with their violence, caused the wanton destruction of many Norman edifices; the latter, with its assault on religion, caused the purposeful destruction of religious objects of any type, and its destabilisation of society resulted in rampant pillaging.\n\nBy far the most famous work of Norman art is the Bayeux Tapestry, which is not a tapestry but a work of embroidery."},{"chunk_id":2786,"rank":2,"doc_id":7,"doc_title":"Steam engine","distance":0.85465,"approx_tokens":200,"text":"Small engines were effective though larger models were problematic. They proved only to have a limited lift height and were prone to boiler explosions. It received some use in mines, pumping stations and for supplying water wheels used to power textile machinery. An attractive feature of the Savery engine was its low cost. Bento de Moura Portugal introduced an ingenious improvement of Savery's construction \"to render it capable of working itself\", as described by John Smeaton in the Philosophical Transactions published in 1751. It continued to be manufactured until the late 18th century. One engine was still known to be operating in 1820.\n\nAround 1800 Richard Trevithick and, separately, Oliver Evans in 1801 introduced engines using high-pressure steam; Trevithick obtained his high-pressure engine patent in 1802. These were much more powerful for a given cylinder size than previous engines and could be made small enough for transport applications."},{"chunk_id":2624,"rank":3,"doc_id":1,"doc_title":"Normans","distance":0.8635,"approx_tokens":216,"text":"The descendants of Rollo's Vikings and their Frankish wives would replace the Norse religion and Old Norse language with Catholicism (Christianity) and the Gallo-Romance language of the local people, blending their maternal Frankish heritage with Old Norse traditions and customs to synthesize a unique \"Norman\" culture in the north of France. The Norman language was forged by the adoption of the indigenous langue d'oïl branch of Romance by a Norse-speaking ruling class, and it developed into the regional language that survives today.\n\nThe Normans thereafter adopted the growing feudal doctrines of the rest of France, and worked them into a functional hierarchical system in both Normandy and in England. The new Norman rulers were culturally and ethnically distinct from the old French aristocracy, most of whom traced their lineage to Franks of the Carolingian dynasty. Most Norman knights remained poor and land-hungry, and by 1066 Normandy had been exporting fighting horsemen for more than a generation."}]},"ms":0,"tokens":0,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":9,"stage":"prompt","status":"ok","parent":null,"label":"9","data":{"provider":"fake","model":"fake-extractive","max_tokens":1024,"system":"You answer questions using only the documents in the user's message. Each document is a passage retrieved from a small corpus of English Wikipedia articles (the SQuAD 2.0 dev set). Cite the passages that support each claim. Do not use outside knowledge. If the documents do not contain the answer, reply exactly: \"I can't find this in the retrieved passages.\" Keep the answer under 120 words.","messages":[{"role":"user","content":[{"type":"document","source":{"type":"content","content":[{"type":"text","text":"These centres were in contact with the so-called \"Winchester school\", which channeled a pure Carolingian artistic tradition to Normandy. In the final decade of the 11th and first of the 12th century, Normandy experienced a golden age of illustrated manuscripts, but it was brief and the major scriptoria of Normandy ceased to function after the midpoint of the century.\n\nThe French Wars of Religion in the 16th century and French Revolution in the 18th successively destroyed much of what existed in the way of the architectural and artistic remnant of this Norman creativity. The former, with their violence, caused the wanton destruction of many Norman edifices; the latter, with its assault on religion, caused the purposeful destruction of religious objects of any type, and its destabilisation of society resulted in rampant pillaging.\n\nBy far the most famous work of Norman art is the Bayeux Tapestry, which is not a tapestry but a work of embroidery."}]},"title":"Normans · chunk 2643","citations":{"enabled":true}},{"type":"document","source":{"type":"content","content":[{"type":"text","text":"Small engines were effective though larger models were problematic. They proved only to have a limited lift height and were prone to boiler explosions. It received some use in mines, pumping stations and for supplying water wheels used to power textile machinery. An attractive feature of the Savery engine was its low cost. Bento de Moura Portugal introduced an ingenious improvement of Savery's construction \"to render it capable of working itself\", as described by John Smeaton in the Philosophical Transactions published in 1751. It continued to be manufactured until the late 18th century. One engine was still known to be operating in 1820.\n\nAround 1800 Richard Trevithick and, separately, Oliver Evans in 1801 introduced engines using high-pressure steam; Trevithick obtained his high-pressure engine patent in 1802. These were much more powerful for a given cylinder size than previous engines and could be made small enough for transport applications."}]},"title":"Steam engine · chunk 2786","citations":{"enabled":true}},{"type":"document","source":{"type":"content","content":[{"type":"text","text":"The descendants of Rollo's Vikings and their Frankish wives would replace the Norse religion and Old Norse language with Catholicism (Christianity) and the Gallo-Romance language of the local people, blending their maternal Frankish heritage with Old Norse traditions and customs to synthesize a unique \"Norman\" culture in the north of France. The Norman language was forged by the adoption of the indigenous langue d'oïl branch of Romance by a Norse-speaking ruling class, and it developed into the regional language that survives today.\n\nThe Normans thereafter adopted the growing feudal doctrines of the rest of France, and worked them into a functional hierarchical system in both Normandy and in England. The new Norman rulers were culturally and ethnically distinct from the old French aristocracy, most of whom traced their lineage to Franks of the Carolingian dynasty. Most Norman knights remained poor and land-hungry, and by 1066 Normandy had been exporting fighting horsemen for more than a generation."}]},"title":"Normans · chunk 2624","citations":{"enabled":true}},{"type":"text","text":"Question: In what country is Normandy located?"}]}],"input_tokens":726,"worst_case_cost_usd":0.0},"ms":1,"tokens":0,"cost_usd":0.0}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"According "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"to "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"the "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"retrieved "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"passage: "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"These "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"centres "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"were "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"in "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"contact "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"with "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"the "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"so-called "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"\"Winchester "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"school\", "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"which "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"channeled "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"a "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"pure "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"Carolingian "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"artistic "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"tradition "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"to "}
+
+event: answer_delta
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","text":"Normandy."}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":10,"stage":"generate","status":"ok","parent":null,"label":"10","data":{"provider":"fake","model":"fake-extractive","stop_reason":"end_turn","usage":{"input_tokens":726,"output_tokens":33,"cache_read_input_tokens":0},"answer":"According to the retrieved passage: These centres were in contact with the so-called \"Winchester school\", which channeled a pure Carolingian artistic tradition to Normandy."},"ms":4,"tokens":759,"cost_usd":0.0}
+
+event: trace
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","seq":11,"stage":"citations","status":"ok","parent":null,"label":"11","data":{"abstained":false,"citations":[{"block":1,"chunk_id":2643,"doc_title":"Normans","rank":1,"cited_text":"These centres were in contact with the so-called \"Winchester school\", which channeled a pure Carolingian artistic tradition to Normandy."}],"blocks":[{"text":"According to the retrieved passage: ","cited":false,"citation_ids":[]},{"text":"These centres were in contact with the so-called \"Winchester school\", which channeled a pure Carolingian artistic tradition to Normandy.","cited":true,"citation_ids":[1]}],"unused_chunk_ids":[2624,2786]},"ms":0,"tokens":0,"cost_usd":0.0}
+
+event: done
+data: {"run_id":"394240cbb8d64745ad8f594076909a18","status":"ok","ms":19,"tokens":767,"cost_usd":0.0,"stages":11}
+

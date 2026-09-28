@@ -7,7 +7,7 @@ The Pydantic models here are the source of truth for the frontend types
 import time
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 Stage = Literal[
     "request",
@@ -27,8 +27,14 @@ Stage = Literal[
 Status = Literal["ok", "skipped", "error", "warning"]
 
 
+# Fields with defaults are always serialized, so the generated TS types mark them required.
+WIRE = ConfigDict(json_schema_serialization_defaults_required=True)
+
+
 class TraceEvent(BaseModel):
     """SSE `event: trace`."""
+
+    model_config = WIRE
 
     run_id: str
     seq: int = Field(description="Emission order within the run, starting at 1.")
@@ -45,12 +51,16 @@ class TraceEvent(BaseModel):
 class AnswerDelta(BaseModel):
     """SSE `event: answer_delta` - streamed answer text while `generate` runs."""
 
+    model_config = WIRE
+
     run_id: str
     text: str
 
 
 class RunDone(BaseModel):
     """SSE `event: done` - always the last event of a run."""
+
+    model_config = WIRE
 
     run_id: str
     status: Literal["ok", "error", "limited"]
