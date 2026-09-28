@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      rebuild_corpus:
+        description: Rebuild the corpus with real embeddings and upload it
+        type: boolean
+        default: false
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    name: API (ruff, pyright, pytest with 100% coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pyright
+      - run: uv run pytest
+      - name: Trace schema is up to date
+        run: |
+          uv run highnet-rag schema
+          git diff --exit-code web/lib/generated/trace.schema.json
+
+  web:
+    name: Web (lint, types, tests, build, design detector)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Live code snippets match the Python source
+        run: |
+          npm run gen:snippets
+          git diff --exit-code lib/generated/snippets.json
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test # Vitest with 100% coverage thresholds
+      - run: npm run build
+      - name: Impeccable design detector (zero findings required)
+        working-directory: .
+        run: .claude/skills/impeccable/scripts/impeccable detect web/app web/components web/content
+
+  # The web app deploys through Vercel's GitHub integration (project root: web/).
+  deploy-api:
+    name: Deploy API to Fly.io
+    needs: [api, web]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    concurrency: deploy-production
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_ORG: ${{ vars.FLY_ORG }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: astral-sh/setup-uv@v6
+      - name: Provision app, volume and secrets (idempotent)
+        run: scripts/fly-provision.sh
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+      - run: flyctl deploy --remote-only
+      - name: Build and upload the corpus if the API has none
+        run: scripts/fly-ensure-corpus.sh
+        env:
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+          FORCE_CORPUS: ${{ inputs.rebuild_corpus || false }}

@@ -1,0 +1,81 @@
+# Merged from highnet/config (gitignore/.gitignore) + Python/uv entries.
+
+# dependencies
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+coverage/
+.nyc_output
+
+# next.js
+.next/
+out/
+
+# production
+build/
+dist/
+
+# turbo
+.turbo
+
+# misc
+.DS_Store
+*.pem
+*.log
+.eslintcache
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files — commit .env.example only
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# python / uv
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+
+# local data: built SQLite index and raw corpus stay out of git
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# graphify knowledge graph — regenerate with `graphify update .`
+graphify-out/
+
+# impeccable — ephemeral output, runtime state, per-dev overrides
+**/.impeccable/config.local.json
+**/.impeccable/hook.cache.json
+**/.impeccable/hook.pending.json
+**/.impeccable/*.png
+**/.impeccable/review/
+**/.impeccable/questions/
+**/.impeccable/live/server.json
+**/.impeccable/live/sessions/
+**/.impeccable/live/previews/
+.claude/settings.local.json

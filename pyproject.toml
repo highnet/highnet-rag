@@ -1,0 +1,59 @@
+# uv workspace root: the API package and the offline evals.
+[tool.uv.workspace]
+members = ["api", "evals"]
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "httpx>=0.27",
+  "ruff>=0.6",
+  "pyright>=1.1.380",
+  "pytest-cov>=5.0",
+]
+
+[project]
+name = "highnet-rag-workspace"
+version = "0.0.0"
+requires-python = ">=3.12"
+dependencies = ["highnet-rag", "highnet-rag-evals"]
+
+[tool.uv.sources]
+highnet-rag = { workspace = true }
+highnet-rag-evals = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["web", ".claude"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["highnet_rag", "highnet_rag_evals"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+pythonVersion = "3.12"
+include = ["api/src", "api/tests", "evals/src", "evals/tests"]
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+testpaths = ["api/tests", "evals/tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "--cov --cov-report=term-missing:skip-covered"
+
+[tool.coverage.run]
+source = ["api/src/highnet_rag", "evals/src/highnet_rag_evals"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+exclude_also = ['if __name__ == "__main__":']

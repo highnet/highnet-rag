@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "AnswerDelta": {
+      "description": "SSE `event: answer_delta` - streamed answer text while `generate` runs.",
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "text"
+      ],
+      "title": "AnswerDelta",
+      "type": "object"
+    },
+    "RunDone": {
+      "description": "SSE `event: done` - always the last event of a run.",
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "error",
+            "limited"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "ms": {
+          "title": "Ms",
+          "type": "integer"
+        },
+        "tokens": {
+          "title": "Tokens",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "title": "Cost Usd",
+          "type": "number"
+        },
+        "stages": {
+          "title": "Stages",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "run_id",
+        "status",
+        "ms",
+        "tokens",
+        "cost_usd",
+        "stages"
+      ],
+      "title": "RunDone",
+      "type": "object"
+    },
+    "TraceEvent": {
+      "description": "SSE `event: trace`.",
+      "properties": {
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "description": "Emission order within the run, starting at 1.",
+          "title": "Seq",
+          "type": "integer"
+        },
+        "stage": {
+          "enum": [
+            "request",
+            "embed_query",
+            "map_project",
+            "bm25",
+            "vector",
+            "fuse",
+            "rerank",
+            "select_context",
+            "prompt",
+            "generate",
+            "citations",
+            "agent_plan",
+            "agent_step"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "status": {
+          "default": "ok",
+          "enum": [
+            "ok",
+            "skipped",
+            "error",
+            "warning"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Parent agent_step id (agentic mode).",
+          "title": "Parent"
+        },
+        "label": {
+          "description": "Step number shown on the pad, e.g. '5' or '4b'.",
+          "title": "Label",
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        },
+        "ms": {
+          "description": "Wall time of this stage in milliseconds.",
+          "title": "Ms",
+          "type": "integer"
+        },
+        "tokens": {
+          "default": 0,
+          "description": "Tokens billed by this stage.",
+          "title": "Tokens",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "default": 0.0,
+          "description": "Cost of this stage in USD.",
+          "title": "Cost Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "stage",
+        "status",
+        "parent",
+        "label",
+        "data",
+        "ms",
+        "tokens",
+        "cost_usd"
+      ],
+      "title": "TraceEvent",
+      "type": "object"
+    }
+  },
+  "title": "highnet-rag trace events"
+}
