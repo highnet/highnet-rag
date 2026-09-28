@@ -36,7 +36,9 @@ describe('evals page', () => {
   it('renders a full run: facts, retrieval, answers, compound and cost', () => {
     render(<EvalsReport results={full} />);
     expect(screen.getByText(EVALS.illustrative)).toBeInTheDocument();
-    expect(screen.getByText(EVALS.runFacts.judge)).toBeInTheDocument();
+    // The run record names every model with a cost line.
+    for (const line of full.cost.by_model)
+      expect(screen.getAllByText(new RegExp(line.model)).length).toBeGreaterThan(0);
     expect(screen.getByText(EVALS.lede(160, true))).toBeInTheDocument();
     // One table per chunk size, plus compound and cost.
     expect(screen.getByRole('table', { name: /Small chunks/ })).toBeInTheDocument();
@@ -59,7 +61,6 @@ describe('evals page', () => {
       <EvalsReport results={{ ...retrievalOnly, run: { ...full.run, illustrative: false } }} />,
     );
     expect(screen.getAllByText(EVALS.notMeasured.label)).toHaveLength(2);
-    expect(screen.queryByText(EVALS.runFacts.judge)).not.toBeInTheDocument();
     expect(screen.queryByText(EVALS.illustrative)).not.toBeInTheDocument();
     expect(screen.queryByText(EVALS.cost.details)).not.toBeInTheDocument();
     expect(screen.getByText(EVALS.lede(105, false))).toBeInTheDocument();

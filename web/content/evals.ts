@@ -17,9 +17,7 @@ export const EVALS = {
   runFacts: {
     date: 'Run',
     corpus: 'Corpus build',
-    embed: 'Embeddings by',
-    answer: 'Answers by',
-    judge: 'Graded by',
+    models: 'Models called',
     cost: 'Run cost',
     costNote: 'paid separately from the visitor budget',
   },
@@ -38,6 +36,7 @@ export const EVALS = {
       'MRR (mean reciprocal rank) rewards finding the answer early: 1 when it is the top passage, ½ when second, ⅓ when third, and 0 when it is not in the top 10.',
     metricLabel: 'Measure',
     metric: (key: string) => (key === 'mrr' ? 'MRR' : `recall@${key}`),
+    metricPrefix: 'recall',
     chunkCaption: (name: string, tokens: number | null) =>
       `${CHUNK_NAMES[name] ?? name} chunks${tokens ? ` (~${tokens} tokens)` : ''}`,
     mode: (name: string) => MODE_NAMES[name] ?? name,

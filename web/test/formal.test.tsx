@@ -28,7 +28,15 @@ describe('formulas', () => {
     expect(select).toHaveAttribute('aria-expanded', 'true');
     fireEvent.mouseEnter(screen.getByRole('button', { name: `C: ${KEY.C.name}` }));
     expect(screen.getByText(KEY.C.name)).toBeInTheDocument();
+    // Leaving restores the tapped symbol rather than clearing it.
     fireEvent.mouseLeave(select.closest('div')!);
+    expect(screen.getByText(KEY.τ.name)).toBeInTheDocument();
+  });
+
+  it('shows the hint until a symbol is tapped or hovered', () => {
+    render(<Formula id="h" source={STEP_FORMULAS.bm25} />);
+    fireEvent.mouseEnter(screen.getByRole('button', { name: `C: ${KEY.C.name}` }));
+    fireEvent.mouseLeave(screen.getByRole('button', { name: `C: ${KEY.C.name}` }).closest('div')!);
     expect(screen.getByText(FORMAL.hint)).toBeInTheDocument();
   });
 

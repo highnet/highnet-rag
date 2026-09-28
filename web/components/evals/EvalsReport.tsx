@@ -12,16 +12,11 @@ import { RunCostSection } from './RunCostSection';
 const F = EVALS.runFacts;
 
 // The models that answered and graded are listed only when the run called them.
+// The run record names every model the run actually called, straight from its cost lines.
 const facts = (results: HighnetRagEvalResults): [string, string][] => [
   [F.date, results.run.started_at.slice(0, 10)],
   [F.corpus, results.run.corpus_build_id],
-  [F.embed, results.run.embed.model],
-  ...(results.answers
-    ? ([
-        [F.answer, results.run.answer.model],
-        [F.judge, results.run.judge.model],
-      ] as [string, string][])
-    : []),
+  [F.models, results.cost.by_model.map((line) => line.model).join(', ')],
   [F.cost, `${formatUsd(results.cost.total_usd)}, ${F.costNote}`],
 ];
 
