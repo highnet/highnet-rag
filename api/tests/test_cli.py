@@ -34,7 +34,7 @@ def test_ingest_fake_builds_a_corpus_and_reports_cost(
     out = tmp_path / "corpus.sqlite"
     run_cli(
         monkeypatch,
-        *("ingest", "--fake", "--limit", "2", "--chunk-sets", "small, medium"),
+        *("ingest", "--fake", "--limit", "2", "--batch-size", "4", "--chunk-sets", "small, medium"),
         *("--source", str(squad_path), "--out", str(out)),
     )
     get_settings.cache_clear()

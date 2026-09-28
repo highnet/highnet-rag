@@ -101,3 +101,47 @@ def test_get_providers_follows_settings(monkeypatch) -> None:
     finally:
         get_settings.cache_clear()
         get_providers.cache_clear()
+
+
+def retrying_client(responses: list[httpx.Response], **settings: object):
+    waits: list[float] = []
+
+    async def fake_sleep(seconds: float) -> None:
+        waits.append(seconds)
+
+    config = Settings(voyage_api_key=SecretStr("k"), _env_file=None, **settings)  # pyright: ignore[reportCallIssue]
+    client = VoyageClient(config, sleep=fake_sleep)
+    queue = iter(responses)
+    client._http = httpx.AsyncClient(
+        base_url=config.voyage_base_url, transport=httpx.MockTransport(lambda r: next(queue))
+    )
+    return client, waits
+
+
+async def test_rate_limits_are_retried_with_retry_after_and_counted() -> None:
+    ok = {"data": [{"index": 0, "embedding": [1.0]}], "usage": {"total_tokens": 3}}
+    client, waits = retrying_client(
+        [
+            httpx.Response(429, headers={"retry-after": "7"}),
+            httpx.Response(503),
+            httpx.Response(200, json=ok),
+        ],
+        voyage_max_retries=3,
+        voyage_max_retry_wait_seconds=5,
+    )
+    result = await VoyageEmbedder(client, "m", 1).embed(["x"], "query")
+    assert result.retries == 2
+    assert waits == [5, 4.0]  # Retry-After capped at 5s, then exponential backoff (2**2)
+
+
+async def test_retries_give_up_and_non_retryable_errors_fail_at_once() -> None:
+    client, waits = retrying_client(
+        [httpx.Response(429), httpx.Response(429)], voyage_max_retries=1
+    )
+    with pytest.raises(httpx.HTTPStatusError):
+        await VoyageEmbedder(client, "m", 1).embed(["x"], "query")
+    assert waits == [2.0]
+    client, waits = retrying_client([httpx.Response(401)])
+    with pytest.raises(httpx.HTTPStatusError):
+        await VoyageReranker(client, "r").rerank("q", ["d"], 1)
+    assert waits == []

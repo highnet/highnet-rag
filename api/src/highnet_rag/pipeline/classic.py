@@ -103,6 +103,7 @@ async def run_classic(
             "dims": int(vector.shape[0]),
             "vector_preview": [round(float(v), 4) for v in vector[:8]],
             "norm": round(float(np.linalg.norm(vector)), 4),
+            "retries": embedded.retries,
         },
         tokens=embedded.tokens,
         cost_usd=cost,

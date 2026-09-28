@@ -79,3 +79,5 @@ graphify-out/
 **/.impeccable/live/sessions/
 **/.impeccable/live/previews/
 .claude/settings.local.json
+.coverage
+.coverage.*

@@ -18,5 +18,7 @@ fi
 
 uv sync --frozen --no-dev --package highnet-rag
 uv run highnet-rag fetch-squad
-uv run highnet-rag ingest --chunk-sets medium   # prints the embedding cost
+# Small batches and patient retries fit Voyage's lowest rate tier (no payment method on file).
+VOYAGE_MAX_RETRIES=8 VOYAGE_MAX_RETRY_WAIT_SECONDS=65 \
+  uv run highnet-rag ingest --chunk-sets medium --batch-size 24   # prints the embedding cost
 scripts/upload-corpus.sh data/corpus.sqlite
