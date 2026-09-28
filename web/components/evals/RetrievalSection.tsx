@@ -32,6 +32,16 @@ const readSearch = () => window.location.search;
 const noSearch = () => '';
 const SERIES: Record<string, Series> = { bm25: 'bm25', vector: 'vector', hybrid: 'fused' };
 
+// On phones "recall" is heard but not shown, so the five options fit a 320px screen.
+const metricLabel = (metric: RetrievalMetric) =>
+  metric === 'mrr' ? (
+    R.metric(metric)
+  ) : (
+    <>
+      <span className="sr-only sm:not-sr-only">{R.metricPrefix}</span>@{metric}
+    </>
+  );
+
 const formatMetric = (metric: RetrievalMetric, value: number) =>
   metric === 'mrr' ? value.toFixed(2) : EVALS.percent(value);
 
@@ -104,7 +114,7 @@ const RetrievalSection = ({ retrieval }: RetrievalSectionProps) => {
           name="retrieval-metric"
           labelledBy="retrieval-metric"
           size="sm"
-          options={RETRIEVAL_METRICS.map((m) => ({ value: m, label: R.metric(m) }))}
+          options={RETRIEVAL_METRICS.map((m) => ({ value: m, label: metricLabel(m) }))}
           value={metric}
           onChange={(value) => setMetric(value as RetrievalMetric)}
         />

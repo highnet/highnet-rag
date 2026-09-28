@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Notice } from '@/components/site/Notice';
 import { Button } from '@/components/ui/Button';
@@ -54,6 +54,13 @@ const CorpusBrowser = () => {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [article, setArticle] = useState<Load<CorpusDocument>>({ status: 'loading' });
   const [attempt, setAttempt] = useState(0);
+  const listRef = useRef<HTMLUListElement>(null);
+  const selectedId = selection?.docId;
+
+  // Keep the chosen article in view in the scrolling list (a linked one can be far down).
+  useEffect(() => {
+    listRef.current?.querySelector('[data-current]')?.scrollIntoView?.({ block: 'nearest' });
+  }, [selectedId]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -147,11 +154,14 @@ const CorpusBrowser = () => {
               </select>
             </label>
 
-            <nav aria-label={CORPUS.articlesLabel} className="hidden lg:block">
+            <nav aria-label={CORPUS.articlesLabel} className="hidden lg:sticky lg:top-4 lg:block">
               <Typography variant="label" color="muted" as="p">
                 {CORPUS.articleCount(list.data.documents.length)}
               </Typography>
-              <ul className="mt-1.5 max-h-[70vh] space-y-0.5 overflow-y-auto pr-1">
+              <ul
+                ref={listRef}
+                className="mt-1.5 max-h-[calc(100vh-10rem)] space-y-0.5 overflow-y-auto border-b pr-1 pb-1"
+              >
                 {list.data.documents.map((d) => {
                   const current = d.id === selection.docId;
                   return (
@@ -159,6 +169,7 @@ const CorpusBrowser = () => {
                       <a
                         href={hrefFor({ ...selection, docId: d.id })}
                         aria-current={current ? 'page' : undefined}
+                        data-current={current || undefined}
                         onClick={(e) => {
                           e.preventDefault();
                           choose({ ...selection, docId: d.id });

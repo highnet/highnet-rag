@@ -26,7 +26,10 @@ type FormulaProps = {
 // A formula whose symbols explain themselves. Tapping (or hovering) a symbol writes its meaning
 // on the line below, in place, so it works the same on a phone as with a mouse.
 const Formula = ({ source, id, className }: FormulaProps) => {
-  const [active, setActive] = useState<string | null>(null);
+  // A tapped symbol stays pinned; hovering previews another and leaving restores the pin.
+  const [pinned, setPinned] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const active = hovered ?? pinned;
   const definitionId = `${id}-definition`;
 
   const render = (nodes: FormulaNode[]): ReactNode[] =>
@@ -36,7 +39,7 @@ const Formula = ({ source, id, className }: FormulaProps) => {
         return <Script key={i}>{render(node.nodes)}</Script>;
       }
       if (node.kind === 'text') return <span key={i}>{node.text}</span>;
-      const open = active === node.symbol;
+      const open = pinned === node.symbol;
       return (
         <Button
           key={i}
@@ -46,8 +49,8 @@ const Formula = ({ source, id, className }: FormulaProps) => {
           aria-expanded={open}
           aria-controls={definitionId}
           aria-label={`${node.symbol}: ${KEY[node.symbol].name}`}
-          onClick={() => setActive(node.symbol)}
-          onMouseEnter={() => setActive(node.symbol)}
+          onClick={() => setPinned(node.symbol)}
+          onMouseEnter={() => setHovered(node.symbol)}
           className="text-[length:inherit]"
         >
           {glyph(node.symbol)}
@@ -57,7 +60,7 @@ const Formula = ({ source, id, className }: FormulaProps) => {
 
   const entry = active ? KEY[active] : null;
   return (
-    <div className={cn('space-y-1', className)} onMouseLeave={() => setActive(null)}>
+    <div className={cn('space-y-1', className)} onMouseLeave={() => setHovered(null)}>
       <p className="voice-data text-sm leading-relaxed break-words">
         {render(parseFormula(source))}
       </p>

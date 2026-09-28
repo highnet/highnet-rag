@@ -24,6 +24,7 @@ const withConfig = (overrides: Record<string, unknown> = {}) =>
           JSON.stringify({
             ...base,
             live: false,
+            illustrative: false,
             questions: [single, compound],
             recorded: { ks: [3, 5, 10], at: '2026-09-28T21:00:00+00:00' },
             ...overrides,
@@ -127,6 +128,14 @@ describe('replayed questions', () => {
     render(<PipelineExplorer />);
     await screen.findByText(R.notice('2026-09-28'));
     expect(ControlledEventSource.instances).toHaveLength(0);
+  });
+
+  it('says so plainly when the recordings come from the offline stand-ins', async () => {
+    withConfig({ illustrative: true });
+    render(<PipelineExplorer />);
+    expect(await screen.findByText(R.noticeIllustrative)).toBeInTheDocument();
+    expect(screen.queryByText(COPY.illustrative)).not.toBeInTheDocument();
+    expect(screen.queryByText(R.notice('2026-09-28'))).not.toBeInTheDocument();
   });
 
   it('says when nothing is recorded, and folds long lists', async () => {

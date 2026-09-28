@@ -210,12 +210,15 @@ const PipelineExplorer = () => {
             </Button>
           </Notice>
         )}
-        {config?.illustrative && <Notice tone="note">{COPY.illustrative}</Notice>}
+        {config?.illustrative && !replay && <Notice tone="note">{COPY.illustrative}</Notice>}
         {replay && (
           <Notice tone="note">
-            {config.recorded.at
-              ? COPY.replay.notice(config.recorded.at.slice(0, 10))
-              : COPY.replay.noticeUndated}
+            {/* Only a server with real providers recorded with real models; say which. */}
+            {config.illustrative
+              ? COPY.replay.noticeIllustrative
+              : config.recorded.at
+                ? COPY.replay.notice(config.recorded.at.slice(0, 10))
+                : COPY.replay.noticeUndated}
           </Notice>
         )}
         {!replay && tier === 'degraded' && config && (

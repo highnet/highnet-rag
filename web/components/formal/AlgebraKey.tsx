@@ -39,9 +39,9 @@ const AlgebraKey = ({ agentic }: AlgebraKeyProps) => {
                 .map(([symbol, entry]) => (
                   <div
                     key={symbol}
-                    className="flex items-baseline gap-2 rounded-sm border bg-card px-2.5 py-1.5 text-xs"
+                    className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 rounded-sm border bg-card px-2.5 py-1.5 text-xs"
                   >
-                    <dt className="voice-data min-w-6 shrink-0 text-sm text-primary">
+                    <dt className="voice-data min-w-6 text-sm whitespace-nowrap text-primary">
                       {glyph(symbol)}
                     </dt>
                     <dd>

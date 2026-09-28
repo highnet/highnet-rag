@@ -137,7 +137,7 @@ describe('step summaries', () => {
         rate_limit: { remaining_minute: 19, limit_minute: 20 },
         budget: { tier: 'normal' },
       }),
-      '19/20 per min · budget normal',
+      '19 of 20 left this minute · budget normal',
     ],
     [ev('embed_query', { dims: 1024, model: 'voyage-3.5-lite' }), '1024 dimensions'],
     [ev('map_project', { x: 0.1234, y: -0.5 }), 'x 0.123, y -0.500'],

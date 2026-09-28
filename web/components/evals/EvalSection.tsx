@@ -22,7 +22,7 @@ const EvalSection = ({ id, title, notes, children }: EvalSectionProps) => {
     <section
       id={id}
       aria-labelledby={headingId}
-      className="grid scroll-mt-6 gap-y-3 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-x-8"
+      className="grid scroll-mt-6 items-start gap-y-3 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-x-8"
     >
       <div className="min-w-0 rounded-md border bg-card px-4 py-4 md:px-5">
         <Typography variant="stepHeading" as="h2" id={headingId}>

@@ -35,6 +35,8 @@ export const COPY = {
   replay: {
     notice: (date: string) =>
       `Every run here was recorded on ${date} with the real models, one run per question and setting, and is replayed step by step. No model is called and nothing is spent; every number is the recorded one.`,
+    noticeIllustrative:
+      'Offline mode: these runs were recorded with the offline stand-ins (hashed word vectors and an extractive stand-in for Claude) and are replayed step by step. Scores, tokens and answers are illustrative, not real model output.',
     noticeUndated:
       'Every run here was recorded ahead of time with the real models and is replayed step by step. No model is called and nothing is spent.',
     empty: 'No questions have been recorded yet, so there is nothing to replay.',
@@ -112,7 +114,7 @@ export const COPY = {
   // One-line step summaries on phones: the number first, then what it measures.
   summary: {
     request: (left: number, limit: number, tier: string) =>
-      `${left}/${limit} per min · budget ${tier}`,
+      `${left} of ${limit} left this minute · budget ${tier}`,
     embed: (dims: number) => `${dims} dimensions`,
     map: (x: string, y: string) => `x ${x}, y ${y}`,
     noResults: 'No passages found',

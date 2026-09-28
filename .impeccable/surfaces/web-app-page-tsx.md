@@ -10,7 +10,7 @@ related_targets: []
 Scope: the single main surface. Ask a question, watch the pipeline work it out step by step, inspect any step, change a setting and run it again. Visitor mode: **Operate**, with a Read layer (the "Why this step?" notes).
 
 - Audience and job: developers learning RAG, then recruiters (see PRODUCT.md). The job is to understand why this answer came out of this retrieval.
-- Action: type or pick a question → Run → read the steps and the answer → change one setting → Run again.
+- Action: pick a recorded question → read the replayed steps and the answer → change one setting (it replays that setting's own recorded run). Free-text questions answered live return only with `LIVE_QUERIES=true`.
 - Proof and content: real trace events for this exact query, plus the SQuAD 2.0 corpus (CC BY-SA 4.0, attributed in the footer).
 - Constraints: static export; SSE stream; mobile-first; WCAG 2.2 AA; budget and rate-limit states must be visible.
 - Memorable moment: the query's point landing on the 2D corpus map among its nearest chunks, then the ranked lists settling as reranking flips rows into place.
@@ -23,7 +23,7 @@ OWN-WORLD: The ground is plain pale-green engineering paper (no grid pattern; ow
 
 STORY: The visitor sees that retrieval decides the answer, believes the numbers because they are live, and changes one knob to watch which step moves.
 
-FIRST VIEWPORT: The top of the sheet reads "Sheet 1 · <question>" beside a full-width question field, with a Run action on the right. Below that come 3 suggested questions, a compact settings strip (mode, top-k, rerank, chunk size, agentic), and the first empty numbered step placeholders showing the pipeline's shape before running. On phones, the settings sit in a drawer.
+FIRST VIEWPORT: Owner decisions (2026-09-28, in the owner's words: "add a top level explanation of what the website does" and "draw a pipeline diagram of the whole thing too at the top"): the page opens with the site's explanation, then the pipeline diagram of the whole system (folded formulas key beneath it). Below them sits the sheet, "Sheet 1 · <question>", then the replay notice, the "Pick a question" picker (one-article and two-article groups, folded to three each), and the settings strip; the numbered step placeholders follow. On phones the explanation and diagram come first, so the picker is one scroll down; that trade is the owner's.
 
 FORM: engineer's computation pad, position 6 of 7 on the grounded list; seed key cfb983fc. Raises: from split-flap board, ranked lists keep fixed columns and only values move when reranking; from one-bit desktop, states are carried by pattern and weight, not colour alone.
 
