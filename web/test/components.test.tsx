@@ -24,6 +24,102 @@ const context = { chunks: new Map(), cited: new Set<number>(), streamedAnswer: '
 const body = (event: ReturnType<typeof ev>) =>
   render(<StageBody event={event} context={context} />);
 
+describe('keyword search and fusion', () => {
+  const hit = (chunk_id: number, rank: number, doc_title = 'Normans') => ({
+    chunk_id,
+    rank,
+    doc_title,
+  });
+
+  it('shows the exact MATCH string, or says there was nothing to match', () => {
+    body(
+      ev('bm25', {
+        fts_query: '"normandy" OR "located"',
+        terms: ['normandy', 'located'],
+        chunk_set: 'small',
+        searched: 12,
+        depth: 1,
+        results: [{ ...hit(3, 1), score: 7.5 }],
+      }),
+    );
+    expect(screen.getByText('"normandy" OR "located"')).toBeInTheDocument();
+    expect(screen.getByText('7.50')).toBeInTheDocument();
+    expect(screen.getByText('BM25 rank 1')).toBeInTheDocument();
+    body(
+      ev(
+        'bm25',
+        { fts_query: '', terms: [], chunk_set: 'small', searched: 12, depth: 1, results: [] },
+        'warning',
+      ),
+    );
+    expect(screen.getByText(COPY.stageText.emptyMatch)).toBeInTheDocument();
+  });
+
+  it('lays out both input rankings and marks the top-k cut in the fused list', () => {
+    const fuse = ev('fuse', {
+      method: 'rrf',
+      k: 60,
+      kept: 1,
+      results: [
+        {
+          ...hit(1, 1),
+          score: 0.0325,
+          from: { bm25_rank: 2, vector_rank: 1 },
+          contributions: { bm25: 0.0161, vector: 0.0164 },
+        },
+        {
+          ...hit(2, 2, 'Oxygen'),
+          score: 0.0164,
+          from: { bm25_rank: 1, vector_rank: null },
+          contributions: { bm25: 0.0164 },
+        },
+      ],
+    });
+    render(
+      <StageBody
+        event={fuse}
+        context={{
+          ...context,
+          bm25: {
+            fts_query: '"x"',
+            terms: ['x'],
+            chunk_set: 'medium',
+            searched: 2,
+            depth: 2,
+            results: [
+              { ...hit(2, 1, 'Oxygen'), score: 3 },
+              { ...hit(1, 2), score: 2 },
+            ],
+          },
+          vector: {
+            metric: 'cosine',
+            chunk_set: 'medium',
+            searched: 2,
+            depth: 2,
+            results: [{ ...hit(1, 1), distance: 0.1 }],
+          },
+        }}
+      />,
+    );
+    expect(screen.getByText(COPY.stageText.inputBm25)).toBeInTheDocument();
+    expect(screen.getByText(COPY.stageText.inputVector)).toBeInTheDocument();
+    expect(screen.getByText('0.0161 + 0.0164')).toBeInTheDocument();
+    // The cut is always drawn; the candidate below it is folded until asked for.
+    expect(screen.getByText(COPY.stageText.cut(1))).toBeInTheDocument();
+    expect(screen.queryByText('0.0164 + 0')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: COPY.stageText.showDropped(1) }));
+    expect(screen.getByText('0.0164 + 0')).toBeInTheDocument();
+    expect(screen.getByText('not in the vector list')).toBeInTheDocument();
+    expect(screen.getByText(/below the top-k cut/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: COPY.stageText.hideDropped }));
+    expect(screen.queryByText(/below the top-k cut/)).not.toBeInTheDocument();
+    // Without its inputs (for example after a failed search) only the fused list is drawn.
+    body(fuse);
+    expect(screen.getAllByText(COPY.stageText.inputBm25)).toHaveLength(1);
+    expect(COPY.stageText.showDropped(2)).toBe('Show the 2 candidates below the cut');
+  });
+});
+
 describe('stage bodies', () => {
   it('shows skip reasons and error messages', () => {
     body(ev('bm25', { reason: 'Arrives in milestone 2.' }, 'skipped'));
@@ -65,10 +161,12 @@ describe('stage bodies', () => {
         metric: 'cosine',
         chunk_set: 'medium',
         searched: 9,
-        results: [{ chunk_id: 4, rank: 1, distance: 0.2 }],
+        depth: 1,
+        results: [{ chunk_id: 4, rank: 1, distance: 0.2, doc_title: 'Oxygen' }],
       }),
     );
-    expect(screen.getByText('Passage')).toBeInTheDocument();
+    expect(screen.getByText('Oxygen')).toBeInTheDocument();
+    expect(screen.getByText('vector rank 1')).toBeInTheDocument();
     body(
       ev(
         'prompt',

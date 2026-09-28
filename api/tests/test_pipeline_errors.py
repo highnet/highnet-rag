@@ -34,6 +34,11 @@ class BrokenCorpus(SqliteCorpusStore):
             raise LookupError("no PCA for this chunk set")
         return super().projection(chunk_set_id)
 
+    def bm25(self, fts_query: str, chunk_set_id: int, k: int):
+        if self.broken == "bm25":
+            raise RuntimeError("fts5: syntax error")
+        return super().bm25(fts_query, chunk_set_id, k)
+
     def knn(self, vector, chunk_set_id: int, k: int):
         if self.broken == "knn":
             raise RuntimeError("vector index unavailable")
@@ -89,10 +94,11 @@ def test_map_failure_is_a_warning_and_the_run_continues(make_settings, corpus_pa
     assert events[-1][1]["status"] == "ok"
 
 
-def test_vector_failure_stops_the_run(make_settings, corpus_path) -> None:
-    with app_with(make_settings(), corpus=BrokenCorpus(corpus_path, broken="knn")) as c:
+@pytest.mark.parametrize(("broken", "stage"), [("knn", "vector"), ("bm25", "bm25")])
+def test_search_failure_stops_the_run(make_settings, corpus_path, broken, stage) -> None:
+    with app_with(make_settings(), corpus=BrokenCorpus(corpus_path, broken=broken)) as c:
         events = run(c)
-    assert traces(events)["vector"]["status"] == "error"
+    assert traces(events)[stage]["status"] == "error"
     assert events[-1][1]["status"] == "error"
 
 
@@ -130,3 +136,19 @@ def test_empty_retrieval_is_a_warning(make_settings, corpus_path) -> None:
     with app_with(make_settings(), corpus=EmptyCorpus(corpus_path)) as c:
         events = run(c)
     assert traces(events)["vector"]["status"] == "warning"
+
+
+def test_nothing_found_by_either_search_is_a_warning_at_each_step(
+    make_settings, corpus_path
+) -> None:
+    class EmptyCorpus(SqliteCorpusStore):
+        def knn(self, vector, chunk_set_id: int, k: int):
+            return []
+
+    with app_with(make_settings(), corpus=EmptyCorpus(corpus_path)) as c:
+        # Only stop words: there is nothing for BM25 to match, so no MATCH string at all.
+        events = run(c, q="What is the?")
+    t = traces(events)
+    assert t["bm25"]["status"] == "warning" and t["bm25"]["data"]["fts_query"] == ""
+    assert t["fuse"]["status"] == "warning" and t["fuse"]["data"]["results"] == []
+    assert t["select_context"]["data"]["chunks"] == []

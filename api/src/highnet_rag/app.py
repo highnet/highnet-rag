@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from highnet_rag.budget import budget_state, hash_ip
 from highnet_rag.config import Settings, get_settings
 from highnet_rag.pipeline.classic import new_run_id, run_classic
-from highnet_rag.pipeline.deps import SUPPORTED_MODES, Deps, QueryParams
+from highnet_rag.pipeline.deps import DEFAULT_MODE, SUPPORTED_MODES, Deps, Mode, QueryParams
 from highnet_rag.providers import Providers, build_providers
 from highnet_rag.storage.base import CorpusStore
 from highnet_rag.storage.sqlite import SqliteCorpusStore, SqliteStateStore
@@ -97,6 +97,7 @@ def create_app(
         p = deps.providers
         return {
             "modes": list(SUPPORTED_MODES),
+            "default_mode": DEFAULT_MODE,
             "top_k": {"default": settings.default_top_k, "max": settings.max_top_k},
             "chunk_sets": [
                 {"name": s.name, "target_tokens": s.target_tokens, "chunks": s.chunk_count}
@@ -148,13 +149,13 @@ def create_app(
         request: Request,
         deps: DepsDep,
         q: Annotated[str, Query(min_length=1, max_length=500)],
-        mode: Annotated[str, Query()] = "vector",
+        mode: Annotated[Mode, Query()] = DEFAULT_MODE,
         k: Annotated[int, Query(ge=1, le=10)] = 5,
         chunk_set: Annotated[str, Query()] = "medium",
     ) -> StreamingResponse:
-        if mode not in SUPPORTED_MODES:
-            raise HTTPException(422, detail=f"Mode {mode!r} is not available in this build.")
-        params = QueryParams(q=q.strip(), k=min(k, settings.max_top_k), chunk_set=chunk_set)
+        params = QueryParams(
+            q=q.strip(), mode=mode, k=min(k, settings.max_top_k), chunk_set=chunk_set
+        )
         ip_hash = hash_ip(client_ip(request), settings)
         return StreamingResponse(
             stream_run(params, deps, ip_hash),

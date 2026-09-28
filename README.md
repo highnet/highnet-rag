@@ -3,12 +3,12 @@
 A transparent Retrieval-Augmented Generation (RAG) teaching tool. Ask a question about a small, fixed corpus and watch every step of the pipeline as it runs. Each step is written out like a line of a calculation, with its timing, tokens, cost, and a plain-language "Why this step?":
 
 - embedding the question and placing it on a 2D map;
-- vector search (BM25 and hybrid arrive in milestone 2);
+- BM25 keyword search, vector search, and hybrid search that fuses the two (reciprocal rank fusion);
 - choosing the context;
 - the exact prompt;
 - the streamed answer and its citations.
 
-> Status: milestone 1 (walking skeleton). See [docs/MILESTONES.md](docs/MILESTONES.md).
+> Status: milestone 2 (hybrid retrieval and the settings strip). See [docs/MILESTONES.md](docs/MILESTONES.md) and the changelog below.
 
 ## Run it locally (no API keys needed)
 
@@ -83,6 +83,11 @@ The Vercel project `highnet-rag` (team "highnet's projects") is linked to this r
 - [Milestones](docs/MILESTONES.md): the plan and acceptance criteria
 - [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md): product and design context (Impeccable)
 - [AGENTS.md](AGENTS.md): conventions for humans and coding agents
+
+## Changelog
+
+- **Milestone 2: hybrid retrieval and the settings strip.** Run the same question in BM25, vector and hybrid modes. The BM25 step shows the exact FTS5 MATCH string. The fusion step shows the two rankings side by side, then the fused list with each passage's rank in both inputs and its reciprocal-rank-fusion score, cut at top-k. Mode, top-k and chunk size (small, medium, large) sit in a settings strip; they and the question live in the URL, so a run can be shared by link. The background grid is gone; the pad is plain paper.
+- **Milestone 1: walking skeleton.** One question, fully traced and live: embed, vector search, context, prompt, a streamed answer with citations, each step with its "Why this step?", timing, tokens, cost and the code that ran.
 
 ## Licence
 

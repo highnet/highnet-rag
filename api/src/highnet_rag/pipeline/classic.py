@@ -12,12 +12,20 @@ import numpy as np
 from highnet_rag.budget import budget_state, rate_state
 from highnet_rag.pipeline.deps import Deps, QueryParams
 from highnet_rag.pipeline.prompt import NOT_FOUND, SYSTEM_PROMPT, build_messages
+from highnet_rag.pipeline.retrieve import RRF_K, fts_query, rrf
 from highnet_rag.pricing import cost_usd
 from highnet_rag.providers.base import FinalAnswer
+from highnet_rag.storage.base import CorpusStore, Hit
 from highnet_rag.trace import AnswerDelta, RunDone, StageClock, TraceEvent, Tracer
 
 Event = TraceEvent | AnswerDelta | RunDone
 MAP_NEIGHBOURS = 5
+HYBRID_DEPTH_FACTOR = 2
+SCORE_NAMES = {"bm25": "bm25", "vector": "distance", "fuse": "rrf"}
+
+
+def doc_titles(corpus: CorpusStore, hits: list[Hit]) -> dict[int, str]:
+    return {c.id: c.doc_title for c in corpus.chunks([h.chunk_id for h in hits])}
 
 
 def new_run_id() -> str:
@@ -75,112 +83,205 @@ async def run_classic(
     # /snippet
 
     # snippet: embed_query | Embed the question
-    # 2 · embed_query
+    # 2 · embed_query: BM25-only runs never need a vector, so they skip the embedding call.
     clock = StageClock()
-    try:
-        embedded = await providers.embedder.embed([params.q], "query")
-    except Exception as exc:
-        yield tracer.error("embed_query", clock, exc)
-        yield finish()
-        return
-    vector: np.ndarray = embedded.vectors[0]
-    cost = cost_usd(providers.embedder.model, settings, embedded.tokens)
-    spend(
-        "embed_query",
-        providers.embedder.provider,
-        providers.embedder.model,
-        embedded.tokens,
-        0,
-        cost,
-    )
-    yield tracer.event(
-        "embed_query",
-        clock,
-        {
-            "provider": providers.embedder.provider,
-            "model": providers.embedder.model,
-            "input_type": "query",
-            "dims": int(vector.shape[0]),
-            "vector_preview": [round(float(v), 4) for v in vector[:8]],
-            "norm": round(float(np.linalg.norm(vector)), 4),
-            "retries": embedded.retries,
-        },
-        tokens=embedded.tokens,
-        cost_usd=cost,
-    )
+    vector: np.ndarray | None = None
+    if params.mode == "bm25":
+        yield tracer.skipped("embed_query", "BM25 mode searches by keywords only; no embedding.")
+    else:
+        try:
+            embedded = await providers.embedder.embed([params.q], "query")
+        except Exception as exc:
+            yield tracer.error("embed_query", clock, exc)
+            yield finish()
+            return
+        embedding: np.ndarray = embedded.vectors[0]
+        vector = embedding
+        cost = cost_usd(providers.embedder.model, settings, embedded.tokens)
+        spend(
+            "embed_query",
+            providers.embedder.provider,
+            providers.embedder.model,
+            embedded.tokens,
+            0,
+            cost,
+        )
+        yield tracer.event(
+            "embed_query",
+            clock,
+            {
+                "provider": providers.embedder.provider,
+                "model": providers.embedder.model,
+                "input_type": "query",
+                "dims": int(embedding.shape[0]),
+                "vector_preview": [round(float(v), 4) for v in embedding[:8]],
+                "norm": round(float(np.linalg.norm(embedding)), 4),
+                "retries": embedded.retries,
+            },
+            tokens=embedded.tokens,
+            cost_usd=cost,
+        )
     # /snippet
 
     # snippet: map_project | Project onto the map
     # 3 · map_project: the same PCA fitted at ingest places the query on the corpus map.
     clock = StageClock()
-    try:
-        projection = corpus.projection(chunk_set.id)
-        x, y = projection.project(vector)
-        coords, points = deps.map_matrix(chunk_set.id)
-        nearest = np.argsort(((coords - np.array([x, y])) ** 2).sum(axis=1))[:MAP_NEIGHBOURS]
-        yield tracer.event(
-            "map_project",
-            clock,
-            {
-                "x": round(x, 5),
-                "y": round(y, 5),
-                "explained_variance": [round(v, 4) for v in projection.explained_variance],
-                "neighbours_2d": [points[i].chunk_id for i in nearest],
-            },
-        )
-    except Exception as exc:
-        # The map is explanatory, not load-bearing: report it as a warning and carry on.
-        error = {"type": type(exc).__name__, "message": str(exc)}
-        yield tracer.event("map_project", clock, {"error": error}, status="warning")
+    if vector is None:
+        yield tracer.skipped("map_project", "BM25 mode has no question embedding to place.")
+    else:
+        try:
+            projection = corpus.projection(chunk_set.id)
+            x, y = projection.project(vector)
+            coords, points = deps.map_matrix(chunk_set.id)
+            nearest = np.argsort(((coords - np.array([x, y])) ** 2).sum(axis=1))[:MAP_NEIGHBOURS]
+            yield tracer.event(
+                "map_project",
+                clock,
+                {
+                    "x": round(x, 5),
+                    "y": round(y, 5),
+                    "explained_variance": [round(v, 4) for v in projection.explained_variance],
+                    "neighbours_2d": [points[i].chunk_id for i in nearest],
+                },
+            )
+        except Exception as exc:
+            # The map is explanatory, not load-bearing: report it as a warning and carry on.
+            error = {"type": type(exc).__name__, "message": str(exc)}
+            yield tracer.event("map_project", clock, {"error": error}, status="warning")
     # /snippet
 
-    # snippet: bm25 | Skip BM25 in this build
-    # 4 · bm25 (not in this build)
-    yield tracer.skipped("bm25", "Vector-only build; BM25 arrives in milestone 2.")
+    # Hybrid mode fetches deeper lists so fusion has candidates to promote; the other modes
+    # fetch exactly top-k.
+    depth = params.k * HYBRID_DEPTH_FACTOR if params.mode == "hybrid" else params.k
+    lists: dict[str, list[Hit]] = {}
+
+    # snippet: bm25 | Keyword search
+    # 4 · bm25: the exact MATCH string goes into the trace.
+    clock = StageClock()
+    if params.mode == "vector":
+        yield tracer.skipped("bm25", "Vector mode searches by meaning only.")
+    else:
+        match, terms = fts_query(params.q)
+        try:
+            bm25_hits = corpus.bm25(match, chunk_set.id, depth) if match else []
+        except Exception as exc:
+            yield tracer.error("bm25", clock, exc)
+            yield finish()
+            return
+        lists["bm25"] = bm25_hits
+        titles = doc_titles(corpus, bm25_hits)
+        yield tracer.event(
+            "bm25",
+            clock,
+            {
+                "fts_query": match,
+                "terms": terms,
+                "chunk_set": chunk_set.name,
+                "searched": chunk_set.chunk_count,
+                "depth": depth,
+                "results": [
+                    {
+                        "chunk_id": h.chunk_id,
+                        "rank": h.rank,
+                        "score": round(h.score, 4),
+                        "doc_title": titles[h.chunk_id],
+                    }
+                    for h in bm25_hits
+                ],
+            },
+            status="ok" if bm25_hits else "warning",
+        )
     # /snippet
 
     # snippet: vector | Vector search
     # 5 · vector
     clock = StageClock()
-    try:
-        hits = corpus.knn(vector, chunk_set.id, params.k)
-    except Exception as exc:
-        yield tracer.error("vector", clock, exc)
-        yield finish()
-        return
-    yield tracer.event(
-        "vector",
-        clock,
-        {
-            "metric": "cosine",
-            "chunk_set": chunk_set.name,
-            "searched": chunk_set.chunk_count,
-            "results": [
-                {"chunk_id": h.chunk_id, "rank": h.rank, "distance": round(h.score, 5)}
-                for h in hits
-            ],
-        },
-        status="ok" if hits else "warning",
-    )
+    if vector is None:
+        yield tracer.skipped("vector", "BM25 mode searches by keywords only.")
+    else:
+        try:
+            vector_hits = corpus.knn(vector, chunk_set.id, depth)
+        except Exception as exc:
+            yield tracer.error("vector", clock, exc)
+            yield finish()
+            return
+        lists["vector"] = vector_hits
+        titles = doc_titles(corpus, vector_hits)
+        yield tracer.event(
+            "vector",
+            clock,
+            {
+                "metric": "cosine",
+                "chunk_set": chunk_set.name,
+                "searched": chunk_set.chunk_count,
+                "depth": depth,
+                "results": [
+                    {
+                        "chunk_id": h.chunk_id,
+                        "rank": h.rank,
+                        "distance": round(h.score, 5),
+                        "doc_title": titles[h.chunk_id],
+                    }
+                    for h in vector_hits
+                ],
+            },
+            status="ok" if vector_hits else "warning",
+        )
     # /snippet
 
-    # snippet: fuse,rerank | Skip fusion and reranking in this build
-    # 6, 7 · fuse, rerank (not in this build)
-    yield tracer.skipped("fuse", "Runs only in hybrid mode (BM25 + vector).")
-    yield tracer.skipped("rerank", "Reranking arrives in milestone 3.")
+    # snippet: fuse | Fuse the two rankings
+    # 6 · fuse: reciprocal rank fusion, with each list's contribution per chunk.
+    clock = StageClock()
+    if params.mode != "hybrid":
+        yield tracer.skipped("fuse", "Runs only in hybrid mode (BM25 + vector).")
+        ranking = params.mode
+        selected = [(h.chunk_id, h.score) for h in lists[params.mode][: params.k]]
+    else:
+        fused = rrf(lists)
+        titles = {cid: t for hits in lists.values() for cid, t in doc_titles(corpus, hits).items()}
+        yield tracer.event(
+            "fuse",
+            clock,
+            {
+                "method": "rrf",
+                "k": RRF_K,
+                "kept": params.k,
+                "results": [
+                    {
+                        "chunk_id": f.chunk_id,
+                        "rank": f.rank,
+                        "score": round(f.score, 6),
+                        "doc_title": titles[f.chunk_id],
+                        "from": {f"{name}_rank": rank for name, rank in f.ranks.items()},
+                        "contributions": {n: round(c, 6) for n, c in f.contributions.items()},
+                    }
+                    for f in fused
+                ],
+            },
+            status="ok" if fused else "warning",
+        )
+        ranking = "fuse"
+        selected = [(f.chunk_id, f.score) for f in fused[: params.k]]
+    # /snippet
+
+    # snippet: rerank | Skip reranking in this build
+    # 7 · rerank (not in this build)
+    yield tracer.skipped("rerank", "Reranking arrives in a later milestone.")
     # /snippet
 
     # snippet: select_context | Choose the context
-    # 8 · select_context
+    # 8 · select_context: the top-k of the final ranking become the model's only facts.
     clock = StageClock()
-    chunks = corpus.chunks([h.chunk_id for h in hits])
-    distance = {h.chunk_id: h.score for h in hits}
+    chunks = corpus.chunks([cid for cid, _ in selected])
+    score = dict(selected)
     context_tokens = sum(c.approx_tokens for c in chunks)
     yield tracer.event(
         "select_context",
         clock,
         {
             "top_k": params.k,
+            "ranking": ranking,
+            "score_name": SCORE_NAMES[ranking],
             "context_tokens_approx": context_tokens,
             "chunks": [
                 {
@@ -188,7 +289,7 @@ async def run_classic(
                     "rank": i + 1,
                     "doc_id": c.doc_id,
                     "doc_title": c.doc_title,
-                    "distance": round(distance[c.id], 5),
+                    "score": round(score[c.id], 6),
                     "approx_tokens": c.approx_tokens,
                     "text": c.text,
                 }

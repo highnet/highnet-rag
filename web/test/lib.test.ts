@@ -4,7 +4,9 @@ import { COPY } from '@/content/copy';
 import { apiUrl, fetchConfig } from '@/lib/api';
 import { formatMs, formatNumber, formatTokens, formatUsd, pad2 } from '@/lib/format';
 import { snippetsFor, sourceUrl } from '@/lib/snippets';
+import type { ApiConfig } from '@/lib/api';
 import { stepSummary } from '@/lib/step-summary';
+import { defaultSettings, parseUrlState, urlSearch } from '@/lib/url-state';
 
 import { ev } from './helpers';
 
@@ -69,8 +71,44 @@ describe('snippets', () => {
   });
 });
 
+describe('url state', () => {
+  const config = {
+    modes: ['bm25', 'vector', 'hybrid'],
+    default_mode: 'hybrid',
+    top_k: { default: 5, max: 10 },
+    chunk_sets: [{ name: 'small' }, { name: 'medium' }],
+    max_query_chars: 10,
+  } as unknown as ApiConfig;
+
+  it('keeps valid values and replaces invalid ones with the defaults', () => {
+    expect(
+      parseUrlState('?q=%20Who%20won%20the%20cup%3F&mode=bm25&k=2&chunks=small', config),
+    ).toEqual({ q: 'Who won th', mode: 'bm25', k: 2, chunkSet: 'small' });
+    expect(parseUrlState('?mode=agentic&k=11&chunks=huge', config)).toEqual({
+      q: '',
+      mode: 'hybrid',
+      k: 5,
+      chunkSet: 'medium',
+    });
+    expect(parseUrlState('?k=2.5', config).k).toBe(5);
+    expect(parseUrlState('?k=0', config).k).toBe(5);
+  });
+
+  it('falls back to the first chunk set, then to medium, when medium is missing', () => {
+    expect(defaultSettings({ ...config, chunk_sets: [{ name: 'large' }] } as never).chunkSet).toBe(
+      'large',
+    );
+    expect(defaultSettings({ ...config, chunk_sets: [] }).chunkSet).toBe('medium');
+  });
+
+  it('leaves the question out of the link until there is one', () => {
+    expect(urlSearch({ q: '', mode: 'vector', k: 3, chunkSet: 'small' })).toBe(
+      '?mode=vector&k=3&chunks=small',
+    );
+  });
+});
+
 describe('step summaries', () => {
-  const chunks = new Map([[7, { chunk_id: 7, doc_title: 'Normans' } as never]]);
   const cases: [Parameters<typeof stepSummary>[0], string][] = [
     [ev('bm25', { reason: 'Not in this build.' }, 'skipped'), 'Not in this build.'],
     [ev('embed_query', { error: { type: 'X', message: 'Key missing' } }, 'error'), 'Key missing'],
@@ -85,8 +123,27 @@ describe('step summaries', () => {
     [ev('map_project', { x: 0.1234, y: -0.5 }), 'x 0.123, y -0.500'],
     [ev('map_project', { error: { type: 'L', message: 'No PCA' } }, 'warning'), 'No PCA'],
     [ev('vector', { results: [] }, 'warning'), 'No passages found'],
-    [ev('vector', { results: [{ chunk_id: 7, distance: 0.12345 }] }), '0.1235 · Normans'],
-    [ev('vector', { results: [{ chunk_id: 8, distance: 0.2 }] }), '0.2000 · #8'],
+    [
+      ev('vector', { results: [{ chunk_id: 7, distance: 0.12345, doc_title: 'Normans' }] }),
+      '0.1235 · Normans',
+    ],
+    [ev('bm25', { results: [] }, 'warning'), 'No passages found'],
+    [
+      ev('bm25', { results: [{ chunk_id: 7, score: 9.876, doc_title: 'Oxygen' }] }),
+      '9.88 · Oxygen',
+    ],
+    [ev('fuse', { kept: 2, results: [] }, 'warning'), 'No passages found'],
+    [
+      ev('fuse', {
+        kept: 2,
+        results: [
+          { from: { bm25_rank: 1, vector_rank: 2 } },
+          { from: { bm25_rank: null, vector_rank: 1 } },
+          { from: { bm25_rank: 3, vector_rank: 3 } },
+        ],
+      }),
+      '2 kept · 1 found by both searches',
+    ],
     [
       ev('select_context', { chunks: [{}, {}], context_tokens_approx: 1500 }),
       '2 passages · ~1,500 tokens',
@@ -106,6 +163,6 @@ describe('step summaries', () => {
     [ev('agent_plan', {}), ''],
   ];
   it.each(cases)('%#', (event, expected) => {
-    expect(stepSummary(event, chunks)).toBe(expected);
+    expect(stepSummary(event)).toBe(expected);
   });
 });

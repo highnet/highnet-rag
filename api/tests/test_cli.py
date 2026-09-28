@@ -52,7 +52,7 @@ def test_ingest_uses_fake_providers_from_settings(monkeypatch, tmp_path: Path, s
     out = tmp_path / "corpus.sqlite"
     run_cli(monkeypatch, "ingest", "--source", str(squad_path), "--out", str(out))
     get_settings.cache_clear()
-    assert [s.name for s in SqliteCorpusStore(out).chunk_sets()] == ["medium"]
+    assert [s.name for s in SqliteCorpusStore(out).chunk_sets()] == ["small", "medium", "large"]
 
 
 def test_ingest_rejects_unknown_chunk_sets(monkeypatch, tmp_path: Path, squad_path: Path) -> None:

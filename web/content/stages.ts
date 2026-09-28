@@ -43,8 +43,9 @@ export const STAGES: Record<Stage, StageCopy> = {
   },
   bm25: {
     title: 'Keyword search (BM25)',
-    why: 'BM25 ranks passages by the question’s exact words, weighting rare words more than common ones.',
-    detail: 'SQLite FTS5 with the Porter stemmer, filtered to the selected chunk size.',
+    why: 'BM25 ranks passages by the question’s exact words, weighting rare words more than common ones. It finds names and numbers that vector search can blur.',
+    detail:
+      'SQLite FTS5 with the Porter stemmer, filtered to the selected chunk size. We drop stop words and quote each remaining term, so your text is never read as query syntax. Scores are shown higher-is-better.',
   },
   vector: {
     title: 'Vector search',
@@ -54,8 +55,9 @@ export const STAGES: Record<Stage, StageCopy> = {
   },
   fuse: {
     title: 'Fuse the rankings',
-    why: 'Hybrid search merges the keyword and vector rankings, so each covers the other’s blind spots.',
-    detail: 'Reciprocal rank fusion: each list contributes 1 / (60 + rank) to a passage’s score.',
+    why: 'Hybrid search merges the keyword and vector rankings, so each covers the other’s blind spots. A passage both searches liked rises to the top.',
+    detail:
+      'Reciprocal rank fusion: each list contributes 1 / (60 + rank) to a passage’s score. Only ranks count, so BM25 scores and cosine distances never need to be put on one scale. Each search fetches twice top-k so fusion has candidates to promote.',
   },
   rerank: {
     title: 'Rerank',
@@ -89,11 +91,11 @@ export const STAGES: Record<Stage, StageCopy> = {
   agent_plan: {
     title: 'Plan the search',
     why: 'The agent rewrites the question into the searches it needs.',
-    detail: 'Arrives in milestone 4.',
+    detail: 'Arrives in milestone 5.',
   },
   agent_step: {
     title: 'Agent step',
     why: 'One search the agent chose to run.',
-    detail: 'Arrives in milestone 4.',
+    detail: 'Arrives in milestone 5.',
   },
 };

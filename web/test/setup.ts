@@ -19,4 +19,8 @@ beforeEach(() => {
     }) as unknown as MediaQueryList;
 });
 
-afterEach(() => cleanup());
+// The explorer writes its settings into the URL; start every test from a clean one.
+afterEach(() => {
+  cleanup();
+  window.history.replaceState(null, '', '/');
+});

@@ -9,6 +9,7 @@ import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 
 type QuestionFormProps = {
+  initialQuestion?: string;
   running: boolean;
   disabled: boolean;
   maxLength: number;
@@ -16,8 +17,15 @@ type QuestionFormProps = {
   onStop: () => void;
 };
 
-const QuestionForm = ({ running, disabled, maxLength, onRun, onStop }: QuestionFormProps) => {
-  const [question, setQuestion] = useState('');
+const QuestionForm = ({
+  initialQuestion = '',
+  running,
+  disabled,
+  maxLength,
+  onRun,
+  onStop,
+}: QuestionFormProps) => {
+  const [question, setQuestion] = useState(initialQuestion);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

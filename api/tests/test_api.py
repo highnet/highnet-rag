@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from highnet_rag.app import create_app
@@ -107,12 +108,66 @@ def test_missing_api_key_fails_as_a_trace_event_not_a_crash(make_settings) -> No
 
 
 def test_unsupported_mode_is_rejected(client: TestClient) -> None:
-    assert client.get("/api/query", params={"q": "x", "mode": "hybrid"}).status_code == 422
+    assert client.get("/api/query", params={"q": "x", "mode": "agentic"}).status_code == 422
+
+
+def by_stage(events) -> dict[str, dict]:
+    return {d["stage"]: d for name, d in events if name == "trace"}
+
+
+def test_bm25_mode_skips_the_embedding_and_shows_the_match_string(client: TestClient) -> None:
+    t = by_stage(run(client, q="Where is Normandy located?", mode="bm25", k=2))
+    for stage in ("embed_query", "map_project", "vector", "fuse"):
+        assert t[stage]["status"] == "skipped", stage
+    assert t["bm25"]["data"]["fts_query"] == '"normandy" OR "located"'
+    assert t["bm25"]["tokens"] == 0 and t["embed_query"]["cost_usd"] == 0
+    context = t["select_context"]["data"]
+    assert context["ranking"] == "bm25" and context["score_name"] == "bm25"
+    assert [c["chunk_id"] for c in context["chunks"]] == [
+        r["chunk_id"] for r in t["bm25"]["data"]["results"]
+    ]
+    assert "Normans" in t["bm25"]["data"]["results"][0]["doc_title"]
+
+
+def test_vector_mode_skips_keyword_search_and_fusion(client: TestClient) -> None:
+    t = by_stage(run(client, mode="vector", k=2))
+    assert t["bm25"]["status"] == "skipped" and t["fuse"]["status"] == "skipped"
+    assert t["vector"]["data"]["depth"] == 2
+    assert t["select_context"]["data"]["score_name"] == "distance"
+
+
+def test_hybrid_mode_fuses_deeper_lists_with_rrf(client: TestClient) -> None:
+    t = by_stage(run(client, q="Where is Normandy?", mode="hybrid", k=2))
+    assert t["bm25"]["data"]["depth"] == 4 and t["vector"]["data"]["depth"] == 4
+    fuse = t["fuse"]["data"]
+    assert fuse["method"] == "rrf" and fuse["k"] == 60 and fuse["kept"] == 2
+    for row in fuse["results"]:
+        ranks = [r for r in row["from"].values() if r is not None]
+        assert row["score"] == pytest.approx(sum(1 / (60 + r) for r in ranks), abs=1e-5)
+        assert set(row["from"]) == {"bm25_rank", "vector_rank"}
+    context = t["select_context"]["data"]
+    assert context["ranking"] == "fuse"
+    assert [c["chunk_id"] for c in context["chunks"]] == [
+        r["chunk_id"] for r in fuse["results"][:2]
+    ]
+
+
+def test_changing_a_setting_changes_the_trace(client: TestClient) -> None:
+    def retrieval(**params: str | int):
+        t = by_stage(run(client, q="Where is Normandy?", **params))
+        context = t["select_context"]["data"]
+        return (context["ranking"], [c["chunk_id"] for c in context["chunks"]])
+
+    base = retrieval(mode="hybrid", k=2, chunk_set="medium")
+    assert retrieval(mode="bm25", k=2, chunk_set="medium")[0] != base[0]
+    assert len(retrieval(mode="hybrid", k=1, chunk_set="medium")[1]) == 1
+    assert set(retrieval(mode="hybrid", k=2, chunk_set="small")[1]).isdisjoint(base[1])
 
 
 def test_config_map_and_chunk_endpoints(client: TestClient) -> None:
     config = client.get("/api/config").json()
-    assert config["modes"] == ["vector"] and config["illustrative"] is True
+    assert config["modes"] == ["bm25", "vector", "hybrid"] and config["illustrative"] is True
+    assert config["default_mode"] == "hybrid"
     points = client.get("/api/corpus/map", params={"chunk_set": "medium"}).json()["points"]
     assert points
     chunk = client.get(f"/api/chunks/{points[0][0]}").json()

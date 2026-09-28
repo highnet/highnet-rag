@@ -11,8 +11,11 @@ const ContextView = ({ data, cited }: ContextViewProps) => {
   return (
     <div className="space-y-3">
       <Typography variant="small" color="muted">
-        {data.chunks.length} passages, about {data.context_tokens_approx.toLocaleString('en')}{' '}
-        tokens of context.
+        {COPY.stageText.context(
+          data.chunks.length,
+          COPY.stageText.rankings[data.ranking],
+          data.context_tokens_approx.toLocaleString('en'),
+        )}
       </Typography>
       <ol className="border-t border-dashed">
         {data.chunks.map((chunk) => (

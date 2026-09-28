@@ -4,29 +4,36 @@ import { ChevronDown, Minus, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { ApiConfig } from '@/lib/api';
+import type { RunSettings } from '@/lib/url-state';
 
 type SettingsStripProps = {
   config: ApiConfig;
-  k: number;
-  chunkSet: string;
+  settings: RunSettings;
   disabled: boolean;
-  onK: (k: number) => void;
+  stale: boolean;
+  onChange: (settings: RunSettings) => void;
 };
 
+const S = COPY.settings;
+
 // Only settings that change something in this build are shown; more join per milestone.
-const SettingsStrip = ({ config, k, chunkSet, disabled, onK }: SettingsStripProps) => {
+const SettingsStrip = ({ config, settings, disabled, stale, onChange }: SettingsStripProps) => {
+  const { mode, k, chunkSet } = settings;
   const set = config.chunk_sets.find((s) => s.name === chunkSet);
+  const modeLabel = S.modes[mode]?.label ?? mode;
+
   // Phones: a one-line summary that opens the controls. From sm up the strip is always open.
   return (
     <Collapsible className="border-y border-dashed">
       <CollapsibleTrigger className="group flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 text-sm sm:hidden">
         <span>
-          <span className="text-muted-foreground">{COPY.settings.summary} </span>
+          <span className="text-muted-foreground">{S.summary} </span>
           <span className="voice-data">
-            k={k} · {config.modes.join(', ')} · {chunkSet}
+            {modeLabel} · k={k} · {chunkSet}
           </span>
         </span>
         <ChevronDown
@@ -36,19 +43,37 @@ const SettingsStrip = ({ config, k, chunkSet, disabled, onK }: SettingsStripProp
       </CollapsibleTrigger>
       <CollapsibleContent
         forceMount
-        className="flex flex-wrap items-center gap-x-8 gap-y-3 pb-3 data-[state=closed]:hidden sm:py-3 sm:data-[state=closed]:flex"
+        className="flex flex-col gap-y-4 pb-4 data-[state=closed]:hidden sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-8 sm:py-3 sm:data-[state=closed]:flex"
       >
-        <div className="flex items-center gap-3">
-          <Typography variant="small" color="muted" as="span" id="topk-label">
-            {COPY.settings.topK}
+        <div className="space-y-1.5">
+          <Typography variant="small" color="muted" as="span" id="mode-label" className="block">
+            {S.search}
+          </Typography>
+          <SegmentedControl
+            name="mode"
+            labelledBy="mode-label"
+            describedBy="mode-description"
+            value={mode}
+            disabled={disabled}
+            onChange={(value) => onChange({ ...settings, mode: value })}
+            options={config.modes.map((m) => ({ value: m, label: S.modes[m]?.label ?? m }))}
+          />
+          <Typography variant="small" color="muted" id="mode-description" className="max-w-[36ch]">
+            {S.modes[mode]?.description}
+          </Typography>
+        </div>
+
+        <div className="space-y-1.5">
+          <Typography variant="small" color="muted" as="span" id="topk-label" className="block">
+            {S.topK}
           </Typography>
           <div role="group" aria-labelledby="topk-label" className="flex items-center gap-1">
             <Button
               variant="quiet"
               size="icon"
-              aria-label={COPY.settings.fewer}
+              aria-label={S.fewer}
               disabled={disabled || k <= 1}
-              onClick={() => onK(k - 1)}
+              onClick={() => onChange({ ...settings, k: k - 1 })}
             >
               <Minus aria-hidden />
             </Button>
@@ -58,25 +83,44 @@ const SettingsStrip = ({ config, k, chunkSet, disabled, onK }: SettingsStripProp
             <Button
               variant="quiet"
               size="icon"
-              aria-label={COPY.settings.more}
+              aria-label={S.more}
               disabled={disabled || k >= config.top_k.max}
-              onClick={() => onK(k + 1)}
+              onClick={() => onChange({ ...settings, k: k + 1 })}
             >
               <Plus aria-hidden />
             </Button>
           </div>
         </div>
-        <p className="text-sm">
-          <span className="text-muted-foreground">{COPY.settings.search} </span>
-          <span className="voice-data">{config.modes.join(', ')}</span>
-        </p>
-        {set && (
-          <p className="text-sm">
-            <span className="text-muted-foreground">{COPY.settings.chunks} </span>
-            <span className="voice-data">
-              {set.name} · ~{set.target_tokens} tok · {set.chunks.toLocaleString('en')} chunks
-            </span>
-          </p>
+
+        {config.chunk_sets.length > 0 && (
+          <div className="space-y-1.5">
+            <Typography variant="small" color="muted" as="span" id="chunks-label" className="block">
+              {S.chunks}
+              {set && (
+                <span className="voice-data ml-2 text-xs">
+                  {S.chunkSize(set.target_tokens, set.chunks)}
+                </span>
+              )}
+            </Typography>
+            <SegmentedControl
+              name="chunks"
+              labelledBy="chunks-label"
+              value={chunkSet}
+              disabled={disabled}
+              onChange={(value) => onChange({ ...settings, chunkSet: value })}
+              options={config.chunk_sets.map((s) => ({
+                value: s.name,
+                label: s.name,
+                description: S.chunkSize(s.target_tokens, s.chunks),
+              }))}
+            />
+          </div>
+        )}
+
+        {stale && (
+          <Typography variant="marginNote" className="sm:basis-full">
+            {S.changed}
+          </Typography>
         )}
       </CollapsibleContent>
     </Collapsible>

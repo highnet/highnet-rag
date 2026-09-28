@@ -9,8 +9,16 @@ import { COPY } from '@/content/copy';
 import { STAGE_ORDER, STAGES } from '@/content/stages';
 import { fetchConfig, type ApiConfig } from '@/lib/api';
 import { formatMs, formatUsd } from '@/lib/format';
-import type { CitationsData, ContextChunk, ContextData } from '@/lib/stage-data';
+import type { TraceEvent } from '@/lib/generated/trace';
+import type {
+  Bm25Data,
+  CitationsData,
+  ContextChunk,
+  ContextData,
+  VectorData,
+} from '@/lib/stage-data';
 import { useTraceStream } from '@/lib/use-trace-stream';
+import { parseUrlState, type RunSettings, writeUrlState } from '@/lib/url-state';
 
 import { AnswerResult } from './AnswerResult';
 import { QuestionForm } from './QuestionForm';
@@ -22,28 +30,36 @@ type ConfigState =
   | { status: 'ready'; config: ApiConfig }
   | { status: 'error'; message: string };
 
-const DEFAULT_CHUNK_SET = 'medium';
-
 const PipelineExplorer = () => {
   const [configState, setConfigState] = useState<ConfigState>({ status: 'loading' });
-  const [k, setK] = useState(5);
+  const [settings, setSettings] = useState<RunSettings | null>(null);
+  const [linkedQuestion, setLinkedQuestion] = useState('');
   const trace = useTraceStream();
+  const { run } = trace;
 
   // State is only set from the fetch callbacks, never synchronously inside the effect.
-  const requestConfig = useCallback((signal?: AbortSignal) => {
-    fetchConfig(signal)
-      .then((config) => {
-        setConfigState({ status: 'ready', config });
-        setK(config.top_k.default);
-      })
-      .catch((error: unknown) => {
-        if (signal?.aborted) return;
-        setConfigState({
-          status: 'error',
-          message: error instanceof Error ? error.message : String(error),
+  // Settings come from the link when it carries valid ones; a linked question runs at once.
+  const requestConfig = useCallback(
+    (signal?: AbortSignal) => {
+      fetchConfig(signal)
+        .then((config) => {
+          const linked = parseUrlState(window.location.search, config);
+          const { q, ...linkedSettings } = linked;
+          setConfigState({ status: 'ready', config });
+          setSettings(linkedSettings);
+          setLinkedQuestion(q);
+          if (q && config.budget.tier !== 'stopped') run({ q, ...linkedSettings });
+        })
+        .catch((error: unknown) => {
+          if (signal?.aborted) return;
+          setConfigState({
+            status: 'error',
+            message: error instanceof Error ? error.message : String(error),
+          });
         });
-      });
-  }, []);
+    },
+    [run],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -64,7 +80,21 @@ const PipelineExplorer = () => {
       (contextData?.chunks ?? []).map((c) => [c.chunk_id, c]),
     );
     const cited = new Set((citations?.citations ?? []).map((c) => c.chunk_id));
-    return { chunks, cited, citations, streamedAnswer: trace.answer };
+    // Fusion shows its two input rankings, so it needs the search steps' results too.
+    const ok = (stage: string) => {
+      const event = byStage.get(stage as TraceEvent['stage']);
+      return event && event.status !== 'skipped' && event.status !== 'error'
+        ? event.data
+        : undefined;
+    };
+    return {
+      chunks,
+      cited,
+      citations,
+      streamedAnswer: trace.answer,
+      bm25: ok('bm25') as Bm25Data | undefined,
+      vector: ok('vector') as VectorData | undefined,
+    };
   }, [trace.events, trace.answer]);
 
   const lastEvent = trace.events.at(-1);
@@ -82,9 +112,21 @@ const PipelineExplorer = () => {
   const running = trace.status === 'running';
 
   const runQuestion = (q: string) => {
-    if (!config) return; // the form is disabled until the API has answered
-    trace.run({ q, k, chunkSet: DEFAULT_CHUNK_SET, mode: config.modes[0] });
+    if (!settings) return; // the form is disabled until the API has answered
+    writeUrlState({ q, ...settings });
+    run({ q, ...settings });
   };
+
+  const changeSettings = (next: RunSettings) => {
+    setSettings(next);
+    writeUrlState({ q: trace.input?.q ?? '', ...next });
+  };
+
+  const ran = trace.input;
+  const stale =
+    ran !== null &&
+    settings !== null &&
+    (ran.mode !== settings.mode || ran.k !== settings.k || ran.chunkSet !== settings.chunkSet);
 
   return (
     <div className="space-y-8 md:space-y-10">
@@ -124,19 +166,21 @@ const PipelineExplorer = () => {
         )}
 
         <QuestionForm
+          key={linkedQuestion}
+          initialQuestion={linkedQuestion}
           running={running}
           disabled={!config || tier === 'stopped'}
           maxLength={config?.max_query_chars ?? 500}
           onRun={runQuestion}
           onStop={trace.cancel}
         />
-        {config && (
+        {config && settings && (
           <SettingsStrip
             config={config}
-            k={k}
-            chunkSet={DEFAULT_CHUNK_SET}
+            settings={settings}
             disabled={running}
-            onK={setK}
+            stale={stale && !running}
+            onChange={changeSettings}
           />
         )}
         {trace.connectionError && <Notice tone="warning">{trace.connectionError}</Notice>}

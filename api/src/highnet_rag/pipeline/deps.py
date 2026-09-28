@@ -8,13 +8,15 @@ from highnet_rag.config import Settings
 from highnet_rag.providers import Providers
 from highnet_rag.storage.base import CorpusStore, MapPoint, StateStore
 
-# Milestone 1 runs vector search only; BM25/hybrid, reranking and agentic mode join in M2-M4.
-SUPPORTED_MODES = ("vector",)
+# Retrieval modes, in the order the UI offers them. Reranking and agentic mode join later.
+Mode = Literal["bm25", "vector", "hybrid"]
+SUPPORTED_MODES: tuple[Mode, ...] = ("bm25", "vector", "hybrid")
+DEFAULT_MODE: Mode = "hybrid"
 
 
 class QueryParams(BaseModel):
     q: str = Field(min_length=1, max_length=500)
-    mode: Literal["vector"] = "vector"
+    mode: Mode = DEFAULT_MODE
     k: int = Field(default=5, ge=1, le=10)
     chunk_set: str = "medium"
 

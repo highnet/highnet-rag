@@ -119,6 +119,66 @@ describe('explorer states', () => {
   });
 });
 
+describe('settings and shared links', () => {
+  const radio = (name: string) => screen.getByRole('radio', { name });
+
+  it('sends the chosen mode, top-k and chunk size, and keeps them in the URL', async () => {
+    withConfig();
+    render(<PipelineExplorer />);
+    await screen.findByText(COPY.settings.topK);
+    expect(radio('hybrid')).toBeChecked();
+    fireEvent.click(radio('BM25'));
+    fireEvent.click(radio('small'));
+    expect(window.location.search).toBe('?mode=bm25&k=5&chunks=small');
+    fireEvent.change(screen.getByLabelText(COPY.questionLabel), { target: { value: 'Why?' } });
+    fireEvent.submit(screen.getByRole('search'));
+    const source = ControlledEventSource.last();
+    expect(source.url).toContain('mode=bm25');
+    expect(source.url).toContain('chunk_set=small');
+    expect(window.location.search).toBe('?q=Why%3F&mode=bm25&k=5&chunks=small');
+    act(() => source.emit('done', { run_id: 'run', status: 'ok', ms: 1, tokens: 0, cost_usd: 0 }));
+    expect(screen.queryByText(COPY.settings.changed)).not.toBeInTheDocument();
+    fireEvent.click(radio('vector'));
+    expect(screen.getByText(COPY.settings.changed)).toBeInTheDocument();
+    expect(window.location.search).toBe('?q=Why%3F&mode=vector&k=5&chunks=small');
+    fireEvent.click(radio('BM25'));
+    fireEvent.click(screen.getByRole('button', { name: COPY.settings.more }));
+    expect(screen.getByText(COPY.settings.changed)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: COPY.settings.fewer }));
+    fireEvent.click(radio('medium'));
+    expect(screen.getByText(COPY.settings.changed)).toBeInTheDocument();
+  });
+
+  it('runs a linked question with the settings in its link', async () => {
+    window.history.replaceState(null, '', '/?q=Who%3F&mode=vector&k=3&chunks=large');
+    withConfig();
+    render(<PipelineExplorer />);
+    await screen.findByText(COPY.settings.topK);
+    const source = ControlledEventSource.last();
+    expect(source.url).toContain('q=Who%3F');
+    expect(source.url).toContain('mode=vector');
+    expect(source.url).toContain('k=3');
+    expect(source.url).toContain('chunk_set=large');
+    expect(screen.getByLabelText(COPY.questionLabel)).toHaveValue('Who?');
+    expect(radio('large')).toBeChecked();
+  });
+
+  it('does not run a linked question once the budget is spent', async () => {
+    window.history.replaceState(null, '', '/?q=Who%3F');
+    withConfig({ budget: { spent_usd: 20, cap_usd: 20, remaining_usd: 0, tier: 'stopped' } });
+    render(<PipelineExplorer />);
+    await screen.findByText(COPY.settings.topK);
+    expect(ControlledEventSource.instances).toHaveLength(0);
+  });
+
+  it('labels a mode it has no copy for by its name', async () => {
+    withConfig({ modes: ['hybrid', 'agentic'], default_mode: 'agentic' });
+    render(<PipelineExplorer />);
+    await screen.findByText(COPY.settings.topK);
+    expect(radio('agentic')).toBeChecked();
+  });
+});
+
 describe('useTraceStream', () => {
   const input = { q: 'q', k: 3, chunkSet: 'medium', mode: 'vector' };
 

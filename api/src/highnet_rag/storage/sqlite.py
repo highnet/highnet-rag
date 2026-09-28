@@ -112,6 +112,7 @@ class SqliteCorpusStore:
             for r in rows
         ]
 
+    # snippet: bm25 | FTS5 BM25 ranking
     def bm25(self, fts_query: str, chunk_set_id: int, k: int) -> list[Hit]:
         rows = self._conn.execute(
             "SELECT rowid, bm25(chunks_fts) AS score FROM chunks_fts "
@@ -120,6 +121,8 @@ class SqliteCorpusStore:
         )
         # FTS5 bm25() is lower-is-better (negative); flip the sign so higher = more relevant.
         return [Hit(r["rowid"], i + 1, -float(r["score"])) for i, r in enumerate(rows)]
+
+    # /snippet
 
     # snippet: vector | sqlite-vec nearest neighbours
     def knn(self, vector: np.ndarray, chunk_set_id: int, k: int) -> list[Hit]:

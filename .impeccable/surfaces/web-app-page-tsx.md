@@ -19,7 +19,7 @@ Scope: the single main surface. Ask a question, watch the pipeline work it out s
 
 THESIS: A query is a calculation worked out on an engineer's computation pad. It refuses the category default of a chat bubble with a hidden "sources" drawer: here the working is the page, and the answer is the last line.
 
-OWN-WORLD: The ground is pale-green engineering paper with a faint 20px grid. Graphite ink carries every fact and number. Blue pencil is the only accent, used for margin notes, the active step and actions; red check marks mean failure only. Recursive: linear sans for prose, casual and slanted for pencil notes, mono with tabular figures for data. Lines are 1px, corners 2–4px, and nothing has a shadow. In the dark theme the same pad sits under a drafting lamp.
+OWN-WORLD: The ground is plain pale-green engineering paper (no grid pattern; owner decision). Graphite ink carries every fact and number. Blue pencil is the only accent, used for margin notes, the active step and actions; red check marks mean failure only. Recursive: linear sans for prose, casual and slanted for pencil notes, mono with tabular figures for data. Lines are 1px, corners 2–4px, and nothing has a shadow. In the dark theme the same pad sits under a drafting lamp.
 
 STORY: The visitor sees that retrieval decides the answer, believes the numbers because they are live, and changes one knob to watch which step moves.
 
