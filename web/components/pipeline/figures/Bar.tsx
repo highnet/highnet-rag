@@ -9,6 +9,7 @@ const segmentVariants = cva('h-full min-w-px shrink-0 border-r border-card last:
       bm25: 'bg-chart-2',
       vector: 'bg-chart-1',
       fused: 'bg-chart-3',
+      rerank: 'bg-chart-4',
       neutral: 'bg-chart-5',
       soft: 'bg-chart-5/35',
       ink: 'bg-foreground',

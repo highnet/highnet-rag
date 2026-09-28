@@ -168,6 +168,31 @@ def test_figures_get_real_numbers(client: TestClient) -> None:
     assert split == {"input_usd": 0.0, "output_usd": 0.0}  # fake models are free
 
 
+def test_rerank_reorders_deeper_candidates_and_records_the_moves(client: TestClient) -> None:
+    t = by_stage(run(client, q="Where is Normandy?", mode="vector", k=2, rerank="true"))
+    assert t["vector"]["data"]["depth"] == 4  # the reranker gets candidates beyond top-k
+    rerank = t["rerank"]["data"]
+    assert rerank["input"] == "vector" and rerank["kept"] == 2
+    results = rerank["results"]
+    assert sorted(r["before_rank"] for r in results) == list(range(1, len(results) + 1))
+    assert [r["relevance"] for r in results] == sorted(
+        (r["relevance"] for r in results), reverse=True
+    )
+    context = t["select_context"]["data"]
+    assert context["ranking"] == "rerank" and context["score_name"] == "relevance"
+    assert [c["chunk_id"] for c in context["chunks"]] == [r["chunk_id"] for r in results[:2]]
+    assert t["request"]["data"]["settings"]["rerank"] is True
+
+
+def test_rerank_is_off_by_default_and_paused_past_the_budget_mark(make_settings) -> None:
+    settings = make_settings(budget_monthly_usd=1.0)
+    with TestClient(create_app(settings)) as c:
+        assert by_stage(run(c))["rerank"]["data"]["reason"].startswith("Off.")
+        SqliteStateStore(settings.state_db_path).record_spend(None, "x", "m", "gen", 0, 0, 0.9)
+        t = by_stage(run(c, rerank="true"))
+    assert t["rerank"]["status"] == "skipped" and "80%" in t["rerank"]["data"]["reason"]
+
+
 def test_changing_a_setting_changes_the_trace(client: TestClient) -> None:
     def retrieval(**params: str | int):
         t = by_stage(run(client, q="Where is Normandy?", **params))
@@ -184,7 +209,9 @@ def test_config_map_and_chunk_endpoints(client: TestClient) -> None:
     config = client.get("/api/config").json()
     assert config["modes"] == ["bm25", "vector", "hybrid"] and config["illustrative"] is True
     assert config["default_mode"] == "hybrid"
-    points = client.get("/api/corpus/map", params={"chunk_set": "medium"}).json()["points"]
+    corpus_map = client.get("/api/corpus/map", params={"chunk_set": "medium"}).json()
+    points = corpus_map["points"]
+    assert corpus_map["documents"][str(points[0][1])] in {"Normans", "Amazon_rainforest", "Oxygen"}
     assert points
     chunk = client.get(f"/api/chunks/{points[0][0]}").json()
     assert chunk["id"] == points[0][0] and chunk["text"]

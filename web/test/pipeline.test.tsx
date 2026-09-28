@@ -11,13 +11,18 @@ import { STAGE_ORDER, STAGES } from '@/content/stages';
 import { FakeEventSource } from './fake-event-source';
 
 const config = JSON.parse(readFileSync(path.join(__dirname, 'fixtures/config.json'), 'utf8'));
+const corpusMap = readFileSync(path.join(__dirname, 'fixtures/map.json'), 'utf8');
 
 describe('pipeline view (smoke)', () => {
   beforeEach(() => {
     vi.stubGlobal('EventSource', FakeEventSource);
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response(JSON.stringify(config), { status: 200 })),
+      vi.fn(async (url: string) =>
+        url.includes('/api/corpus/map')
+          ? new Response(corpusMap, { status: 200 })
+          : new Response(JSON.stringify(config), { status: 200 }),
+      ),
     );
   });
 
@@ -48,6 +53,9 @@ describe('pipeline view (smoke)', () => {
       expect(within(step).getAllByText(COPY.why).length).toBeGreaterThan(0);
       expect(within(step).getAllByText(STAGES[stage].why).length).toBeGreaterThan(0);
     }
+    // The map arrives on its own request and draws every chunk plus the question.
+    const map = await screen.findByRole('img', { name: /Map of 1,008 chunks/ });
+    expect(map.querySelectorAll('circle').length).toBeGreaterThan(1000);
     const result = screen.getByRole('region', { name: COPY.resultLabel });
     expect(within(result).getByText(/Normandy/)).toBeInTheDocument();
     expect(within(result).getByText(/Total/)).toBeInTheDocument();

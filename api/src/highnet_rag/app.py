@@ -123,6 +123,7 @@ def create_app(
             "chunk_set": chunk_set,
             "explained_variance": deps.corpus.projection(match.id).explained_variance,
             "points": [[p.chunk_id, p.doc_id, round(p.x, 5), round(p.y, 5)] for p in points],
+            "documents": {str(i): t for i, t in deps.corpus.documents().items()},
         }
         build = deps.corpus.meta().get("build_id", "")
         return JSONResponse(body, headers={"ETag": f'"{build}-{chunk_set}"'})
@@ -152,9 +153,14 @@ def create_app(
         mode: Annotated[Mode, Query()] = DEFAULT_MODE,
         k: Annotated[int, Query(ge=1, le=10)] = 5,
         chunk_set: Annotated[str, Query()] = "medium",
+        rerank: Annotated[bool, Query()] = False,
     ) -> StreamingResponse:
         params = QueryParams(
-            q=q.strip(), mode=mode, k=min(k, settings.max_top_k), chunk_set=chunk_set
+            q=q.strip(),
+            mode=mode,
+            k=min(k, settings.max_top_k),
+            chunk_set=chunk_set,
+            rerank=rerank,
         )
         ip_hash = hash_ip(client_ip(request), settings)
         return StreamingResponse(

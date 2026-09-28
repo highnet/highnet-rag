@@ -6,7 +6,7 @@ export type ProviderModel = { provider: string; model: string };
 
 export type RequestData = {
   run_id: string;
-  settings: { q: string; mode: string; k: number; chunk_set: string };
+  settings: { q: string; mode: string; k: number; chunk_set: string; rerank?: boolean };
   models: { embed: ProviderModel; answer: ProviderModel };
   rate_limit: {
     remaining_minute: number;
@@ -31,6 +31,13 @@ export type EmbedData = ProviderModel & {
   dims: number;
   vector_preview: number[];
   norm: number;
+};
+
+export type CorpusMapData = {
+  chunk_set: string;
+  explained_variance: [number, number];
+  points: [number, number, number, number][];
+  documents: Record<string, string>;
 };
 
 export type MapData = {
@@ -69,6 +76,16 @@ export type FusedHit = RankedHit & {
 
 export type FuseData = { method: string; k: number; kept: number; results: FusedHit[] };
 
+export type RerankData = ProviderModel & {
+  input: string;
+  kept: number;
+  retries: number;
+  results: (RankedHit & { before_rank: number; relevance: number })[];
+  // Set instead of the fields above when reranking failed and the earlier order was kept.
+  error?: StageError;
+  fallback?: string;
+};
+
 export type ContextChunk = {
   chunk_id: number;
   rank: number;
@@ -81,8 +98,8 @@ export type ContextChunk = {
 
 export type ContextData = {
   top_k: number;
-  ranking: 'bm25' | 'vector' | 'fuse';
-  score_name: 'bm25' | 'distance' | 'rrf';
+  ranking: 'bm25' | 'vector' | 'fuse' | 'rerank';
+  score_name: 'bm25' | 'distance' | 'rrf' | 'relevance';
   context_tokens_approx: number;
   chunks: ContextChunk[];
 };

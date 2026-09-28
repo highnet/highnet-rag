@@ -22,7 +22,7 @@ const S = COPY.settings;
 
 // Only settings that change something in this build are shown; more join per milestone.
 const SettingsStrip = ({ config, settings, disabled, stale, onChange }: SettingsStripProps) => {
-  const { mode, k, chunkSet } = settings;
+  const { mode, k, chunkSet, rerank } = settings;
   const set = config.chunk_sets.find((s) => s.name === chunkSet);
   const modeLabel = S.modes[mode]?.label ?? mode;
 
@@ -33,7 +33,8 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
         <span>
           <span className="text-muted-foreground">{S.summary} </span>
           <span className="voice-data">
-            {modeLabel} · k={k} · {chunkSet}
+            {modeLabel} · k={k}
+            {rerank && ` · ${S.rerankShort}`} · {chunkSet}
           </span>
         </span>
         <ChevronDown
@@ -58,7 +59,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
             onChange={(value) => onChange({ ...settings, mode: value })}
             options={config.modes.map((m) => ({ value: m, label: S.modes[m]?.label ?? m }))}
           />
-          <Typography variant="small" color="muted" id="mode-description" className="max-w-[36ch]">
+          <Typography variant="small" color="muted" id="mode-description" className="max-w-[28ch]">
             {S.modes[mode]?.description}
           </Typography>
         </div>
@@ -90,6 +91,32 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
               <Plus aria-hidden />
             </Button>
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Typography variant="small" color="muted" as="span" id="rerank-label" className="block">
+            {S.rerank}
+          </Typography>
+          <SegmentedControl
+            name="rerank"
+            labelledBy="rerank-label"
+            describedBy="rerank-description"
+            value={rerank ? 'on' : 'off'}
+            disabled={disabled}
+            onChange={(value) => onChange({ ...settings, rerank: value === 'on' })}
+            options={[
+              { value: 'off', label: S.rerankOptions.off },
+              { value: 'on', label: S.rerankOptions.on },
+            ]}
+          />
+          <Typography
+            variant="small"
+            color="muted"
+            id="rerank-description"
+            className="max-w-[28ch]"
+          >
+            {rerank ? S.rerankDescription.on : S.rerankDescription.off}
+          </Typography>
         </div>
 
         {config.chunk_sets.length > 0 && (

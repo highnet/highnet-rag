@@ -18,6 +18,7 @@ class QueryParams(BaseModel):
     q: str = Field(min_length=1, max_length=500)
     mode: Mode = DEFAULT_MODE
     k: int = Field(default=5, ge=1, le=10)
+    rerank: bool = False
     chunk_set: str = "medium"
 
 

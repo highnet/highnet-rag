@@ -180,7 +180,7 @@ describe('settings and shared links', () => {
 });
 
 describe('useTraceStream', () => {
-  const input = { q: 'q', k: 3, chunkSet: 'medium', mode: 'vector' };
+  const input = { q: 'q', k: 3, chunkSet: 'medium', mode: 'vector', rerank: false };
 
   it('collects events in order, streams text and finishes', () => {
     const { result } = renderHook(() => useTraceStream());

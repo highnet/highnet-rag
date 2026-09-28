@@ -83,13 +83,15 @@ describe('url state', () => {
   it('keeps valid values and replaces invalid ones with the defaults', () => {
     expect(
       parseUrlState('?q=%20Who%20won%20the%20cup%3F&mode=bm25&k=2&chunks=small', config),
-    ).toEqual({ q: 'Who won th', mode: 'bm25', k: 2, chunkSet: 'small' });
+    ).toEqual({ q: 'Who won th', mode: 'bm25', k: 2, chunkSet: 'small', rerank: false });
     expect(parseUrlState('?mode=agentic&k=11&chunks=huge', config)).toEqual({
       q: '',
       mode: 'hybrid',
       k: 5,
       chunkSet: 'medium',
+      rerank: false,
     });
+    expect(parseUrlState('?rerank=1', config).rerank).toBe(true);
     expect(parseUrlState('?k=2.5', config).k).toBe(5);
     expect(parseUrlState('?k=0', config).k).toBe(5);
   });
@@ -102,8 +104,11 @@ describe('url state', () => {
   });
 
   it('leaves the question out of the link until there is one', () => {
-    expect(urlSearch({ q: '', mode: 'vector', k: 3, chunkSet: 'small' })).toBe(
+    expect(urlSearch({ q: '', mode: 'vector', k: 3, chunkSet: 'small', rerank: false })).toBe(
       '?mode=vector&k=3&chunks=small',
+    );
+    expect(urlSearch({ q: 'x', mode: 'hybrid', k: 5, chunkSet: 'small', rerank: true })).toBe(
+      '?q=x&mode=hybrid&k=5&chunks=small&rerank=1',
     );
   });
 });

@@ -35,6 +35,13 @@ export const COPY = {
     chunkSize: (tokens: number, chunks: number) =>
       `~${tokens} tokens each · ${chunks.toLocaleString('en')} chunks`,
     changed: 'Changed since this run. Run again to see the effect.',
+    rerank: 'Reranker',
+    rerankOptions: { off: 'off', on: 'on' },
+    rerankDescription: {
+      off: 'The search order is final.',
+      on: 'A reranker reads each candidate with the question and reorders them.',
+    },
+    rerankShort: 'rerank',
   },
   workingLabel: 'The working',
   workingNote: (n: number) => `${n} steps, in the order they run`,
@@ -48,6 +55,8 @@ export const COPY = {
     closest: (distance: string, title: string) => `${distance} · ${title}`,
     bm25Top: (score: string, title: string) => `${score} · ${title}`,
     fused: (kept: number, both: number) => `${kept} kept · ${both} found by both searches`,
+    reranked: (moved: number, kept: number) =>
+      moved === 0 ? `top ${kept} unchanged` : `${moved} of the top ${kept} changed places`,
     context: (n: number, tokens: string) => `${n} passages · ~${tokens} tokens`,
     prompt: (tokens: string, worstCase: string) => `${tokens} in · ${worstCase} worst case`,
     generate: (tokens: string, stop: string) => `${tokens} out · ${stop}`,
@@ -72,7 +81,12 @@ export const COPY = {
       bm25Input: 'BM25 ranking, input to fusion',
       vectorInput: 'Vector ranking, input to fusion',
     },
-    series: { bm25: 'BM25', vector: 'vector', fused: 'fused' },
+    series: { bm25: 'BM25', vector: 'vector', fused: 'fused', rerank: 'reranked' },
+    rerank: (n: number, input: string) =>
+      `Reranked all ${n} candidates from the ${input} ranking by relevance.`,
+    was: 'was',
+    moved: { up: (n: number) => `up ${n}`, down: (n: number) => `down ${n}`, same: 'no change' },
+    relevance: 'relevance',
     inList: (series: string, rank: number) => `${series} rank ${rank}`,
     notInList: (series: string) => `not in the ${series} list`,
     emptyMatch: '(nothing left to search for after dropping stop words)',
@@ -91,7 +105,10 @@ export const COPY = {
       n === 1 ? 'Show the 1 candidate below the cut' : `Show the ${n} candidates below the cut`,
     hideDropped: 'Hide the candidates below the cut',
     contributions: (bm25: string, vector: string) => `${bm25} + ${vector}`,
-    rankings: { bm25: 'BM25', vector: 'vector', fuse: 'fused' } as Record<string, string>,
+    rankings: { bm25: 'BM25', vector: 'vector', fuse: 'fused', rerank: 'reranked' } as Record<
+      string,
+      string
+    >,
     context: (n: number, ranking: string, tokens: string) =>
       `The top ${n} of the ${ranking} ranking, about ${tokens} tokens of context.`,
   },
@@ -154,6 +171,27 @@ export const COPY = {
       output: 'output',
       caption: 'Where this answer’s cost went: reading the prompt versus writing the answer.',
       alt: (input: string, output: string) => `Input cost ${input}, output cost ${output}.`,
+    },
+    rerank: {
+      caption:
+        'Rows slide from their old place to their new one. The bar is the reranker’s relevance score, 0 to 1.',
+    },
+    map: {
+      loading: 'Drawing the map…',
+      failed: 'The map could not be loaded.',
+      axis: (n: number, pct: string) => `PC${n} · ${pct} of the spread`,
+      you: 'your question',
+      showTable: 'Show as a table',
+      hideTable: 'Hide the table',
+      caption: (kept: string) =>
+        `Every dot is a chunk. Blue dots are the passages retrieved, numbered by rank; the “Detail” inset magnifies the neighbourhood of your question, where ringed dots are its nearest on the map. The two axes keep ${kept} of the spread in the embeddings, so nearby on this map is only roughly nearby in meaning. Point at a dot, or pick a row in the table, to light up its whole article.`,
+      detail: 'Detail',
+      groups: { retrieved: 'Retrieved', nearest: 'Nearest on map' },
+      alt: (points: number, retrieved: string) =>
+        `Map of ${points.toLocaleString('en')} chunks with the question and the retrieved passages ${retrieved}. A table with the same positions follows.`,
+      pointed: (title: string, id: number) => `${title} · chunk #${id}`,
+      columns: { what: 'point', x: 'x', y: 'y', distance: 'distance on map' },
+      retrievedRow: (rank: number, title: string) => `[${rank}] ${title}`,
     },
     citations: {
       sentence: 'answer text',
