@@ -14,12 +14,12 @@ const ContextView = ({ data, cited }: ContextViewProps) => {
         {data.chunks.length} passages, about {data.context_tokens_approx.toLocaleString('en')}{' '}
         tokens of context.
       </Typography>
-      <ol className="space-y-2">
+      <ol className="border-t border-dashed">
         {data.chunks.map((chunk) => (
           <li
             key={chunk.chunk_id}
             id={`chunk-${chunk.chunk_id}`}
-            className="scroll-mt-24 rounded-sm border bg-background px-3 py-2 target:border-primary target:bg-accent"
+            className="scroll-mt-24 border-b border-dashed py-2 target:bg-accent"
           >
             <Collapsible>
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">

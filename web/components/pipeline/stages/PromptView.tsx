@@ -39,7 +39,7 @@ const PromptView = ({ data }: PromptViewProps) => {
           <span className="hidden group-data-[state=open]:inline">{COPY.hidePrompt}</span>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <pre className="voice-data mt-2 max-h-96 overflow-auto rounded-sm bg-background p-3 text-xs leading-relaxed">
+          <pre className="voice-data mt-2 max-h-96 overflow-auto border-y border-dashed py-3 text-xs leading-relaxed">
             {JSON.stringify(request, null, 2)}
           </pre>
         </CollapsibleContent>

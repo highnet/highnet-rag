@@ -20,7 +20,10 @@ const StepList = ({ events, runStatus, context }: StepListProps) => {
   const stopped = runStatus !== 'running';
 
   return (
-    <ol className="space-y-4" aria-labelledby="working-title">
+    <ol
+      aria-labelledby="working-title"
+      className="relative space-y-4 md:before:absolute md:before:inset-y-0 md:before:left-14 md:before:w-px md:before:bg-border lg:before:left-16"
+    >
       {STAGE_ORDER.map((stage, index) => {
         const event = byStage.get(stage);
         const running = !event && !stopped && stage === firstMissing;

@@ -89,10 +89,10 @@ const PipelineExplorer = () => {
     <div className="space-y-10">
       <section aria-labelledby="sheet-title" className="space-y-5">
         <div className="space-y-2">
-          <Typography variant="label" color="muted" as="p">
-            {COPY.sheetLabel}
-          </Typography>
           <Typography variant="sheetTitle" id="sheet-title">
+            <span className="voice-data mr-3 align-[0.2em] text-sm font-normal tracking-normal text-muted-foreground">
+              {COPY.sheetLabel} ·
+            </span>
             {trace.input?.q ?? COPY.emptyTitle}
           </Typography>
           {!trace.input && <Typography color="muted">{COPY.intro}</Typography>}

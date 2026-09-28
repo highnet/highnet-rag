@@ -31,17 +31,20 @@ const StepSheet = ({ number, copy, status, measure, children }: StepSheetProps) 
       <span
         aria-hidden
         className={cn(
-          'voice-data pt-4 text-right text-sm md:text-base',
+          'voice-data flex flex-col items-end gap-2 self-stretch pt-4 text-sm md:text-base',
           status === 'running' ? 'text-primary' : 'text-muted-foreground',
+          !quiet && 'animate-write-in [animation-duration:120ms]',
         )}
       >
         {pad2(number)}
+        {status === 'running' && <span className="w-0.5 flex-1 bg-primary" />}
       </span>
       <article
         className={cn(
-          'min-w-0 rounded-md border px-4 py-4 md:px-5',
-          quiet ? 'border-dashed bg-transparent' : 'animate-write-in bg-card',
-          status === 'running' && 'border-primary',
+          'min-w-0 self-start rounded-md border px-4 py-4 md:px-5',
+          quiet
+            ? 'border-dashed bg-transparent py-3'
+            : 'animate-write-in bg-card [animation-delay:40ms] [animation-duration:140ms] motion-reduce:[animation-delay:0ms]',
           status === 'error' && 'border-destructive',
         )}
       >
@@ -65,7 +68,15 @@ const StepSheet = ({ number, copy, status, measure, children }: StepSheetProps) 
           <WhyThisStep copy={copy} layout="inline" className="mt-4 lg:hidden" />
         )}
       </article>
-      <WhyThisStep copy={copy} layout="margin" className="hidden lg:block" />
+      <WhyThisStep
+        copy={copy}
+        layout="margin"
+        className={cn(
+          'hidden lg:block',
+          !quiet &&
+            'animate-write-in [animation-delay:90ms] [animation-duration:90ms] motion-reduce:[animation-delay:0ms]',
+        )}
+      />
     </li>
   );
 };
