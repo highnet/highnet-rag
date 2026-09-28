@@ -1,0 +1,846 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T16:00:00Z",
+  "title": "Design System: highnet-rag",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(95.6% 0.021 121.8)",
+        "tonalRamp": [
+          "#0a0d04",
+          "#22261b",
+          "#3e4236",
+          "#5b6053",
+          "#7e8275",
+          "#9fa496",
+          "#c5cabb",
+          "#ecf1e2"
+        ],
+        "cssVar": "--paper",
+        "theme": "light"
+      },
+      "paper-raised": {
+        "role": "neutral",
+        "displayName": "Raised Paper",
+        "canonical": "oklch(98.0% 0.012 121.7)",
+        "tonalRamp": [
+          "#0a0c07",
+          "#23251e",
+          "#3f413a",
+          "#5c5f57",
+          "#7f8179",
+          "#a0a39a",
+          "#c6c9c0",
+          "#edf0e7"
+        ],
+        "cssVar": "--paper-raised",
+        "theme": "light"
+      },
+      "grid": {
+        "role": "neutral",
+        "displayName": "Grid Green",
+        "canonical": "oklch(89.7% 0.037 127.4)",
+        "tonalRamp": [
+          "#070e00",
+          "#1f2713",
+          "#3a442e",
+          "#58624b",
+          "#7a856d",
+          "#9ba68e",
+          "#c1ccb3",
+          "#e7f4d9"
+        ],
+        "cssVar": "--grid",
+        "theme": "light"
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Sheet Rule",
+        "canonical": "oklch(75.6% 0.058 131.3)",
+        "tonalRamp": [
+          "#050e00",
+          "#1a2909",
+          "#354625",
+          "#526542",
+          "#748864",
+          "#95a984",
+          "#bad0a9",
+          "#e1f7cf"
+        ],
+        "cssVar": "--rule",
+        "theme": "light"
+      },
+      "rule-input": {
+        "role": "neutral",
+        "displayName": "Input Rule",
+        "canonical": "oklch(60.6% 0.051 133.5)",
+        "tonalRamp": [
+          "#050f00",
+          "#1a290e",
+          "#35462a",
+          "#526447",
+          "#748768",
+          "#95a989",
+          "#bacfae",
+          "#e1f7d4"
+        ],
+        "cssVar": "--rule-input",
+        "theme": "light"
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "oklch(27.2% 0.015 141.2)",
+        "tonalRamp": [
+          "#080d07",
+          "#20261f",
+          "#3b423a",
+          "#596058",
+          "#7b837a",
+          "#9ca49b",
+          "#c2cac1",
+          "#e9f1e8"
+        ],
+        "cssVar": "--graphite",
+        "theme": "light"
+      },
+      "graphite-muted": {
+        "role": "neutral",
+        "displayName": "Muted Graphite",
+        "canonical": "oklch(45.6% 0.030 137.9)",
+        "tonalRamp": [
+          "#050e03",
+          "#1d2719",
+          "#384434",
+          "#566252",
+          "#788574",
+          "#99a694",
+          "#beccba",
+          "#e5f4e0"
+        ],
+        "cssVar": "--graphite-muted",
+        "theme": "light"
+      },
+      "blue-pencil": {
+        "role": "primary",
+        "displayName": "Blue Pencil",
+        "canonical": "oklch(47.1% 0.114 256.9)",
+        "tonalRamp": [
+          "#000a21",
+          "#02224d",
+          "#0f3e7a",
+          "#2f5d9d",
+          "#5281c3",
+          "#72a3e8",
+          "#a5cafe",
+          "#e5efff"
+        ],
+        "cssVar": "--blue-pencil",
+        "theme": "light"
+      },
+      "blue-wash": {
+        "role": "primary",
+        "displayName": "Blue Wash",
+        "canonical": "oklch(92.1% 0.018 250.6)",
+        "tonalRamp": [
+          "#060c13",
+          "#1d252d",
+          "#394149",
+          "#565f68",
+          "#78818b",
+          "#99a3ad",
+          "#bfc8d3",
+          "#e6f0fb"
+        ],
+        "cssVar": "--blue-wash",
+        "theme": "light"
+      },
+      "red-check": {
+        "role": "semantic",
+        "displayName": "Red Check",
+        "canonical": "oklch(49.6% 0.176 29.0)",
+        "tonalRamp": [
+          "#1e0000",
+          "#4b0101",
+          "#7c0202",
+          "#ab1f18",
+          "#d54b3d",
+          "#fc6f5e",
+          "#fdb1a6",
+          "#ffe9e5"
+        ],
+        "cssVar": "--red-check",
+        "theme": "light"
+      },
+      "amber-note": {
+        "role": "semantic",
+        "displayName": "Amber Note",
+        "canonical": "oklch(49.3% 0.105 72.7)",
+        "tonalRamp": [
+          "#130900",
+          "#341f01",
+          "#583802",
+          "#7f5306",
+          "#a6752f",
+          "#ca9753",
+          "#f1bd78",
+          "#ffebd4"
+        ],
+        "cssVar": "--amber-note",
+        "theme": "light"
+      },
+      "green-tick": {
+        "role": "semantic",
+        "displayName": "Green Tick",
+        "canonical": "oklch(47.5% 0.099 148.2)",
+        "tonalRamp": [
+          "#001003",
+          "#022d0e",
+          "#0c4d1f",
+          "#316d3c",
+          "#54905e",
+          "#75b37e",
+          "#9bd9a3",
+          "#c8ffcf"
+        ],
+        "cssVar": "--green-tick",
+        "theme": "light"
+      },
+      "data-bm25": {
+        "role": "data",
+        "displayName": "BM25 Umber",
+        "canonical": "oklch(50.1% 0.092 58.5)",
+        "tonalRamp": [
+          "#160700",
+          "#391b00",
+          "#613200",
+          "#844f22",
+          "#a97245",
+          "#cd9366",
+          "#f5b98b",
+          "#ffeadb"
+        ],
+        "cssVar": "--data-bm25",
+        "theme": "light"
+      },
+      "data-vector": {
+        "role": "data",
+        "displayName": "Vector Blue",
+        "canonical": "oklch(47.1% 0.114 256.9)",
+        "tonalRamp": [
+          "#000a21",
+          "#02224d",
+          "#0f3e7a",
+          "#2f5d9d",
+          "#5281c3",
+          "#72a3e8",
+          "#a5cafe",
+          "#e5efff"
+        ],
+        "cssVar": "--data-vector",
+        "theme": "light"
+      },
+      "data-fused": {
+        "role": "data",
+        "displayName": "Fused Violet",
+        "canonical": "oklch(48.1% 0.126 300.5)",
+        "tonalRamp": [
+          "#120026",
+          "#300856",
+          "#4c2a77",
+          "#6a4a99",
+          "#8d6dbf",
+          "#ae8ee4",
+          "#d1b9fd",
+          "#f1ebfe"
+        ],
+        "cssVar": "--data-fused",
+        "theme": "light"
+      },
+      "data-rerank": {
+        "role": "data",
+        "displayName": "Rerank Green",
+        "canonical": "oklch(51.6% 0.097 148.3)",
+        "tonalRamp": [
+          "#001003",
+          "#022d0e",
+          "#0d4d1f",
+          "#316c3d",
+          "#55905f",
+          "#76b37f",
+          "#9bd9a4",
+          "#c9ffd0"
+        ],
+        "cssVar": "--data-rerank",
+        "theme": "light"
+      },
+      "data-neutral": {
+        "role": "data",
+        "displayName": "Everything Else",
+        "canonical": "oklch(45.6% 0.030 137.9)",
+        "tonalRamp": [
+          "#050e03",
+          "#1d2719",
+          "#384434",
+          "#566252",
+          "#788574",
+          "#99a694",
+          "#beccba",
+          "#e5f4e0"
+        ],
+        "cssVar": "--data-neutral",
+        "theme": "light"
+      },
+      "lamp-paper": {
+        "role": "neutral",
+        "displayName": "Paper (lamp)",
+        "canonical": "oklch(20.4% 0.016 149.0)",
+        "tonalRamp": [
+          "#070d08",
+          "#1f2620",
+          "#3a423b",
+          "#586059",
+          "#7a837b",
+          "#9ba49c",
+          "#c1cac2",
+          "#e8f2e9"
+        ],
+        "cssVar": "--paper",
+        "theme": "dark"
+      },
+      "lamp-paper-raised": {
+        "role": "neutral",
+        "displayName": "Raised Paper (lamp)",
+        "canonical": "oklch(24.0% 0.020 147.9)",
+        "tonalRamp": [
+          "#060d07",
+          "#1e271f",
+          "#39433a",
+          "#566157",
+          "#79847a",
+          "#9aa59b",
+          "#bfcbc0",
+          "#e6f2e7"
+        ],
+        "cssVar": "--paper-raised",
+        "theme": "dark"
+      },
+      "lamp-grid": {
+        "role": "neutral",
+        "displayName": "Grid Green (lamp)",
+        "canonical": "oklch(29.3% 0.027 151.0)",
+        "tonalRamp": [
+          "#030e06",
+          "#1a281d",
+          "#354438",
+          "#536256",
+          "#758578",
+          "#96a799",
+          "#bbcdbe",
+          "#e2f4e5"
+        ],
+        "cssVar": "--grid",
+        "theme": "dark"
+      },
+      "lamp-rule": {
+        "role": "neutral",
+        "displayName": "Sheet Rule (lamp)",
+        "canonical": "oklch(41.3% 0.038 149.0)",
+        "tonalRamp": [
+          "#010f04",
+          "#17291a",
+          "#324535",
+          "#4f6452",
+          "#718774",
+          "#92a895",
+          "#b7cfba",
+          "#def6e1"
+        ],
+        "cssVar": "--rule",
+        "theme": "dark"
+      },
+      "lamp-rule-input": {
+        "role": "neutral",
+        "displayName": "Input Rule (lamp)",
+        "canonical": "oklch(59.3% 0.040 148.7)",
+        "tonalRamp": [
+          "#011003",
+          "#152919",
+          "#314634",
+          "#4e6451",
+          "#708773",
+          "#91a994",
+          "#b6cfb9",
+          "#ddf7e0"
+        ],
+        "cssVar": "--rule-input",
+        "theme": "dark"
+      },
+      "lamp-graphite": {
+        "role": "neutral",
+        "displayName": "Graphite (lamp)",
+        "canonical": "oklch(92.3% 0.024 127.6)",
+        "tonalRamp": [
+          "#080d03",
+          "#21261a",
+          "#3c4235",
+          "#5a6052",
+          "#7c8374",
+          "#9da595",
+          "#c3cbba",
+          "#eaf2e1"
+        ],
+        "cssVar": "--graphite",
+        "theme": "dark"
+      },
+      "lamp-graphite-muted": {
+        "role": "neutral",
+        "displayName": "Muted Graphite (lamp)",
+        "canonical": "oklch(75.0% 0.033 135.1)",
+        "tonalRamp": [
+          "#050e02",
+          "#1d2817",
+          "#384432",
+          "#56624f",
+          "#788571",
+          "#99a792",
+          "#becdb7",
+          "#e5f4de"
+        ],
+        "cssVar": "--graphite-muted",
+        "theme": "dark"
+      },
+      "lamp-blue-pencil": {
+        "role": "primary",
+        "displayName": "Blue Pencil (lamp)",
+        "canonical": "oklch(76.5% 0.087 256.8)",
+        "tonalRamp": [
+          "#000a20",
+          "#02224d",
+          "#1f406d",
+          "#3c5f8e",
+          "#5e82b4",
+          "#7ea4d8",
+          "#a5cafd",
+          "#e5effe"
+        ],
+        "cssVar": "--blue-pencil",
+        "theme": "dark"
+      },
+      "lamp-blue-wash": {
+        "role": "primary",
+        "displayName": "Blue Wash (lamp)",
+        "canonical": "oklch(29.4% 0.042 255.9)",
+        "tonalRamp": [
+          "#020b1c",
+          "#162538",
+          "#314156",
+          "#4e5f75",
+          "#70829a",
+          "#91a3bc",
+          "#b6c9e3",
+          "#e4f0ff"
+        ],
+        "cssVar": "--blue-wash",
+        "theme": "dark"
+      },
+      "lamp-red-check": {
+        "role": "semantic",
+        "displayName": "Red Check (lamp)",
+        "canonical": "oklch(74.5% 0.127 25.8)",
+        "tonalRamp": [
+          "#1e0001",
+          "#4a0105",
+          "#741818",
+          "#983b36",
+          "#c05f57",
+          "#e68078",
+          "#feb0a8",
+          "#ffe9e6"
+        ],
+        "cssVar": "--red-check",
+        "theme": "dark"
+      },
+      "lamp-amber-note": {
+        "role": "semantic",
+        "displayName": "Amber Note (lamp)",
+        "canonical": "oklch(79.8% 0.118 82.9)",
+        "tonalRamp": [
+          "#110a00",
+          "#302101",
+          "#533b03",
+          "#785807",
+          "#a27814",
+          "#c59a41",
+          "#edc068",
+          "#ffecca"
+        ],
+        "cssVar": "--amber-note",
+        "theme": "dark"
+      },
+      "lamp-green-tick": {
+        "role": "semantic",
+        "displayName": "Green Tick (lamp)",
+        "canonical": "oklch(77.7% 0.088 151.3)",
+        "tonalRamp": [
+          "#001004",
+          "#012d12",
+          "#104c26",
+          "#336c43",
+          "#568f65",
+          "#77b286",
+          "#9dd8ab",
+          "#c8ffd4"
+        ],
+        "cssVar": "--green-tick",
+        "theme": "dark"
+      },
+      "lamp-data-bm25": {
+        "role": "data",
+        "displayName": "BM25 Umber (lamp)",
+        "canonical": "oklch(74.9% 0.095 61.9)",
+        "tonalRamp": [
+          "#150700",
+          "#381c00",
+          "#5d3406",
+          "#83501c",
+          "#a97341",
+          "#cc9462",
+          "#f4ba87",
+          "#feeada"
+        ],
+        "cssVar": "--data-bm25",
+        "theme": "dark"
+      },
+      "lamp-data-vector": {
+        "role": "data",
+        "displayName": "Vector Blue (lamp)",
+        "canonical": "oklch(76.5% 0.087 256.8)",
+        "tonalRamp": [
+          "#000a20",
+          "#02224d",
+          "#1f406d",
+          "#3c5f8e",
+          "#5e82b4",
+          "#7ea4d8",
+          "#a5cafd",
+          "#e5effe"
+        ],
+        "cssVar": "--data-vector",
+        "theme": "dark"
+      },
+      "lamp-data-fused": {
+        "role": "data",
+        "displayName": "Fused Violet (lamp)",
+        "canonical": "oklch(75.3% 0.102 300.4)",
+        "tonalRamp": [
+          "#120026",
+          "#2d124d",
+          "#49306d",
+          "#674f8e",
+          "#8a71b4",
+          "#ac93d8",
+          "#d1b9fd",
+          "#f1ebfe"
+        ],
+        "cssVar": "--data-fused",
+        "theme": "dark"
+      },
+      "lamp-data-rerank": {
+        "role": "data",
+        "displayName": "Rerank Green (lamp)",
+        "canonical": "oklch(77.7% 0.088 151.3)",
+        "tonalRamp": [
+          "#001004",
+          "#012d12",
+          "#104c26",
+          "#336c43",
+          "#568f65",
+          "#77b286",
+          "#9dd8ab",
+          "#c8ffd4"
+        ],
+        "cssVar": "--data-rerank",
+        "theme": "dark"
+      },
+      "lamp-data-neutral": {
+        "role": "data",
+        "displayName": "Everything Else (lamp)",
+        "canonical": "oklch(75.0% 0.033 135.1)",
+        "tonalRamp": [
+          "#050e02",
+          "#1d2817",
+          "#384432",
+          "#56624f",
+          "#788571",
+          "#99a792",
+          "#becdb7",
+          "#e5f4de"
+        ],
+        "cssVar": "--data-neutral",
+        "theme": "dark"
+      }
+    },
+    "typographyMeta": {
+      "sheet-title": {
+        "displayName": "Sheet Title",
+        "purpose": "The question at the top of the sheet."
+      },
+      "step-heading": {
+        "displayName": "Step Heading",
+        "purpose": "A step title; pending steps drop to 500 at 1rem, muted."
+      },
+      "answer": {
+        "displayName": "Answer",
+        "purpose": "The result line in the answer sheet, max 68ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Explanations and passages, max 68ch."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Notices, settings and supporting text."
+      },
+      "margin-note": {
+        "displayName": "Margin Note",
+        "purpose": "The pencil voice: the blue-pencil \"Why this step?\" note."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "The data voice for every measured value, with tabular figures."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Sentence-case section headings, status words and column heads."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Python excerpts under each step, coloured by the One Pencil Rule."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-write",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Easing for the write-in motion."
+      },
+      {
+        "name": "write-in",
+        "value": "write-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both; from { opacity: 0; transform: translateY(4px); clip-path: inset(0 0 100% 0) }",
+        "purpose": "A step or the answer sheet being written into the pad as its trace event arrives."
+      },
+      {
+        "name": "write-in-stage-number",
+        "value": "120ms, delay 0ms",
+        "purpose": "Step number in the margin, first."
+      },
+      {
+        "name": "write-in-stage-sheet",
+        "value": "140ms, delay 40ms",
+        "purpose": "The step sheet, second."
+      },
+      {
+        "name": "write-in-stage-note",
+        "value": "90ms, delay 90ms",
+        "purpose": "The margin note, last; the whole step lands in about 180ms."
+      },
+      {
+        "name": "caret",
+        "value": "caret 1s steps(2, start) infinite",
+        "purpose": "Blinking 2px blue-pencil caret on a streaming answer."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation-duration: 0.01ms; transition-duration: 0.01ms",
+        "purpose": "Under prefers-reduced-motion everything appears instantly."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "grid": {
+      "square": "20px",
+      "line": "1px var(--grid)",
+      "offset": "-1px -1px",
+      "container": "72rem",
+      "stepTracks": {
+        "base": "2rem minmax(0,1fr), gap 12px",
+        "md": "3rem minmax(0,1fr), gap 16px, 1px margin rule at 56px",
+        "lg": "3rem minmax(0,1fr) 17rem, gap 32px, margin rule at 64px"
+      }
+    },
+    "focus": {
+      "value": "outline: 2px solid var(--blue-pencil); outline-offset: 2px",
+      "purpose": "Every focusable element; inputs use offset 0 with a blue-pencil border."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Blue-pencil fill for the one main action, Run.",
+      "html": "<button class=\"ds-btn ds-btn-primary\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"9 10 4 15 9 20\"/><path d=\"M20 4v7a4 4 0 0 1-4 4H4\"/></svg>Run</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 2px; border: 1px solid transparent; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0, 'slnt' 0; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color 150ms, color 150ms, border-color 150ms; } .ds-btn svg { width: 16px; height: 16px; } .ds-btn:focus-visible { outline: 2px solid var(--blue-pencil); outline-offset: 2px; } .ds-btn-primary { background: var(--blue-pencil); color: var(--paper); } .ds-btn-primary:hover { background: color-mix(in oklab, var(--blue-pencil), var(--graphite) 18%); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:disabled { background: var(--grid); color: var(--graphite-muted); cursor: not-allowed; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Raised paper with an input rule, for Stop and steppers; pressed state lays a blue wash.",
+      "html": "<button class=\"ds-btn ds-btn-quiet ds-btn-icon\" aria-label=\"Fewer\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/></svg></button> <button class=\"ds-btn ds-btn-quiet\" aria-pressed=\"true\">Pressed</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 2px; border: 1px solid transparent; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0, 'slnt' 0; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color 150ms, color 150ms, border-color 150ms; } .ds-btn svg { width: 16px; height: 16px; } .ds-btn:focus-visible { outline: 2px solid var(--blue-pencil); outline-offset: 2px; } .ds-btn-quiet { background: var(--paper-raised); color: var(--graphite); border-color: var(--rule-input); } .ds-btn-quiet:hover { background: var(--blue-wash); } .ds-btn-quiet[aria-pressed=\"true\"] { background: var(--blue-wash); border-color: var(--blue-pencil); color: var(--blue-pencil); } .ds-btn-icon { width: 40px; padding: 0; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Muted icon control on nothing, for the theme toggle.",
+      "html": "<button class=\"ds-btn ds-btn-ghost ds-btn-icon\" aria-label=\"Switch to dark\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/></svg></button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 2px; border: 1px solid transparent; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0, 'slnt' 0; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color 150ms, color 150ms, border-color 150ms; } .ds-btn svg { width: 16px; height: 16px; } .ds-btn:focus-visible { outline: 2px solid var(--blue-pencil); outline-offset: 2px; } .ds-btn-ghost { background: transparent; color: var(--graphite-muted); } .ds-btn-ghost:hover { background: var(--blue-wash); color: var(--graphite); } .ds-btn-icon { width: 40px; padding: 0; }"
+    },
+    {
+      "name": "Pencil Button",
+      "kind": "button",
+      "refersTo": "button-pencil",
+      "description": "A text action in the pencil voice with a dotted underline, for suggestions and disclosures.",
+      "html": "<button class=\"ds-btn-pencil\">What is the capital of Normandy?</button>",
+      "css": ".ds-btn-pencil { background: none; border: 0; padding: 0; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0.5, 'slnt' -7; font-size: 15px; color: var(--blue-pencil); text-decoration: underline dotted; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer; } .ds-btn-pencil:hover { text-decoration-style: solid; } .ds-btn-pencil:focus-visible { outline: 2px solid var(--blue-pencil); outline-offset: 2px; }"
+    },
+    {
+      "name": "Question Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "The 44px question field on raised paper with a blue-pencil caret.",
+      "html": "<input class=\"ds-input\" placeholder=\"Ask about the corpus\" aria-label=\"Question\" />",
+      "css": ".ds-input { height: 44px; width: 100%; padding: 0 12px; border: 1px solid var(--rule-input); border-radius: 2px; background: var(--paper-raised); color: var(--graphite); font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0, 'slnt' 0; font-size: 16px; caret-color: var(--blue-pencil); transition: border-color 150ms; } .ds-input::placeholder { color: var(--graphite-muted); } .ds-input:hover { border-color: color-mix(in oklab, var(--graphite) 60%, transparent); } .ds-input:focus-visible { border-color: var(--blue-pencil); outline: 2px solid var(--blue-pencil); outline-offset: 0; } .ds-input[aria-invalid=\"true\"] { border-color: var(--red-check); }"
+    },
+    {
+      "name": "Step Sheet",
+      "kind": "card",
+      "refersTo": "step-sheet",
+      "description": "A numbered step: number in the margin with the 2px running mark, the working on a raised sheet, a pending step as a dashed outline.",
+      "html": "<ol class=\"ds-steps\"><li class=\"ds-step\"><span class=\"ds-step-num ds-running\">03<span class=\"ds-run-mark\"></span></span><article class=\"ds-sheet\"><header class=\"ds-sheet-head\"><h3>Vector search</h3><span class=\"ds-status ds-status-run\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"/></svg>running</span></header><p class=\"ds-readout\">142 ms · 0 tok · $0.0000</p></article></li><li class=\"ds-step\"><span class=\"ds-step-num\">04</span><article class=\"ds-sheet ds-pending\"><h3>Select context</h3></article></li></ol>",
+      "css": ".ds-steps { position: relative; list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0, 'slnt' 0; color: var(--graphite); } .ds-steps::before { content: ''; position: absolute; top: 0; bottom: 0; left: 56px; width: 1px; background: var(--rule); } .ds-step { display: grid; grid-template-columns: 3rem minmax(0,1fr); column-gap: 16px; } .ds-step-num { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; padding-top: 16px; font-size: 16px; color: var(--graphite-muted); } .ds-step-num.ds-running { color: var(--blue-pencil); } .ds-run-mark { width: 2px; flex: 1; background: var(--blue-pencil); } .ds-sheet { background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px; padding: 16px 20px; animation: ds-write-in 140ms cubic-bezier(0.16, 1, 0.3, 1) 40ms both; } .ds-sheet h3 { margin: 0; font-size: 1.125rem; font-weight: 600; line-height: 1.375; } .ds-sheet-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; } .ds-pending { background: transparent; border-style: dashed; padding: 12px 20px; animation: none; } .ds-pending h3 { font-size: 1rem; font-weight: 500; color: var(--graphite-muted); } .ds-readout { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; margin: 8px 0 0; font-size: 12px; color: var(--graphite-muted); } .ds-status { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; } .ds-status svg { width: 14px; height: 14px; } .ds-status-run { color: var(--blue-pencil); } @keyframes ds-write-in { from { opacity: 0; transform: translateY(4px); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 0 0); } } @media (prefers-reduced-motion: reduce) { .ds-sheet { animation: none; } }"
+    },
+    {
+      "name": "Compact Step Row",
+      "kind": "custom",
+      "refersTo": "step-row-compact",
+      "description": "Below 768px each step folds to one collapsible line: title, two-line data summary, status mark and a blue-pencil chevron.",
+      "html": "<button class=\"ds-row\" aria-expanded=\"false\"><span class=\"ds-row-text\"><span class=\"ds-row-title\">Vector search</span><span class=\"ds-row-sum\">5 passages · best 0.4121</span></span><span class=\"ds-status ds-status-ok\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>done</span><svg class=\"ds-chev\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button>",
+      "css": ".ds-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 8px 12px; background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px; text-align: left; cursor: pointer; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0, 'slnt' 0; color: var(--graphite); } .ds-row:focus-visible { outline: 2px solid var(--blue-pencil); outline-offset: 2px; } .ds-row-text { flex: 1; min-width: 0; } .ds-row-title { display: block; font-size: 1rem; font-weight: 600; } .ds-row-sum { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; display: block; font-size: 12px; color: var(--graphite-muted); } .ds-status { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; } .ds-status svg { width: 14px; height: 14px; } .ds-status-ok { color: var(--green-tick); } .ds-chev { width: 16px; height: 16px; color: var(--blue-pencil); transition: transform 150ms; } .ds-row[aria-expanded=\"true\"] .ds-chev { transform: rotate(180deg); }"
+    },
+    {
+      "name": "Notice",
+      "kind": "custom",
+      "refersTo": "notice-warning",
+      "description": "Raised strip with a toned 1px border and toned SVG icon; tones note, warning, error.",
+      "html": "<div class=\"ds-notice ds-notice-warning\" role=\"status\"><span class=\"ds-notice-icon\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/></svg></span><div>Budget running low: $4.10 of $5.00 spent. Answers use the cheaper model.</div></div>",
+      "css": ".ds-notice { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--paper-raised); border: 1px solid; border-radius: 2px; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'MONO' 0, 'CASL' 0, 'slnt' 0; font-size: 14px; line-height: 1.5; color: var(--graphite); } .ds-notice-icon svg { width: 16px; height: 16px; margin-top: 2px; } .ds-notice-note { border-color: color-mix(in oklab, var(--blue-pencil) 60%, transparent); } .ds-notice-note .ds-notice-icon { color: var(--blue-pencil); } .ds-notice-warning { border-color: var(--amber-note); } .ds-notice-warning .ds-notice-icon { color: var(--amber-note); } .ds-notice-error { border-color: var(--red-check); } .ds-notice-error .ds-notice-icon { color: var(--red-check); }"
+    },
+    {
+      "name": "Margin Note",
+      "kind": "custom",
+      "refersTo": "margin-note",
+      "description": "The blue-pencil \"Why this step?\" note in the 17rem margin column from lg.",
+      "html": "<aside class=\"ds-note\"><p class=\"ds-note-label\">Why this step?</p><p class=\"ds-note-body\">Words alone miss paraphrases. Comparing meaning finds passages that say the same thing differently.</p></aside>",
+      "css": ".ds-note { width: 272px; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; color: var(--blue-pencil); } .ds-note-label { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; margin: 0 0 8px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; } .ds-note-body { font-variation-settings: 'MONO' 0, 'CASL' 0.5, 'slnt' -7; margin: 0; font-size: 15px; font-weight: 450; line-height: 1.5; }"
+    },
+    {
+      "name": "Code Excerpt",
+      "kind": "custom",
+      "refersTo": "code-excerpt",
+      "description": "Build-time Python excerpt in graphite and blue pencil only (the One Pencil Rule).",
+      "html": "<figure class=\"ds-code\"><figcaption><span>Embed the query</span><a href=\"#\">retrieval/vector.py:12–18</a></figcaption><pre><code><span class=\"k\">def</span> <span class=\"t\">embed</span>(text):\n    <span class=\"c\"># one vector per query</span>\n    <span class=\"k\">return</span> model.encode(<span class=\"s\">\"query: \"</span> + text)</code></pre></figure>",
+      "css": ".ds-code { margin: 0; font-family: var(--font-recursive), ui-sans-serif, system-ui, sans-serif; color: var(--graphite); } .ds-code figcaption { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 4px; border-bottom: 1px dashed var(--rule); font-size: 14px; } .ds-code a { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; font-size: 12px; color: var(--graphite-muted); } .ds-code a:hover { color: var(--blue-pencil); text-decoration: underline; } .ds-code pre { font-variation-settings: 'MONO' 1, 'CASL' 0, 'slnt' 0; font-variant-numeric: tabular-nums slashed-zero; margin: 0; padding: 8px 0; font-size: 12px; line-height: 1.625; overflow-x: auto; } .ds-code .k { color: var(--blue-pencil); font-weight: 600; } .ds-code .t { font-weight: 600; } .ds-code .s { font-variation-settings: 'MONO' 1, 'CASL' 1, 'slnt' 0; } .ds-code .c { color: var(--graphite-muted); font-variation-settings: 'MONO' 1, 'CASL' 0.5, 'slnt' -7; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Engineer's Computation Pad",
+    "overview": "Each query is worked out like a calculation on pale-green engineering paper. The question is written at the top of the sheet, every pipeline stage is one numbered step below it, and the answer is the last line, marked with an `=` in the number margin. Graphite ink carries every fact and number. Blue pencil, the draughtsman's non-photo blue, is the one voice of annotation and action: \"Why this step?\" notes, the running step, links, focus and the Run button. Red means a failure and nothing else.\n\nThe mood is calm and exact. A faint 20px grid covers the whole page and gives numbers and passages a place to sit, but it is never louder than what is written on it. There are no gradients, glass, glows or illustrations; the trace data is the imagery. The dark theme is the same pad under a drafting lamp: a green-black ground, pale graphite and a brighter blue pencil. It is a change of lighting, not a different world.\n\nMotion is sparse and has one job: steps are written into the pad as their trace events arrive. A streaming answer shows a blinking blue-pencil caret. Under `prefers-reduced-motion`, every animation and transition collapses to an instant change.",
+    "keyCharacteristics": [
+      "One family, Recursive, in three voices set by its axes: prose, pencil and data.",
+      "A single accent, blue pencil; a separate data palette reserved for retrieval series.",
+      "Flat paper: 1px rules, 2px and 4px corners, no shadows anywhere.",
+      "Solid rules for edges, dashed rules for the working inside a sheet and for steps not yet written.",
+      "Step numbers hang in a margin; the running step is marked there, not on the sheet.",
+      "Every state is an SVG mark plus a word, never colour alone."
+    ],
+    "rules": [
+      {
+        "name": "The One Pencil Rule",
+        "body": "Blue pencil is the only accent. When something needs emphasis, use weight, scale, position or Recursive's casual axis before adding a colour. Code excerpts follow the same rule: keywords, built-ins and literals are blue pencil at 600, titles are graphite at 600, strings and numbers switch to the casual mono voice, comments are muted graphite in the pencil slant. The data palette is reserved for retrieval series and never tints code.",
+        "section": "colors"
+      },
+      {
+        "name": "The Red Means Wrong Rule",
+        "body": "Red appears only for failure. Never use it for brand, highlights or \"important\".",
+        "section": "colors"
+      },
+      {
+        "name": "The Lamp Rule",
+        "body": "The dark theme changes values, never roles. Every new colour is added to both `:root` and `.dark` under the same name.",
+        "section": "colors"
+      },
+      {
+        "name": "The Numbers Are Mono Rule",
+        "body": "Anything measured (rank, score, distance, ms, tokens, $) is set in the data voice with tabular figures, so columns line up like a worked calculation.",
+        "section": "typography"
+      },
+      {
+        "name": "The Three Voices Rule",
+        "body": "Voice is set by Recursive's axes, never by another family. Prose is linear, annotation is pencil, measurement is mono. Labels stay sentence case; never all caps.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Pad Rule",
+        "body": "No `box-shadow`, blur or glow on anything. Depth is paper fill and a 1px line.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Dashed Is Inside Rule",
+        "body": "A solid rule bounds a thing; a dashed rule divides the working inside it or outlines something still to come.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Margin Carries the Mark Rule",
+        "body": "Step state that needs a line lives in the number margin. Never add a thick coloured stripe to a sheet's edge.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do let real trace data be the only imagery: scores, distances, prompts, passages.",
+      "Do keep every measured value in the data voice with its unit, taken from the actual trace.",
+      "Do show states with an SVG mark and a word as well as colour, in both themes.",
+      "Do put new colours in both `:root` and `.dark` under one name, and reach them through the shadcn aliases.",
+      "Do write a new step in with the staged write-in motion and let reduced motion make it instant.",
+      "Do keep the grid faint enough that a screenshot without it would read the same."
+    ],
+    "donts": [
+      "Don't ship default shadcn styling. Every primitive is restyled to these tokens.",
+      "Don't add shadows, gradients, glassmorphism, glows or neon.",
+      "Don't use decorative illustrations, or icons that stand in for data.",
+      "Don't add a thick coloured stripe to a sheet's edge; step state goes in the number margin.",
+      "Don't colour code or UI chrome from the data palette, or add a second accent colour for emphasis.",
+      "Don't use red for anything except failure.",
+      "Don't turn the paper metaphor into a costume: no torn edges, coffee stains, spiral bindings or a second, handwriting family.",
+      "Don't set labels in all caps or put a small label above a heading as decoration."
+    ]
+  }
+}
