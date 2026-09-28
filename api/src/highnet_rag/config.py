@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     corpus_db_path: Path = Path("data/corpus.sqlite")
     state_db_path: Path = Path("data/state.sqlite")
     static_dir: Path = Path("web/out")
+    evals_results_path: Path = Path("evals/results/latest.json")
+    sse_keepalive_seconds: float = 15.0
 
     # Budget and rate limits
     budget_monthly_usd: float = 20.0

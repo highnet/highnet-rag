@@ -38,3 +38,8 @@ def test_oversized_sentence_becomes_its_own_chunk() -> None:
     long = "word " * 200 + "end."
     chunks = chunk_text(long, ChunkSpec("t", target_tokens=10, overlap_tokens=2))
     assert len(chunks) == 1
+
+
+def test_trailing_whitespace_and_empty_text() -> None:
+    assert sentence_spans("One. Two. ") == [(0, 4), (5, 9)]
+    assert chunk_text("", ChunkSpec("t", target_tokens=10, overlap_tokens=2)) == []

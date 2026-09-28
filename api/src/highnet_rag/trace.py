@@ -81,9 +81,6 @@ class Tracer:
         self.started = time.perf_counter()
         self.failed = False
 
-    def clock(self) -> "StageClock":
-        return StageClock()
-
     def event(
         self,
         stage: Stage,

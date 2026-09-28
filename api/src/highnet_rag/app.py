@@ -4,7 +4,6 @@ import asyncio
 import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
@@ -21,7 +20,6 @@ from highnet_rag.storage.base import CorpusStore
 from highnet_rag.storage.sqlite import SqliteCorpusStore, SqliteStateStore
 from highnet_rag.trace import AnswerDelta, RunDone, TraceEvent
 
-KEEPALIVE_SECONDS = 15.0
 SSE_HEADERS = {
     "Cache-Control": "no-cache, no-transform",
     "X-Accel-Buffering": "no",
@@ -159,14 +157,12 @@ def create_app(
         params = QueryParams(q=q.strip(), k=min(k, settings.max_top_k), chunk_set=chunk_set)
         ip_hash = hash_ip(client_ip(request), settings)
         return StreamingResponse(
-            stream_run(request, params, deps, ip_hash),
+            stream_run(params, deps, ip_hash),
             media_type="text/event-stream",
             headers=SSE_HEADERS,
         )
 
-    async def stream_run(
-        request: Request, params: QueryParams, deps: Deps, ip_hash: str
-    ) -> AsyncIterator[str]:
+    async def stream_run(params: QueryParams, deps: Deps, ip_hash: str) -> AsyncIterator[str]:
         queue: asyncio.Queue[TraceEvent | AnswerDelta | RunDone | None] = asyncio.Queue()
 
         async def produce() -> None:
@@ -177,13 +173,13 @@ def create_app(
                 await queue.put(None)
 
         task = asyncio.create_task(produce())
+        keepalive = settings.sse_keepalive_seconds
         try:
             while True:
                 try:
-                    item = await asyncio.wait_for(queue.get(), timeout=KEEPALIVE_SECONDS)
+                    item = await asyncio.wait_for(queue.get(), timeout=keepalive)
                 except TimeoutError:
-                    if await request.is_disconnected():
-                        break
+                    # Starlette cancels this generator when the client disconnects.
                     yield ": keep-alive\n\n"
                     continue
                 if item is None:
@@ -199,7 +195,7 @@ def create_app(
 
     @app.get("/api/evals")
     def evals() -> JSONResponse:
-        path = Path("evals/results/latest.json")
+        path = settings.evals_results_path
         if not path.exists():
             raise HTTPException(404, detail="No eval results published yet.")
         return JSONResponse(json.loads(path.read_text(encoding="utf-8")))

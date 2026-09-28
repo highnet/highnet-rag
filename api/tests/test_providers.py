@@ -53,3 +53,51 @@ async def test_missing_voyage_key_raises_on_first_use() -> None:
     client = VoyageClient(Settings(_env_file=None))  # pyright: ignore[reportCallIssue]
     with pytest.raises(ProviderNotConfiguredError):
         await VoyageEmbedder(client, "m", 2).embed(["x"], "query")
+
+
+async def test_voyage_client_is_created_once_with_the_key() -> None:
+    client = VoyageClient(Settings(voyage_api_key=SecretStr("k"), _env_file=None))  # pyright: ignore[reportCallIssue]
+    first = client._client()
+    assert first is client._client()
+    assert first.headers["authorization"] == "Bearer k"
+    await first.aclose()
+
+
+async def test_fake_reranker_orders_by_word_overlap() -> None:
+    from highnet_rag.providers.fake import FakeReranker
+
+    ranked = await FakeReranker().rerank(
+        "Normandy France", ["rainforest", "Normandy is in France", "France"], top_k=2
+    )
+    assert [r.index for r in ranked.results] == [1, 2]
+    assert ranked.results[0].relevance == 1.0
+
+
+async def test_fake_answer_abstains_without_overlap() -> None:
+    from highnet_rag.providers.fake import FakeAnswerModel
+
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "document", "source": {"content": [{"type": "text", "text": "Oxygen."}]}},
+                {"type": "text", "text": "Question: Who won the World Cup?"},
+            ],
+        }
+    ]
+    parts = [p async for p in FakeAnswerModel().stream_answer("", messages, 50)]
+    assert parts[-1].text == FakeAnswerModel.not_found  # type: ignore[union-attr]
+
+
+def test_get_providers_follows_settings(monkeypatch) -> None:
+    from highnet_rag.config import get_settings
+    from highnet_rag.providers import get_providers
+
+    monkeypatch.setenv("FAKE_PROVIDERS", "true")
+    get_settings.cache_clear()
+    get_providers.cache_clear()
+    try:
+        assert get_providers().answer.provider == "fake"
+    finally:
+        get_settings.cache_clear()
+        get_providers.cache_clear()

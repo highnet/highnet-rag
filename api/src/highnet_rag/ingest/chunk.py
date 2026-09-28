@@ -40,9 +40,9 @@ def sentence_spans(text: str) -> list[tuple[int, int]]:
         cursor = 0
         for match in SENTENCE_END.finditer(para):
             end = match.end()
+            # The match starts with sentence punctuation, so the sentence is never empty.
             sentence = para[cursor:end].rstrip()
-            if sentence:
-                spans.append((para_start + cursor, para_start + cursor + len(sentence)))
+            spans.append((para_start + cursor, para_start + cursor + len(sentence)))
             cursor = end
         tail = para[cursor:].rstrip()
         if tail:

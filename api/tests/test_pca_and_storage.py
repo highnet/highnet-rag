@@ -40,3 +40,14 @@ def test_bm25_is_filtered_by_chunk_set(corpus_path: Path) -> None:
     assert hits and all(
         c.chunk_set_id == sets["small"] for c in store.chunks([h.chunk_id for h in hits])
     )
+
+
+def test_store_edge_cases(corpus_path: Path, tmp_path: Path) -> None:
+    import pytest
+
+    with pytest.raises(FileNotFoundError):
+        SqliteCorpusStore(tmp_path / "missing.sqlite")
+    store = SqliteCorpusStore(corpus_path)
+    assert store.chunks([]) == []
+    with pytest.raises(LookupError):
+        store.projection(999)
