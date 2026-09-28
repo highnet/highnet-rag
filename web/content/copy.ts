@@ -207,17 +207,17 @@ export const COPY = {
       instructions: 'Show the agent’s instructions',
       hideInstructions: 'Hide the instructions',
       searches: 'Searches',
-      tokens: 'Tokens',
+      tokens: 'Claude tokens',
       meterCaption:
-        'How much of each cap this run used: searches out of the maximum, and the agent’s tokens out of its budget.',
+        'How much of each cap this run used: searches out of the maximum, and Claude’s own tokens (the plan in step 2 included) out of the agent’s token cap. The step’s readout above counts everything this step ran, embeddings included.',
       query: 'query',
       answered: (n: number) =>
         `Enough evidence: answered from the ${n} ${n === 1 ? 'passage' : 'passages'} found.`,
       noTool: 'Claude replied without calling a tool.',
       stopped: 'Stopped',
       top: 'Top passages',
-      showStages: (n: number) => `Show every stage of this search (${n})`,
-      hideStages: 'Hide the stages',
+      showStages: (label: string, n: number) => `Show every stage of search ${label} (${n})`,
+      hideStages: (label: string) => `Hide the stages of search ${label}`,
       running: 'Searching…',
     },
     rerank: {
@@ -265,6 +265,9 @@ export const COPY = {
   noCitations: 'The answer cites no passage. Treat it with suspicion.',
   unused: (n: number) => (n === 1 ? '1 passage was not cited.' : `${n} passages were not cited.`),
   totals: 'Total',
+  stagesRun: (n: number) => (n === 1 ? '1 stage run' : `${n} stages run`),
+  moreSuggestions: (n: number) => `More questions that join two articles (${n})`,
+  fewerSuggestions: 'Fewer questions',
   status: {
     pending: 'waiting',
     running: 'working',

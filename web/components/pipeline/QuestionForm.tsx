@@ -1,12 +1,13 @@
 'use client';
 
 import { type FormEvent, useState } from 'react';
-import { CornerDownLeft, Square } from 'lucide-react';
+import { ChevronDown, CornerDownLeft, Square } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
+import { cn } from '@/lib/utils';
 
 type QuestionFormProps = {
   initialQuestion?: string;
@@ -32,6 +33,11 @@ const QuestionForm = ({
   onStop,
 }: QuestionFormProps) => {
   const [question, setQuestion] = useState(initialQuestion);
+  const [showAll, setShowAll] = useState(false);
+  // Long lists (agentic mode) show three and fold the rest, so the page stays short on phones.
+  const folded = suggestions.length > 4 && !showAll;
+  const shown = folded ? suggestions.slice(0, 3) : suggestions;
+  const hidden = suggestions.length > 4 ? suggestions.length - 3 : 0;
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,25 +94,41 @@ const QuestionForm = ({
         <Typography variant="small" color="muted" as="p">
           {suggestionsLabel}
         </Typography>
-        <ul className="grid gap-x-6 sm:grid-cols-2">
-          {suggestions.map((s, i) => (
+        <ul className="grid gap-x-6 gap-y-2 py-1 sm:grid-cols-2">
+          {shown.map((s, i) => (
             <li key={s}>
               <Button
                 type="button"
                 variant="pencil"
                 size="inline"
-                className="inline min-h-8 text-left leading-8 whitespace-normal"
+                className="inline min-h-8 text-left leading-snug whitespace-normal"
                 disabled={disabled || running}
                 onClick={() => ask(s)}
               >
                 {s}
               </Button>
-              {lastNote && i === suggestions.length - 1 && (
+              {lastNote && i === shown.length - 1 && (
                 <span className="ml-2 text-sm text-muted-foreground">{lastNote}</span>
               )}
             </li>
           ))}
         </ul>
+        {hidden > 0 && (
+          <Button
+            type="button"
+            variant="pencil"
+            size="inline"
+            aria-expanded={showAll}
+            className="min-h-8 gap-1 text-sm"
+            onClick={() => setShowAll((open) => !open)}
+          >
+            <ChevronDown
+              aria-hidden
+              className={cn('transition-transform', showAll && 'rotate-180')}
+            />
+            {showAll ? COPY.fewerSuggestions : COPY.moreSuggestions(hidden)}
+          </Button>
+        )}
       </div>
     </div>
   );

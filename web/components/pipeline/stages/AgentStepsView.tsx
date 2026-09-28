@@ -126,24 +126,27 @@ const AgentStepsView = ({ searches, caps, agentTokens }: AgentStepsViewProps) =>
                       className="size-4 transition-transform group-data-[state=open]:rotate-180"
                     />
                     <span className="underline decoration-dotted underline-offset-4 group-data-[state=open]:hidden">
-                      {A.showStages(stages.length)}
+                      {A.showStages(step.label, stages.length)}
                     </span>
                     <span className="hidden underline decoration-dotted underline-offset-4 group-data-[state=open]:inline">
-                      {A.hideStages}
+                      {A.hideStages(step.label)}
                     </span>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <ol className="mt-1 space-y-1">
                       {stages.map((e) => (
-                        <li key={e.seq} className="flex items-baseline gap-3 text-sm">
-                          <span className="voice-data w-10 shrink-0 text-muted-foreground">
-                            {e.label}
+                        <li
+                          key={e.seq}
+                          className="grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-baseline gap-x-3 text-sm"
+                        >
+                          <span className="voice-data text-muted-foreground">{e.label}</span>
+                          <span>
+                            {STAGES[e.stage].title}
+                            <span className="voice-data block text-xs text-muted-foreground sm:ml-3 sm:inline">
+                              {stepSummary(e)}
+                            </span>
                           </span>
-                          <span className="shrink-0">{STAGES[e.stage].title}</span>
-                          <span className="voice-data min-w-0 truncate text-xs text-muted-foreground">
-                            {stepSummary(e)}
-                          </span>
-                          <StatusMark status={e.status as StepStatus} className="ml-auto" />
+                          <StatusMark status={e.status as StepStatus} />
                         </li>
                       ))}
                     </ol>

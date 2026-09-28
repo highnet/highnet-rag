@@ -121,7 +121,8 @@ const PipelineExplorer = () => {
   const runQuestion = (q: string) => {
     if (!settings) return; // the form is disabled until the API has answered
     writeUrlState({ q, ...settings });
-    run({ q, ...settings });
+    // A paused agent is not asked for: the run on screen is the one the server will do.
+    run({ q, ...settings, agentic: settings.agentic && tier === 'normal' });
   };
 
   const changeSettings = (next: RunSettings) => {

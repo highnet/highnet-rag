@@ -43,7 +43,7 @@ const SettingsStrip = ({
           <span className="voice-data">
             {modeLabel} · k={k}
             {rerank && ` · ${S.rerankShort}`} · {chunkSet}
-            {agentic && ` · ${S.agentShort}`}
+            {agentic && !agentPaused && ` · ${S.agentShort}`}
           </span>
         </span>
         <ChevronDown
@@ -53,7 +53,7 @@ const SettingsStrip = ({
       </CollapsibleTrigger>
       <CollapsibleContent
         forceMount
-        className="flex flex-col gap-y-4 pb-4 data-[state=closed]:hidden sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-8 sm:py-3 sm:data-[state=closed]:flex"
+        className="flex flex-col gap-y-4 pb-4 data-[state=closed]:hidden sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-6 sm:py-3 sm:data-[state=closed]:flex"
       >
         <div className="space-y-1.5">
           <Typography variant="small" color="muted" as="span" id="mode-label" className="block">
@@ -68,7 +68,7 @@ const SettingsStrip = ({
             onChange={(value) => onChange({ ...settings, mode: value })}
             options={config.modes.map((m) => ({ value: m, label: S.modes[m]?.label ?? m }))}
           />
-          <Typography variant="small" color="muted" id="mode-description" className="max-w-[28ch]">
+          <Typography variant="small" color="muted" id="mode-description" className="max-w-[22ch]">
             {S.modes[mode]?.description}
           </Typography>
         </div>
@@ -122,7 +122,7 @@ const SettingsStrip = ({
             variant="small"
             color="muted"
             id="rerank-description"
-            className="max-w-[28ch]"
+            className="max-w-[22ch]"
           >
             {rerank ? S.rerankDescription.on : S.rerankDescription.off}
           </Typography>
@@ -132,15 +132,11 @@ const SettingsStrip = ({
           <div className="space-y-1.5">
             <Typography variant="small" color="muted" as="span" id="chunks-label" className="block">
               {S.chunks}
-              {set && (
-                <span className="voice-data ml-2 text-xs">
-                  {S.chunkSize(set.target_tokens, set.chunks)}
-                </span>
-              )}
             </Typography>
             <SegmentedControl
               name="chunks"
               labelledBy="chunks-label"
+              describedBy="chunks-description"
               value={chunkSet}
               disabled={disabled}
               onChange={(value) => onChange({ ...settings, chunkSet: value })}
@@ -150,6 +146,16 @@ const SettingsStrip = ({
                 description: S.chunkSize(s.target_tokens, s.chunks),
               }))}
             />
+            {set && (
+              <Typography
+                variant="small"
+                color="muted"
+                id="chunks-description"
+                className="voice-data max-w-[22ch] text-xs"
+              >
+                {S.chunkSize(set.target_tokens, set.chunks)}
+              </Typography>
+            )}
           </div>
         )}
 
@@ -173,7 +179,7 @@ const SettingsStrip = ({
             variant="small"
             color={agentPaused ? 'warning' : 'muted'}
             id="agent-description"
-            className="max-w-[28ch]"
+            className="max-w-[22ch]"
           >
             {agentPaused
               ? S.agentDescription.paused

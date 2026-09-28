@@ -64,7 +64,7 @@ const AnswerResult = ({ citations, done }: AnswerResultProps) => {
         {done && (
           <p className="voice-data mt-4 text-xs text-muted-foreground">
             {COPY.totals} · {formatMs(done.ms)} · {formatTokens(done.tokens)} ·{' '}
-            {formatUsd(done.cost_usd)} · {done.stages} steps
+            {formatUsd(done.cost_usd)} · {COPY.stagesRun(done.stages)}
           </p>
         )}
       </div>

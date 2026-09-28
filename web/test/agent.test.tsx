@@ -46,6 +46,13 @@ describe('agentic mode', () => {
     expect(window.location.search).toContain('agent=1');
     expect(screen.getByText(COPY.agentTryLabel)).toBeInTheDocument();
     expect(screen.getByText(COPY.workingNote(AGENT_STAGE_ORDER.length))).toBeInTheDocument();
+    // Three questions show; the other seven fold behind a toggle.
+    expect(
+      screen.queryByRole('button', { name: COPY.agentSuggestions[5] }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: COPY.moreSuggestions(7) }));
+    expect(screen.getByRole('button', { name: COPY.agentSuggestions[5] })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: COPY.fewerSuggestions }));
     fireEvent.click(screen.getByRole('button', { name: COPY.agentSuggestions[0] }));
     const source = ControlledEventSource.last();
     expect(source.url).toContain('agentic=true');
@@ -61,7 +68,7 @@ describe('agentic mode', () => {
     expect(within(sheet).getByText('3a')).toBeInTheDocument();
     expect(within(sheet).getAllByText('Harvard University').length).toBeGreaterThan(0);
     expect(within(sheet).getByText(A.answered(8))).toBeInTheDocument();
-    fireEvent.click(within(sheet).getAllByText(A.showStages(5))[0]);
+    fireEvent.click(within(sheet).getByText(A.showStages('3a', 5)));
     expect(within(sheet).getByText('3a.1')).toBeInTheDocument();
     fireEvent.click(screen.getByText(A.instructions));
     expect(screen.getByText(/You gather evidence/)).toBeInTheDocument();
@@ -113,6 +120,7 @@ describe('agentic mode', () => {
     expect(within(sheet).getByText(A.noTool)).toBeInTheDocument();
     expect(within(sheet).getByText(A.answered(0))).toBeInTheDocument();
     expect(A.answered(1)).toBe('Enough evidence: answered from the 1 passage found.');
+    expect(COPY.stagesRun(1)).toBe('1 stage run');
     expect(within(sheet).getByText(/Reached the limit\./)).toBeInTheDocument();
     expect(within(sheet).getAllByText(COPY.status.warning).length).toBeGreaterThan(0);
     rerender(
