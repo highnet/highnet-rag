@@ -12,9 +12,9 @@ primary_region = "fra"
   BUDGET_MONTHLY_USD = "20"
   RATE_LIMIT_PER_MIN = "20"
   RATE_LIMIT_PER_DAY = "200"
-  # Free-text live questions until data/recordings.sqlite is on the volume (Record demo
-  # questions workflow); then this flips to "false" and visitors only replay recorded runs.
-  LIVE_QUERIES = "true"
+  # Visitors only replay the recorded runs in /data/recordings.sqlite (Record demo questions
+  # workflow). "true" brings back free-text live questions, paid per visit.
+  LIVE_QUERIES = "false"
   # Vercel team "highnet's projects": the stable project domain, plus every deployment and
   # branch URL of the project (highnet-<hash>-… and highnet-rag-git-<branch>-…).
   CORS_ORIGINS = "https://highnet-rag.vercel.app,https://highnet-rag-highnets-projects.vercel.app"
