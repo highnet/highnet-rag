@@ -80,14 +80,16 @@ const RerankView = ({ data }: RerankViewProps) => {
                 <Fragment key={row.chunk_id}>
                   <tr
                     className={cn(
-                      'motion-safe:animate-settle border-b border-dashed',
+                      'border-b border-dashed',
+                      // Only the kept rows slide in on arrival; rows opened below the cut just appear.
+                      !below && 'motion-safe:animate-settle',
                       below && 'text-muted-foreground',
                       row.rank === data.kept && 'border-b-0',
                     )}
                     style={{ '--shift': row.before_rank - row.rank } as CSSProperties}
                   >
                     <td className="py-1.5 pr-3 sm:py-2">
-                      <RankBadge series="rerank" rank={row.rank} muted={below} />
+                      <RankBadge series="rerank" rank={row.rank} muted={below} marker={false} />
                     </td>
                     <td className="py-1.5 pr-3 sm:py-2">
                       {row.doc_title}{' '}

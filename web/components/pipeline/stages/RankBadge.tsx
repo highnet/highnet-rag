@@ -29,12 +29,13 @@ type RankBadgeProps = {
   series: Series;
   rank: number | null;
   muted?: boolean;
+  marker?: boolean;
   className?: string;
 };
 
 // A rank in one list: marker, then the number. A missing rank reads as a dash. Muted badges
 // (rows below the top-k cut) keep their marker shape but lose the series colour.
-const RankBadge = ({ series, rank, muted, className }: RankBadgeProps) => {
+const RankBadge = ({ series, rank, muted, marker = true, className }: RankBadgeProps) => {
   const label = COPY.stageText.series[series];
   const quiet = muted || rank === null;
   return (
@@ -46,7 +47,7 @@ const RankBadge = ({ series, rank, muted, className }: RankBadgeProps) => {
         className,
       )}
     >
-      <SeriesMarker series={series} className={cn(rank === null && 'opacity-40')} />
+      {marker && <SeriesMarker series={series} className={cn(rank === null && 'opacity-40')} />}
       <span aria-hidden className={cn(!quiet && 'text-foreground')}>
         {rank ?? '–'}
       </span>

@@ -33,8 +33,8 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
         <span>
           <span className="text-muted-foreground">{S.summary} </span>
           <span className="voice-data">
-            {modeLabel} · k={k} · {chunkSet}
-            {rerank && ` · ${S.rerankShort}`}
+            {modeLabel} · k={k}
+            {rerank && ` · ${S.rerankShort}`} · {chunkSet}
           </span>
         </span>
         <ChevronDown
@@ -59,7 +59,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
             onChange={(value) => onChange({ ...settings, mode: value })}
             options={config.modes.map((m) => ({ value: m, label: S.modes[m]?.label ?? m }))}
           />
-          <Typography variant="small" color="muted" id="mode-description" className="max-w-[36ch]">
+          <Typography variant="small" color="muted" id="mode-description" className="max-w-[28ch]">
             {S.modes[mode]?.description}
           </Typography>
         </div>
@@ -93,6 +93,32 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
           </div>
         </div>
 
+        <div className="space-y-1.5">
+          <Typography variant="small" color="muted" as="span" id="rerank-label" className="block">
+            {S.rerank}
+          </Typography>
+          <SegmentedControl
+            name="rerank"
+            labelledBy="rerank-label"
+            describedBy="rerank-description"
+            value={rerank ? 'on' : 'off'}
+            disabled={disabled}
+            onChange={(value) => onChange({ ...settings, rerank: value === 'on' })}
+            options={[
+              { value: 'off', label: S.rerankOptions.off },
+              { value: 'on', label: S.rerankOptions.on },
+            ]}
+          />
+          <Typography
+            variant="small"
+            color="muted"
+            id="rerank-description"
+            className="max-w-[28ch]"
+          >
+            {rerank ? S.rerankDescription.on : S.rerankDescription.off}
+          </Typography>
+        </div>
+
         {config.chunk_sets.length > 0 && (
           <div className="space-y-1.5">
             <Typography variant="small" color="muted" as="span" id="chunks-label" className="block">
@@ -117,32 +143,6 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
             />
           </div>
         )}
-
-        <div className="space-y-1.5">
-          <Typography variant="small" color="muted" as="span" id="rerank-label" className="block">
-            {S.rerank}
-          </Typography>
-          <SegmentedControl
-            name="rerank"
-            labelledBy="rerank-label"
-            describedBy="rerank-description"
-            value={rerank ? 'on' : 'off'}
-            disabled={disabled}
-            onChange={(value) => onChange({ ...settings, rerank: value === 'on' })}
-            options={[
-              { value: 'off', label: S.rerankOptions.off },
-              { value: 'on', label: S.rerankOptions.on },
-            ]}
-          />
-          <Typography
-            variant="small"
-            color="muted"
-            id="rerank-description"
-            className="max-w-[36ch]"
-          >
-            {rerank ? S.rerankDescription.on : S.rerankDescription.off}
-          </Typography>
-        </div>
 
         {stale && (
           <Typography variant="marginNote" className="sm:basis-full">

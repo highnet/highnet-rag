@@ -110,12 +110,16 @@ describe('corpus map', () => {
     draw();
     expect(screen.getByText(M.loading)).toBeInTheDocument();
     const map = await screen.findByRole('img', { name: /Map of 4 chunks.*\[1\] Oxygen/ });
-    expect(map.querySelectorAll('circle').length).toBe(4 + 1 + 1 + 1);
+    const plot = map.querySelector('svg.touch-none') as SVGSVGElement;
+    expect(plot.querySelectorAll(':scope > circle')).toHaveLength(4 + 1); // chunks + retrieved
+    // The detail inset rings the question's nearest dot on the map (#10; #12 is retrieved).
+    expect(map.querySelectorAll('svg[aria-hidden] circle.stroke-foreground')).toHaveLength(1);
+    expect(screen.getByText(M.detail)).toBeInTheDocument();
     expect(screen.getByText(M.axis(1, '20.0%'), { exact: false })).toBeInTheDocument();
     expect(screen.getByText(M.caption('30.0%'))).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: M.showTable }));
     expect(screen.getByText(M.retrievedRow(1, 'Oxygen'))).toBeInTheDocument();
-    expect(screen.getByText(M.neighbourRow('Normans'))).toBeInTheDocument();
+    expect(screen.getByText('Normans')).toBeInTheDocument();
     expect(screen.getByText('2.121')).toBeInTheDocument(); // distance from the question
     fireEvent.click(screen.getByRole('button', { name: M.hideTable }));
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -182,12 +186,58 @@ describe('corpus map', () => {
     expect(screen.queryByText(/late/)).not.toBeInTheDocument();
   });
 
+  it('sizes callouts to the plot and draws leaders when a crowd pushes labels away', async () => {
+    const observed: ((entries: { contentRect: { width: number } }[]) => void)[] = [];
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: (entries: { contentRect: { width: number } }[]) => void) {
+          observed.push(callback);
+        }
+        observe = () => undefined;
+        disconnect = () => undefined;
+      },
+    );
+    // Twelve retrieved passages stacked on one spot: they cannot all sit beside their dots.
+    const crowd = Array.from({ length: 12 }, (_, i) => [20 + i, 1, 1, 1] as const);
+    vi.stubGlobal('fetch', respond({ ...corpusMap, points: [...corpusMap.points, ...crowd] }));
+    render(
+      <CorpusMap
+        chunkSet="medium"
+        query={{ x: 0, y: 3 }}
+        explained={[0.2, 0.1]}
+        neighbours={[10]}
+        retrieved={crowd.map(
+          ([id], i) => ({ chunk_id: id, rank: i + 1, doc_title: 'N' }) as ContextChunk,
+        )}
+      />,
+    );
+    const map = await screen.findByRole('img', { name: /Map of 16 chunks/ });
+    act(() => observed.forEach((callback) => callback([{ contentRect: { width: 0 } }])));
+    act(() => observed.forEach((callback) => callback([{ contentRect: { width: 320 } }])));
+    // Beyond the zoom leader, pushed callouts draw their own leaders.
+    expect(map.querySelectorAll('svg.touch-none g.fill-none line').length).toBeGreaterThan(1);
+  });
+
+  it('lights an article from the table, by click or keyboard focus', async () => {
+    vi.stubGlobal('fetch', respond(corpusMap));
+    draw();
+    await screen.findByRole('img', { name: /Map of 4 chunks/ });
+    fireEvent.click(screen.getByRole('button', { name: M.showTable }));
+    expect(screen.getByText(M.groups.retrieved)).toBeInTheDocument();
+    expect(screen.getByText(M.groups.nearest)).toBeInTheDocument();
+    fireEvent.focus(screen.getByRole('button', { name: 'Normans' }));
+    expect(screen.getByText(M.pointed('Normans', 10))).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: M.retrievedRow(1, 'Oxygen') }));
+    expect(screen.getByText(M.pointed('Oxygen', 12))).toBeInTheDocument();
+  });
+
   it('labels a chunk without a known article by its id', async () => {
     vi.stubGlobal('fetch', respond({ ...corpusMap, documents: {} }));
     draw();
     await screen.findByRole('img', { name: /Map of 4 chunks/ });
     fireEvent.click(screen.getByRole('button', { name: M.showTable }));
-    expect(screen.getByText(M.neighbourRow('#10'))).toBeInTheDocument();
+    expect(screen.getAllByText('#10').length).toBeGreaterThan(0);
   });
 });
 

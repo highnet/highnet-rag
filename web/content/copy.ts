@@ -184,13 +184,14 @@ export const COPY = {
       showTable: 'Show as a table',
       hideTable: 'Hide the table',
       caption: (kept: string) =>
-        `Every dot is a chunk. The two axes keep ${kept} of the spread in the embeddings, so nearby on this map is only roughly nearby in meaning. Point at a dot to light up its whole article.`,
+        `Every dot is a chunk. Blue dots are the passages retrieved, numbered by rank; the “Detail” inset magnifies the neighbourhood of your question, where ringed dots are its nearest on the map. The two axes keep ${kept} of the spread in the embeddings, so nearby on this map is only roughly nearby in meaning. Point at a dot, or pick a row in the table, to light up its whole article.`,
+      detail: 'Detail',
+      groups: { retrieved: 'Retrieved', nearest: 'Nearest on map' },
       alt: (points: number, retrieved: string) =>
         `Map of ${points.toLocaleString('en')} chunks with the question and the retrieved passages ${retrieved}. A table with the same positions follows.`,
       pointed: (title: string, id: number) => `${title} · chunk #${id}`,
       columns: { what: 'point', x: 'x', y: 'y', distance: 'distance on map' },
       retrievedRow: (rank: number, title: string) => `[${rank}] ${title}`,
-      neighbourRow: (title: string) => `nearest on map: ${title}`,
     },
     citations: {
       sentence: 'answer text',

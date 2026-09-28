@@ -1,12 +1,21 @@
 'use client';
 
-import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import {
+  Fragment,
+  type PointerEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { ArrowRight, ArrowUp, ChevronDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import { fetchCorpusMap } from '@/lib/api';
+import { type Box, placeLabels } from '@/lib/map-labels';
 import type { ContextChunk, CorpusMapData } from '@/lib/stage-data';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +38,11 @@ const F = COPY.figures.map;
 const VIEW = 100;
 const PAD = 4;
 const HIT = 3; // view units: how close the pointer must be to pick a dot
+const CROSS = 3.5; // crosshair arm length, view units
+const INSET = 30; // detail inset size, view units
+const RANK_LABEL_PX = { char: 8, pad: 6, h: 14 };
+const YOU_LABEL_PX = { w: 108, h: 20 };
+const DEFAULT_WIDTH_PX = 400;
 
 const pct = (value: number) => `${(value * 100).toFixed(1)}%`;
 
@@ -39,6 +53,19 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
   const [pointed, setPointed] = useState<MapPoint | null>(null);
   const [showTable, setShowTable] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
+  const plotRef = useRef<HTMLDivElement>(null);
+  const [widthPx, setWidthPx] = useState(DEFAULT_WIDTH_PX);
+
+  // Labels keep a fixed size in pixels, so their size in view units depends on the plot width.
+  useEffect(() => {
+    const plot = plotRef.current;
+    if (!plot || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width > 0) setWidthPx(entry.contentRect.width);
+    });
+    observer.observe(plot);
+    return () => observer.disconnect();
+  }, [state.status]);
 
   useEffect(() => {
     let live = true;
@@ -130,10 +157,69 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
   const distance = (x: number, y: number) => Math.hypot(x - query.x, y - query.y).toFixed(3);
   const retrievedIds = new Set(retrieved.map((c) => c.chunk_id));
   const kept = pct(explained[0] + explained[1]);
+  const at = (id: number) => byId.get(id) as MapPoint;
+  const shown = retrieved.filter((c) => byId.has(c.chunk_id));
+  const near = neighbours.filter((id) => byId.has(id) && !retrievedIds.has(id));
+  const qx = scale.x(query.x);
+  const qy = scale.y(query.y);
+  const px = VIEW / widthPx; // view units per pixel
+
+  // Detail inset: the question's neighbourhood magnified, in the emptiest corner of the plot.
+  const corners = [
+    { x: 1, y: 1 },
+    { x: VIEW - INSET - 1, y: 1 },
+    { x: 1, y: VIEW - INSET - 1 },
+    { x: VIEW - INSET - 1, y: VIEW - INSET - 1 },
+  ];
+  const crowd = (c: { x: number; y: number }) =>
+    points.filter(([, , x, y]) => {
+      const [vx, vy] = [scale.x(x), scale.y(y)];
+      return vx >= c.x && vx <= c.x + INSET && vy >= c.y && vy <= c.y + INSET;
+    }).length + (qx >= c.x && qx <= c.x + INSET && qy >= c.y && qy <= c.y + INSET ? 1e6 : 0);
+  const inset = corners.reduce((best, c) => (crowd(c) < crowd(best) ? c : best));
+  const reach = Math.max(
+    ...near.map((id) => Math.hypot(at(id)[2] - query.x, at(id)[3] - query.y)),
+    1e-6,
+  );
+  const half = reach * 1.6; // data units from the question to the inset's edge
+  const detail = {
+    x: (x: number) => 50 + ((x - query.x) / half) * 50,
+    y: (y: number) => 50 - ((y - query.y) / half) * 50,
+    has: (x: number, y: number) => Math.abs(x - query.x) <= half && Math.abs(y - query.y) <= half,
+  };
+  const zoomBox = Math.max(Math.abs(scale.x(query.x + half) - qx), CROSS + 1);
+  const insetBox: Box = { x: inset.x, y: inset.y, w: INSET, h: INSET };
+
+  // Callouts: the question's note first, then the ranks, never over dots, the crosshair,
+  // the inset or each other.
+  const dotBoxes: Box[] = shown.map((c) => {
+    const [, , x, y] = at(c.chunk_id);
+    return { x: scale.x(x) - 1.4, y: scale.y(y) - 1.4, w: 2.8, h: 2.8 };
+  });
+  const crossBox: Box = { x: qx - CROSS, y: qy - CROSS, w: 2 * CROSS, h: 2 * CROSS };
+  const placed = placeLabels(
+    [
+      { key: -1, x: qx, y: qy, w: YOU_LABEL_PX.w * px, h: YOU_LABEL_PX.h * px },
+      ...shown.map((c) => {
+        const [, , x, y] = at(c.chunk_id);
+        const w = (String(c.rank).length * RANK_LABEL_PX.char + RANK_LABEL_PX.pad) * px;
+        return { key: c.rank, x: scale.x(x), y: scale.y(y), w, h: RANK_LABEL_PX.h * px };
+      }),
+    ],
+    [...dotBoxes, crossBox, insetBox],
+    { x: qx, y: qy },
+    CROSS,
+  );
+  const youLabel = placed[0];
+  const rankLabels = placed.slice(1);
+
+  // Pointing at a table row lights its article on the plot, like pointing at its dot.
+  const select = (id: number) => () => setPointed(at(id));
 
   return (
     <figure className="space-y-2">
       <div
+        ref={plotRef}
         role="img"
         aria-label={F.alt(
           points.length,
@@ -163,91 +249,151 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
                   className="fill-foreground"
                 />
               ))}
-          {neighbours
-            .filter((id) => byId.has(id) && !retrievedIds.has(id))
-            .map((id) => {
-              const [, , x, y] = byId.get(id) as [number, number, number, number];
-              return (
-                <circle
-                  key={id}
-                  cx={scale.x(x)}
-                  cy={scale.y(y)}
-                  r={1.1}
-                  className="fill-none stroke-foreground"
-                  strokeWidth={0.3}
-                />
-              );
-            })}
-          {retrieved
-            .filter((c) => byId.has(c.chunk_id))
-            .map((c) => {
-              const [, , x, y] = byId.get(c.chunk_id) as [number, number, number, number];
-              return (
-                <circle
-                  key={c.chunk_id}
-                  cx={scale.x(x)}
-                  cy={scale.y(y)}
-                  r={1.4}
-                  className="fill-primary stroke-card"
-                  strokeWidth={0.5}
-                />
-              );
-            })}
-          <g className="stroke-primary" strokeWidth={0.4}>
-            <circle cx={scale.x(query.x)} cy={scale.y(query.y)} r={2} className="fill-none" />
-            <line
-              x1={scale.x(query.x) - 3.5}
-              x2={scale.x(query.x) + 3.5}
-              y1={scale.y(query.y)}
-              y2={scale.y(query.y)}
-            />
-            <line
-              x1={scale.x(query.x)}
-              x2={scale.x(query.x)}
-              y1={scale.y(query.y) - 3.5}
-              y2={scale.y(query.y) + 3.5}
-            />
-          </g>
-        </svg>
-        {/* Labels are HTML over the plot, so they stay readable at any width. */}
-        {retrieved
-          .filter((c) => byId.has(c.chunk_id))
-          .map((c) => {
-            const [, , x, y] = byId.get(c.chunk_id) as [number, number, number, number];
+          {shown.map((c) => {
+            const [, , x, y] = at(c.chunk_id);
             return (
-              <Typography
+              <circle
                 key={c.chunk_id}
-                variant="label"
-                as="span"
-                className="pointer-events-none absolute translate-x-1.5 -translate-y-full bg-card/85 px-0.5 leading-none text-primary"
-                style={{ left: `${scale.x(x)}%`, top: `${scale.y(y)}%` }}
-              >
-                {c.rank}
-              </Typography>
+                cx={scale.x(x)}
+                cy={scale.y(y)}
+                r={1.4}
+                className="fill-primary stroke-card"
+                strokeWidth={0.5}
+              />
             );
           })}
+          <g className="fill-none stroke-foreground/60" strokeWidth={1}>
+            {rankLabels
+              .filter((l) => l.leader)
+              .map(({ key, leader }) => (
+                <line key={key} {...leader} vectorEffect="non-scaling-stroke" />
+              ))}
+            <rect
+              x={qx - zoomBox}
+              y={qy - zoomBox}
+              width={2 * zoomBox}
+              height={2 * zoomBox}
+              strokeDasharray="3 2"
+              vectorEffect="non-scaling-stroke"
+            />
+            <line
+              x1={inset.x + INSET / 2 > qx ? qx + zoomBox : qx - zoomBox}
+              y1={inset.y + INSET / 2 > qy ? qy + zoomBox : qy - zoomBox}
+              x2={inset.x + INSET / 2 > qx ? inset.x : inset.x + INSET}
+              y2={inset.y + INSET / 2 > qy ? inset.y : inset.y + INSET}
+              vectorEffect="non-scaling-stroke"
+            />
+          </g>
+          <g className="stroke-primary" strokeWidth={0.4}>
+            <circle cx={qx} cy={qy} r={2} className="fill-none" />
+            <line x1={qx - CROSS} x2={qx + CROSS} y1={qy} y2={qy} />
+            <line x1={qx} x2={qx} y1={qy - CROSS} y2={qy + CROSS} />
+          </g>
+        </svg>
+
+        {/* Detail A: the neighbourhood of the question, magnified. */}
+        <div
+          className="absolute border border-dashed border-foreground/60 bg-card"
+          style={{
+            left: `${inset.x}%`,
+            top: `${inset.y}%`,
+            width: `${INSET}%`,
+            height: `${INSET}%`,
+          }}
+        >
+          <svg viewBox="0 0 100 100" className="size-full" aria-hidden>
+            {points
+              .filter(([, , x, y]) => detail.has(x, y))
+              .map(([id, , x, y]) => (
+                <circle
+                  key={id}
+                  cx={detail.x(x)}
+                  cy={detail.y(y)}
+                  r={1.8}
+                  className="fill-chart-5 opacity-40"
+                />
+              ))}
+            {near.map((id) => (
+              <circle
+                key={id}
+                cx={detail.x(at(id)[2])}
+                cy={detail.y(at(id)[3])}
+                r={4}
+                className="fill-none stroke-foreground"
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+            {shown
+              .filter((c) => detail.has(at(c.chunk_id)[2], at(c.chunk_id)[3]))
+              .map((c) => (
+                <circle
+                  key={c.chunk_id}
+                  cx={detail.x(at(c.chunk_id)[2])}
+                  cy={detail.y(at(c.chunk_id)[3])}
+                  r={3.5}
+                  className="fill-primary"
+                />
+              ))}
+            <g className="stroke-primary" strokeWidth={1.2}>
+              <line x1={38} x2={62} y1={50} y2={50} />
+              <line x1={50} x2={50} y1={38} y2={62} />
+            </g>
+          </svg>
+          <Typography
+            variant="label"
+            color="muted"
+            as="span"
+            className="pointer-events-none absolute top-0.5 left-1 leading-none"
+          >
+            {F.detail}
+          </Typography>
+        </div>
+
+        {/* Callouts are HTML over the plot, so they keep their size at any width. */}
+        {rankLabels.map(({ key, box }) => (
+          <Typography
+            key={key}
+            variant="label"
+            as="span"
+            className="pointer-events-none absolute flex items-center justify-center bg-card/85 leading-none text-primary"
+            style={{ left: `${box.x}%`, top: `${box.y}%`, width: `${box.w}%`, height: `${box.h}%` }}
+          >
+            {key}
+          </Typography>
+        ))}
         <Typography
           variant="marginNote"
           as="span"
-          className={cn(
-            'pointer-events-none absolute translate-y-2 bg-card/85 px-1 text-sm leading-tight whitespace-nowrap',
-            scale.x(query.x) > 70 ? '-translate-x-[calc(100%+12px)]' : 'translate-x-3',
-          )}
-          style={{ left: `${scale.x(query.x)}%`, top: `${scale.y(query.y)}%` }}
+          className="pointer-events-none absolute bg-card/85 px-1 text-sm leading-tight whitespace-nowrap"
+          style={{ left: `${youLabel.box.x}%`, top: `${youLabel.box.y}%` }}
         >
           {F.you}
         </Typography>
       </div>
       <div className="mx-auto flex max-w-md flex-wrap justify-between gap-x-4">
-        <Typography variant="label" color="muted" as="span">
-          → {F.axis(1, pct(explained[0]))}
+        <Typography
+          variant="label"
+          color="muted"
+          as="span"
+          className="inline-flex items-center gap-1"
+        >
+          <ArrowRight aria-hidden className="size-3" />
+          {F.axis(1, pct(explained[0]))}
         </Typography>
-        <Typography variant="label" color="muted" as="span">
-          ↑ {F.axis(2, pct(explained[1]))}
+        <Typography
+          variant="label"
+          color="muted"
+          as="span"
+          className="inline-flex items-center gap-1"
+        >
+          <ArrowUp aria-hidden className="size-3" />
+          {F.axis(2, pct(explained[1]))}
         </Typography>
       </div>
       <Typography
         variant="small"
+        aria-live="polite"
         className={cn('mx-auto max-w-md min-h-5', pointed === null && 'text-muted-foreground')}
       >
         {pointed === null ? ' ' : F.pointed(title(pointed[0]), pointed[0])}
@@ -275,10 +421,10 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
               <th scope="col" className="py-1.5 pr-3 font-medium">
                 {F.columns.what}
               </th>
-              <th scope="col" className="py-1.5 pr-3 text-right font-medium">
+              <th scope="col" className="hidden py-1.5 pr-3 text-right font-medium sm:table-cell">
                 {F.columns.x}
               </th>
-              <th scope="col" className="py-1.5 pr-3 text-right font-medium">
+              <th scope="col" className="hidden py-1.5 pr-3 text-right font-medium sm:table-cell">
                 {F.columns.y}
               </th>
               <th scope="col" className="py-1.5 text-right font-medium">
@@ -291,30 +437,56 @@ const CorpusMap = ({ chunkSet, query, explained, neighbours, retrieved }: Corpus
               <th scope="row" className="py-1.5 pr-3 text-left font-normal text-primary">
                 {F.you}
               </th>
-              <td className="pr-3 text-right">{query.x.toFixed(3)}</td>
-              <td className="pr-3 text-right">{query.y.toFixed(3)}</td>
+              <td className="hidden pr-3 text-right sm:table-cell">{query.x.toFixed(3)}</td>
+              <td className="hidden pr-3 text-right sm:table-cell">{query.y.toFixed(3)}</td>
               <td className="text-right">–</td>
             </tr>
             {[
-              ...retrieved
-                .filter((c) => byId.has(c.chunk_id))
-                .map((c) => ({ id: c.chunk_id, label: F.retrievedRow(c.rank, c.doc_title) })),
-              ...neighbours
-                .filter((id) => byId.has(id) && !retrievedIds.has(id))
-                .map((id) => ({ id, label: F.neighbourRow(title(id)) })),
-            ].map(({ id, label }) => {
-              const [, , x, y] = byId.get(id) as [number, number, number, number];
-              return (
-                <tr key={id} className="border-b border-dashed last:border-b-0">
-                  <th scope="row" className="py-1.5 pr-3 text-left font-normal">
-                    {label} <span className="text-xs text-muted-foreground">#{id}</span>
-                  </th>
-                  <td className="pr-3 text-right">{x.toFixed(3)}</td>
-                  <td className="pr-3 text-right">{y.toFixed(3)}</td>
-                  <td className="text-right">{distance(x, y)}</td>
-                </tr>
-              );
-            })}
+              {
+                group: F.groups.retrieved,
+                rows: shown.map((c) => ({
+                  id: c.chunk_id,
+                  label: F.retrievedRow(c.rank, c.doc_title),
+                })),
+              },
+              { group: F.groups.nearest, rows: near.map((id) => ({ id, label: title(id) })) },
+            ]
+              .filter(({ rows }) => rows.length > 0)
+              .map(({ group, rows }) => (
+                <Fragment key={group}>
+                  <tr>
+                    <th
+                      colSpan={4}
+                      scope="colgroup"
+                      className="pt-2.5 pb-1 text-left text-xs font-medium text-muted-foreground"
+                    >
+                      {group}
+                    </th>
+                  </tr>
+                  {rows.map(({ id, label }) => {
+                    const [, , x, y] = at(id);
+                    return (
+                      <tr key={id} className="border-b border-dashed last:border-b-0">
+                        <th scope="row" className="py-1 pr-3 text-left font-normal">
+                          <Button
+                            variant="pencil"
+                            size="inline"
+                            className="min-h-8 text-left whitespace-normal"
+                            onClick={select(id)}
+                            onFocus={select(id)}
+                          >
+                            {label}
+                          </Button>{' '}
+                          <span className="text-xs text-muted-foreground">#{id}</span>
+                        </th>
+                        <td className="hidden pr-3 text-right sm:table-cell">{x.toFixed(3)}</td>
+                        <td className="hidden pr-3 text-right sm:table-cell">{y.toFixed(3)}</td>
+                        <td className="text-right">{distance(x, y)}</td>
+                      </tr>
+                    );
+                  })}
+                </Fragment>
+              ))}
           </tbody>
         </table>
       )}
