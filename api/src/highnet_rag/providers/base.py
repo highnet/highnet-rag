@@ -17,6 +17,7 @@ class ProviderNotConfiguredError(RuntimeError):
 class Embeddings:
     vectors: np.ndarray  # shape (n, dims), float32
     tokens: int
+    retries: int = 0  # rate-limit or transient-error retries before success
 
 
 @dataclass
@@ -29,6 +30,7 @@ class RerankResult:
 class Reranked:
     results: list[RerankResult]
     tokens: int
+    retries: int = 0
 
 
 @dataclass

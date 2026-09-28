@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     voyage_embed_model: str = "voyage-3.5-lite"
     voyage_rerank_model: str = "rerank-2.5-lite"
     embed_dims: int = 1024
+    # Retries on 429/5xx. Keep them short for live questions; the corpus build raises both.
+    voyage_max_retries: int = 2
+    voyage_max_retry_wait_seconds: float = 10.0
 
     # Storage
     corpus_db_path: Path = Path("data/corpus.sqlite")

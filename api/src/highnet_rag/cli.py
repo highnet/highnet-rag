@@ -33,7 +33,9 @@ def cmd_ingest(args: argparse.Namespace) -> None:
         articles = articles[: args.limit]
     embedder = build_providers(settings).embedder
     sets = [s.strip() for s in args.chunk_sets.split(",") if s.strip()]
-    report = asyncio.run(build_corpus(articles, Path(args.out), embedder, settings, sets))
+    report = asyncio.run(
+        build_corpus(articles, Path(args.out), embedder, settings, sets, batch_size=args.batch_size)
+    )
     print(f"\nBuilt {args.out} (build {report.build_id}) from {report.documents} articles")
     for s in report.sets:
         pc1, pc2 = s.explained_variance
@@ -78,6 +80,7 @@ def main() -> None:
     p.add_argument("--out", default="data/corpus.sqlite")
     p.add_argument("--chunk-sets", default="medium", help="comma list of small,medium,large")
     p.add_argument("--limit", type=int, default=0, help="only the first N articles (testing)")
+    p.add_argument("--batch-size", type=int, default=128, help="texts per embedding request")
     p.add_argument("--fake", action="store_true", help="offline hashed embeddings, no API cost")
     p.set_defaults(func=cmd_ingest)
 

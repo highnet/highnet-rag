@@ -37,6 +37,7 @@ def test_every_stage_emits_exactly_one_trace_event_in_order(client: TestClient) 
         assert set(t) >= {"stage", "data", "ms", "tokens", "cost_usd", "status", "run_id"}
         if t["status"] == "skipped":
             assert t["data"]["reason"]
+    assert traces[1]["data"]["retries"] == 0
     name, done = events[-1]
     assert name == "done" and done["status"] == "ok" and done["stages"] == len(STAGES)
     assert done["tokens"] == sum(t["tokens"] for t in traces)
