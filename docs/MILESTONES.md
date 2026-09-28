@@ -47,17 +47,18 @@ Acceptance criteria:
 
 Acceptance criteria:
 
-- [ ] Each step has one explanatory figure next to its numbers, built from the trace (no invented values; anything schematic is labelled schematic):
+- [x] Each step has one explanatory figure next to its numbers, built from the trace (no invented values; anything schematic is labelled schematic):
   - `request`: rate-limit and budget meters.
   - `embed_query`: the shown dimensions as a strip of signed values, with the norm.
   - `bm25`: the question with matched terms highlighted and each term's weight (IDF). The trace gains per-term document frequencies.
+  - `map_project` keeps its coordinates until the drawn corpus map lands in M4.
   - `vector`: distances on a 0 to 1 number line, with the kept passages marked.
   - `fuse`: stacked contribution bars (BM25 part plus vector part) per fused passage, with the top-k cut.
   - `select_context` and `prompt`: a context-window bar split into system, passages and question tokens, against the model's window and the worst-case cost.
   - `generate` and `citations`: answer sentences linked to the passages they cite; uncited passages shown as unused.
-- [ ] Figures are SVG or HTML in DESIGN.md's data colours and marker shapes, have a text alternative carrying the same numbers, respect reduced motion, and fold with their step on phones, so a run stays short.
-- [ ] A one-line "how to read this" caption wherever a figure needs one.
-- [ ] Tests render every figure from fixture data; coverage stays at 100%; Impeccable finish with zero detector findings.
+- [x] Figures are SVG or HTML in DESIGN.md's data colours and marker shapes, have a text alternative carrying the same numbers, respect reduced motion, and fold with their step on phones, so a run stays short.
+- [x] A one-line "how to read this" caption wherever a figure needs one.
+- [x] Tests render every figure from fixture data; coverage stays at 100%; Impeccable finish with zero detector findings.
 
 ## M4 · Reranking and the corpus map
 

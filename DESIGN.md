@@ -365,6 +365,10 @@ A raised-paper strip with 2px corners, a 1px toned border, 12px by 16px padding,
 
 The result line: an `=` in blue pencil in the number margin, then a raised-paper sheet with a graphite outline at 70%, a muted label heading, the answer at 1.125rem with superscript blue-pencil citation numbers, a dashed rule, the sources list and a totals line in muted data.
 
+### Step Figures
+
+Each step carries one small figure, drawn from that run's trace and placed above the step's tables. Figures are HTML and CSS, not charts: a Bar is a 1px-ruled track in quiet green with filled segments laid end to end and optional 1px graphite tick marks for thresholds. Colour keeps its meaning. The three retrieval series use their data colours (BM25 umber for term weights, vector blue for distances and embedding values, both for fusion contributions); everything else is blue pencil (the part that matters: used requests, passages, input), graphite (the question, output cost), soft graphite (reserved room, uncited passages) or the tier colours on the budget meter. Every figure has a one-line caption in small muted prose that says how to read it, and a text alternative with the same numbers; the citation grid is a real table instead. Nothing animates. On phones a figure folds away with its step.
+
 ### Code Excerpt
 
 Opened by a pencil action with a code icon. Each excerpt has a caption over a dashed rule (title in small sans, `file:start–end` link in muted data) and a scrolling block at 0.75rem in the data voice, coloured by the One Pencil Rule.
