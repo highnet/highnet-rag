@@ -58,6 +58,9 @@ class Settings(BaseSettings):
     default_top_k: int = 5
     max_top_k: int = 10
     agent_max_steps: int = 4
+    # Input + output tokens across all agent turns of one question (the final answer excluded).
+    agent_token_cap: int = 30_000
+    agent_turn_max_tokens: int = 512
 
     # The web app is hosted on Vercel and calls this API cross-origin. Comma-separated exact
     # origins (production domain, `next dev`) plus an optional regex for preview deployments.

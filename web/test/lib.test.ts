@@ -64,9 +64,9 @@ describe('api client', () => {
 describe('snippets', () => {
   it('are extracted per stage and link to their lines', () => {
     const [first] = snippetsFor('vector');
-    expect(first.file).toBe('api/src/highnet_rag/pipeline/classic.py');
+    expect(first.file).toBe('api/src/highnet_rag/pipeline/search.py');
     expect(first.html).toContain('hljs-');
-    expect(sourceUrl(first)).toMatch(/classic\.py#L\d+-L\d+$/);
+    expect(sourceUrl(first)).toMatch(/search\.py#L\d+-L\d+$/);
     expect(snippetsFor('agent_plan')).toEqual([]);
   });
 });

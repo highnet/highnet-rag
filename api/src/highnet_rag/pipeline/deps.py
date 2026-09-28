@@ -19,6 +19,7 @@ class QueryParams(BaseModel):
     mode: Mode = DEFAULT_MODE
     k: int = Field(default=5, ge=1, le=10)
     rerank: bool = False
+    agentic: bool = False
     chunk_set: str = "medium"
 
 

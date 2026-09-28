@@ -7,6 +7,7 @@ Every trace event names provider="fake" so the UI can label the run as illustrat
 
 import asyncio
 import hashlib
+import json
 import re
 from collections.abc import AsyncIterator
 from typing import Any
@@ -15,6 +16,7 @@ import numpy as np
 
 from highnet_rag.pipeline.prompt import NOT_FOUND
 from highnet_rag.providers.base import (
+    AgentTurn,
     AnswerBlock,
     Citation,
     Embeddings,
@@ -22,10 +24,13 @@ from highnet_rag.providers.base import (
     InputType,
     Reranked,
     RerankResult,
+    ToolCall,
 )
 
 WORD = re.compile(r"[a-z0-9]+")
 SENTENCE = re.compile(r"(?<=[.!?])\s+")
+# Where the fake agent splits a compound question into one search per part.
+COMPOUND = re.compile(r",|\bor\b|\band\b|\bbefore\b|\bafter\b|\bthan\b", re.IGNORECASE)
 STOPWORDS = frozenset(
     [
         "a",
@@ -130,9 +135,48 @@ class FakeAnswerModel:
     model = "fake-extractive"
     not_found = NOT_FOUND
 
-    async def count_tokens(self, system: str, messages: list[dict[str, Any]]) -> int:
+    async def count_tokens(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> int:
+        if tools is not None:
+            return approx_tokens(system + json.dumps(messages) + json.dumps(tools))
         docs, question = _documents(messages)
         return approx_tokens(system) + approx_tokens(question) + sum(approx_tokens(d) for d in docs)
+
+    async def agent_turn(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        max_tokens: int,
+    ) -> AgentTurn:
+        """Search once per part of a compound question, then answer. Deterministic."""
+        searched = any(
+            isinstance(m["content"], list) and m["content"][0].get("type") == "tool_result"
+            for m in messages
+        )
+        if searched:
+            text, calls = "The passages cover every part.", [ToolCall("answer-1", "answer", {})]
+        else:
+            question = str(messages[0]["content"]).removeprefix("Question: ")
+            parts = [p.strip(" ?,.") for p in COMPOUND.split(question) if len(p.split()) >= 2]
+            queries = parts[:3] or [question]
+            text = f"I'll search for each part: {len(queries)} search(es)."
+            calls = [ToolCall(f"search-{i}", "search", {"query": q}) for i, q in enumerate(queries)]
+        content = [{"type": "text", "text": text}] + [
+            {"type": "tool_use", "id": c.id, "name": c.name, "input": c.input} for c in calls
+        ]
+        return AgentTurn(
+            text=text,
+            calls=calls,
+            stop_reason="tool_use",
+            input_tokens=await self.count_tokens(system, messages, tools),
+            output_tokens=approx_tokens(json.dumps(content)),
+            content=content,
+        )
 
     async def stream_answer(
         self, system: str, messages: list[dict[str, Any]], max_tokens: int
