@@ -372,8 +372,9 @@ Tests never call real APIs; providers are faked.
   - `owner` (~20): written by the owner.
   - `compound` (~10): cross-article questions for agentic mode.
 - **Metrics:**
-  - recall@k (k = 1, 3, 5, 10) and MRR, per mode × chunk set × rerank;
-  - faithfulness: the `CLAUDE_MODEL_JUDGE` model scores each answer sentence as supported or unsupported by the cited chunks;
-  - abstention rate on unanswerable questions;
-  - cost and latency per configuration.
-- **Output:** `evals/results/latest.json`, plus a dated copy, committed. The web build copies it to `web/public/evals/latest.json`; the site never shows numbers that aren't in that file.
+  - recall@k (k = 1, 3, 5, 10) and MRR, per mode × chunk set × rerank; each answerable question is ranked once to depth 10 through `pipeline/search.retrieve`;
+  - answers through the default configuration, end to end (`run_classic`): the `CLAUDE_MODEL_JUDGE` model marks each answer sentence as supported or not by the passages sent, and the answer as correct or not against the expected answer (a forced `grade` tool call);
+  - abstention, on unanswerable questions (the right behaviour) and on answerable ones (a miss), and whether a chunk holding the gold answer was among the passages sent;
+  - the compound questions through the classic pipeline and agentic mode: were all the needed articles found, correctness, searches, tokens, cost;
+  - cost and latency per configuration, from the run's own ledger (eval runs never touch the visitor budget).
+- **Output:** `evals/results/latest.json`, a dated copy and a dated `*.details.jsonl` (every question's answer and grade), committed. The Evals workflow (manual) downloads the live corpus from Fly, runs a smoke test and the full set, and pushes the results to an `evals/run-<id>` branch. The web build reads `latest.json` at build time; the site never shows numbers that aren't in that file.

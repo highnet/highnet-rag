@@ -32,10 +32,11 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run pyright
       - run: uv run pytest
-      - name: Trace schema is up to date
+      - name: Trace and eval-results schemas are up to date
         run: |
           uv run highnet-rag schema
-          git diff --exit-code web/lib/generated/trace.schema.json
+          uv run highnet-rag-evals schema
+          git diff --exit-code web/lib/generated/trace.schema.json web/lib/generated/evals.schema.json
 
   web:
     name: Web (lint, types, tests, build, design detector)

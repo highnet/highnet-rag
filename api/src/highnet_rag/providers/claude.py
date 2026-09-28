@@ -12,11 +12,12 @@ from highnet_rag.providers.base import (
     Citation,
     FinalAnswer,
     ProviderNotConfiguredError,
+    ToolAnswer,
     ToolCall,
 )
 
 
-class ClaudeAnswerModel:
+class _ClaudeClient:
     provider = "anthropic"
 
     def __init__(self, settings: Settings, model: str) -> None:
@@ -29,9 +30,37 @@ class ClaudeAnswerModel:
             key = self._settings.anthropic_api_key
             if key is None or not key.get_secret_value():
                 raise ProviderNotConfiguredError("ANTHROPIC_API_KEY is not set.")
-            self._client = anthropic.AsyncAnthropic(api_key=key.get_secret_value())
+            self._client = anthropic.AsyncAnthropic(
+                api_key=key.get_secret_value(), max_retries=self._settings.anthropic_max_retries
+            )
         return self._client
 
+
+class ClaudeJudge(_ClaudeClient):
+    """The eval judge: a single call that must answer through one tool (structured output)."""
+
+    max_tokens = 2048
+
+    async def call(self, system: str, prompt: str, tool: dict[str, Any]) -> ToolAnswer:
+        response = await self._get_client().messages.create(
+            model=self.model,
+            max_tokens=self.max_tokens,
+            system=system,
+            messages=[{"role": "user", "content": prompt}],
+            tools=[tool],  # pyright: ignore[reportArgumentType]
+            tool_choice={"type": "tool", "name": tool["name"]},
+        )
+        used = next((b for b in response.content if b.type == "tool_use"), None)
+        if used is None:
+            raise RuntimeError(f"The judge did not call {tool['name']} ({response.stop_reason}).")
+        return ToolAnswer(
+            input=dict(used.input),  # pyright: ignore[reportArgumentType]
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+        )
+
+
+class ClaudeAnswerModel(_ClaudeClient):
     async def count_tokens(
         self,
         system: str,

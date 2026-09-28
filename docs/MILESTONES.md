@@ -89,7 +89,7 @@ Acceptance criteria:
 Acceptance criteria:
 
 - [ ] Golden sets: `squad_auto` (~150, auto-mapped), `owner` (~20, written by the owner), `compound` (~10).
-- [ ] `uv run --package evals run` computes the metrics, writes `evals/results/latest.json` and a dated copy, and prints its cost.
+- [ ] `uv run highnet-rag-evals run` computes the metrics, writes `evals/results/latest.json` and a dated copy, and prints its cost. The Evals workflow runs it against the live corpus.
 - [ ] The `/evals` page renders only numbers present in the JSON, with methodology notes ("what recall@5 means").
 - [ ] Full Impeccable finish on every page: critique, audit, polish, a finish-reviewer verdict of `ship`, and DESIGN.md current.
 - [ ] Accessibility pass: keyboard-only walkthrough, screen-reader announcement check, AA contrast in both themes.

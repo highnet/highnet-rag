@@ -39,6 +39,16 @@ class Hit:
 
 
 @dataclass(frozen=True)
+class Span:
+    """A chunk's place in its article: character offsets into the article text."""
+
+    chunk_id: int
+    doc_id: int
+    start: int
+    end: int
+
+
+@dataclass(frozen=True)
 class MapPoint:
     chunk_id: int
     doc_id: int
@@ -74,6 +84,10 @@ class CorpusStore(Protocol):
 
     def documents(self) -> dict[int, str]: ...
     def projection(self, chunk_set_id: int) -> Projection: ...
+
+    # For the evals: where each chunk sits in its article, and the articles' text.
+    def spans(self, chunk_set_id: int) -> list[Span]: ...
+    def document_text(self, doc_id: int) -> str: ...
 
 
 class StateStore(Protocol):

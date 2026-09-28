@@ -78,6 +78,15 @@ class AgentTurn:
     content: list[dict[str, Any]] = field(default_factory=list)
 
 
+@dataclass
+class ToolAnswer:
+    """A forced tool call's input: structured output from one model call."""
+
+    input: dict[str, Any]
+    input_tokens: int
+    output_tokens: int
+
+
 class Embedder(Protocol):
     provider: str
     model: str
@@ -117,3 +126,12 @@ class AnswerModel(Protocol):
     ) -> AsyncIterator[str | FinalAnswer]:
         """Yields text deltas, then exactly one FinalAnswer."""
         ...
+
+
+class Judge(Protocol):
+    """The eval judge: one model call that must answer through the given tool."""
+
+    provider: str
+    model: str
+
+    async def call(self, system: str, prompt: str, tool: dict[str, Any]) -> ToolAnswer: ...
