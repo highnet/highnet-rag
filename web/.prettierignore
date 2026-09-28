@@ -2,3 +2,5 @@
 lib/generated/trace.schema.json
 test/fixtures/map.json
 lib/generated/evals.schema.json
+# Copied from evals/results/latest.json by `npm run gen:evals`; CI diffs it.
+lib/generated/evals-latest.json

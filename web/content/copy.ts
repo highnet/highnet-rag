@@ -3,6 +3,13 @@
 export const COPY = {
   siteName: 'highnet-rag',
   tagline: 'Retrieval-augmented generation, worked out step by step.',
+  nav: {
+    label: 'Pages',
+    links: [
+      { key: 'pipeline', href: '/', text: 'Pipeline' },
+      { key: 'evals', href: '/evals/', text: 'Evals' },
+    ],
+  },
   sheetLabel: 'Sheet 1',
   emptyTitle: 'Ask the corpus a question',
   // What the site is, for anyone arriving cold. Always shown at the top of the page.

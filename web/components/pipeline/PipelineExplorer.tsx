@@ -8,6 +8,7 @@ import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import { AGENT_STAGE_ORDER, STAGE_ORDER, STAGES } from '@/content/stages';
 import { fetchConfig, type ApiConfig } from '@/lib/api';
+import { runEvalsHref } from '@/lib/evals';
 import { formatMs, formatUsd } from '@/lib/format';
 import type { TraceEvent } from '@/lib/generated/trace';
 import type {
@@ -214,7 +215,13 @@ const PipelineExplorer = () => {
         <StepList order={order} events={trace.events} runStatus={trace.status} context={context} />
       </section>
 
-      {context.citations && <AnswerResult citations={context.citations} done={trace.done} />}
+      {context.citations && (
+        <AnswerResult
+          citations={context.citations}
+          done={trace.done}
+          evalsHref={runEvalsHref(trace.input)}
+        />
+      )}
 
       <p aria-live="polite" className="sr-only">
         {announcement}

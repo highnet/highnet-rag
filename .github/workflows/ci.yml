@@ -56,6 +56,10 @@ jobs:
         run: |
           npm run gen:snippets
           git diff --exit-code lib/generated/snippets.json
+      - name: The page's eval results match evals/results/latest.json
+        run: |
+          npm run gen:evals
+          git diff --exit-code lib/generated/evals-latest.json
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test # Vitest with 100% coverage thresholds

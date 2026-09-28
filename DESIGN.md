@@ -406,3 +406,7 @@ Opened by a pencil action with a code icon. Each excerpt has a caption over a da
 - **Don't** use red for anything except failure.
 - **Don't** turn the paper metaphor into a costume: no torn edges, coffee stains, spiral bindings or a second, handwriting family.
 - **Don't** set labels in all caps or put a small label above a heading as decoration.
+
+## Evals report (`/evals`)
+
+Sheet 2 of the same pad: the sheet title "Sheet 2 · How well does it work?", a lede, and a run record on a dashed rule (date, corpus build, the models the run actually called, cost). Each question the evals answer is a raised sheet with its blue-pencil note in the margin from `lg` and above the working below it. Retrieval results are one small table per chunk size (modes down the side with their series markers, reranker off and on across): a thin bar in graphite (off) or rerank green (on) with the value in the data voice. The visitor's own setting, linked from an answer, sits on blue wash with a pencil "your settings". A section the run did not measure is a dashed box that says so and why, never an empty chart.

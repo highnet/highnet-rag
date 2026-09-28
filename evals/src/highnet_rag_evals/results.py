@@ -57,7 +57,7 @@ class RetrievalConfig(BaseModel):
     errors: int
     recall: dict[str, float]  # "1", "3", "5", "10" -> share of questions with a hit in the top k
     mrr: float
-    mean_ms: float
+    mean_ms: float  # search, fusion and rerank; the question's embedding is left out
     cost_usd: float
 
 
