@@ -18,6 +18,7 @@ export type ApiConfig = {
   budget: { spent_usd: number; cap_usd: number; remaining_usd: number; tier: BudgetTier };
   corpus: Record<string, string>;
   max_query_chars: number;
+  agent: { max_steps: number; token_cap: number };
 };
 
 export type BudgetTier = 'normal' | 'degraded' | 'stopped';

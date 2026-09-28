@@ -66,8 +66,8 @@ describe('rerank step', () => {
   });
 
   it('names an unknown input ranking as is, and needs no toggle when nothing was cut', () => {
-    render(<RerankView data={rerank({ input: 'agent', kept: 3 })} />);
-    expect(screen.getByText(T.rerank(3, 'agent'))).toBeInTheDocument();
+    render(<RerankView data={rerank({ input: 'custom', kept: 3 })} />);
+    expect(screen.getByText(T.rerank(3, 'custom'))).toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 

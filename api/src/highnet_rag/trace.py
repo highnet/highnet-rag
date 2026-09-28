@@ -80,6 +80,8 @@ class Tracer:
         self.cost_usd = 0.0
         self.started = time.perf_counter()
         self.failed = False
+        # Stage -> label overrides, for pipelines whose step numbers are not the event order.
+        self.labels: dict[str, str] = {}
 
     def event(
         self,
@@ -104,22 +106,25 @@ class Tracer:
             stage=stage,
             status=status,
             parent=parent,
-            label=label or str(self.seq),
+            label=label or self.labels.get(stage) or str(self.seq),
             data=data,
             ms=clock.ms(),
             tokens=tokens,
             cost_usd=cost_usd,
         )
 
-    def skipped(self, stage: Stage, reason: str) -> TraceEvent:
-        return self.event(stage, StageClock(), {"reason": reason}, status="skipped")
+    def skipped(self, stage: Stage, reason: str, **where: Any) -> TraceEvent:
+        return self.event(stage, StageClock(), {"reason": reason}, status="skipped", **where)
 
-    def error(self, stage: Stage, clock: "StageClock", exc: BaseException) -> TraceEvent:
+    def error(
+        self, stage: Stage, clock: "StageClock", exc: BaseException, **where: Any
+    ) -> TraceEvent:
         return self.event(
             stage,
             clock,
             {"error": {"type": type(exc).__name__, "message": str(exc)}},
             status="error",
+            **where,
         )
 
     def done(self, status: Literal["ok", "error", "limited"] | None = None) -> RunDone:

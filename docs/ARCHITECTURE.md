@@ -109,13 +109,15 @@ No LangChain or similar framework. Each stage is a plain function: `(inputs) -> 
 | 11  | `citations`                | always                                                                                                                                     | `citations` [{block, chunk_id, doc_title, rank, cited_text}], `blocks` (answer text with citation markers), `unused_chunk_ids`, `abstained`                                                                                                                   |
 | 12  | `done` (SSE `event: done`) | always, last                                                                                                                               | totals: `ms`, `tokens`, `cost_usd`, `stages`                                                                                                                                                                                                                  |
 
-**Agentic mode** replaces 2–9 with:
+**Agentic mode** (`agentic=true`) replaces stages 2–7 with a Claude tool-use loop (`pipeline/agent.py`; tools `search` and `answer`):
 
-- `agent_plan`: the model's first turn, with rewritten sub-queries;
-- then, per tool call, `agent_step` (tool name + input), followed by that call's retrieval stages (`embed_query`, `bm25`, …), each carrying `parent: "<agent_step id>"` and a step label (`4a`, `4b`, …);
-- then `generate` and `citations` as usual.
+- `agent_plan` (label `2`): the model's first turn: plan text, planned queries, the caps and the agent's instructions;
+- then, per tool call, `agent_step` (labels `3a`, `3b`, …: tool, input, the turn's note; `answer`, `stop` with the cap that ended the loop, tool errors as warnings, and tool-less turns); each `search` is followed by that search's retrieval stages from `pipeline/search.py` (`embed_query`, `bm25`, `vector`, `fuse`, `rerank`, no map), each carrying `parent: "<step label>"` and a sub-label (`3a.1`, `3a.2`, …);
+- then `select_context` (`4`, the passages found, best search rank first), `prompt` (`5`), `generate` (`6`) and `citations` (`7`) as usual.
 
-`AGENT_MAX_STEPS` (default 4) and the per-query token cap are enforced and shown in the trace.
+Past the 80% budget mark `agent_plan` is skipped with the reason and the classic stages run instead.
+
+`AGENT_MAX_STEPS` (default 4), `AGENT_TOKEN_CAP` (30,000 tokens across the agent's turns), `AGENT_TURN_MAX_TOKENS` (512), a limit of `AGENT_MAX_STEPS + 2` turns and the worst-case budget guard are enforced before every turn and shown in the trace.
 
 ### TraceEvent (SSE `event: trace`)
 
@@ -159,15 +161,15 @@ The Pydantic models are the source of truth. `uv run highnet-rag schema` exports
 
 ## 5. HTTP endpoints
 
-| Method & path                    | Returns             | Notes                                                                                                                                                                                                                                                                                            |
-| -------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `GET /api/query`                 | `text/event-stream` | Query params: `q` (≤ 500 chars), `mode` (`bm25`\|`vector`\|`hybrid`, default `hybrid`), `k` (1–10), `chunk_set` (name: `small`\|`medium`\|`large`), `rerank` (bool, default false); later `agentic` (bool). GET makes it work with `EventSource`. The response is not cached and not compressed. |
-| `GET /api/config`                | JSON                | Allowed settings, chunk sets, defaults, suggested questions, the models in use, and the current budget tier.                                                                                                                                                                                     |
-| `GET /api/corpus/map?chunk_set=` | JSON                | `points` [[chunk_id, doc_id, x, y]], `documents` {id: title}, `explained_variance` for the 2D map. Immutable per corpus build (ETag = build id).                                                                                                                                                 |
-| `GET /api/chunks/{id}`           | JSON                | Chunk text, document title, character offsets, and neighbouring chunk ids                                                                                                                                                                                                                        |
-| `GET /api/evals`                 | JSON                | The latest published eval results, or 404 before the first run                                                                                                                                                                                                                                   |
-| `GET /api/health`                | JSON                | Liveness plus corpus build id; used by Fly health checks                                                                                                                                                                                                                                         |
-| `GET /*`                         | static              | `web/out`, with `index.html` fallbacks for the static routes                                                                                                                                                                                                                                     |
+| Method & path                    | Returns             | Notes                                                                                                                                                                                                                                                                                                     |
+| -------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/query`                 | `text/event-stream` | Query params: `q` (≤ 500 chars), `mode` (`bm25`\|`vector`\|`hybrid`, default `hybrid`), `k` (1–10), `chunk_set` (name: `small`\|`medium`\|`large`), `rerank` (bool, default false), `agentic` (bool, default false). GET makes it work with `EventSource`. The response is not cached and not compressed. |
+| `GET /api/config`                | JSON                | Allowed settings, chunk sets, defaults, suggested questions, the models in use, and the current budget tier.                                                                                                                                                                                              |
+| `GET /api/corpus/map?chunk_set=` | JSON                | `points` [[chunk_id, doc_id, x, y]], `documents` {id: title}, `explained_variance` for the 2D map. Immutable per corpus build (ETag = build id).                                                                                                                                                          |
+| `GET /api/chunks/{id}`           | JSON                | Chunk text, document title, character offsets, and neighbouring chunk ids                                                                                                                                                                                                                                 |
+| `GET /api/evals`                 | JSON                | The latest published eval results, or 404 before the first run                                                                                                                                                                                                                                            |
+| `GET /api/health`                | JSON                | Liveness plus corpus build id; used by Fly health checks                                                                                                                                                                                                                                                  |
+| `GET /*`                         | static              | `web/out`, with `index.html` fallbacks for the static routes                                                                                                                                                                                                                                              |
 
 ## 6. SQLite schema
 

@@ -58,6 +58,26 @@ class FinalAnswer:
         return "".join(b.text for b in self.blocks)
 
 
+@dataclass
+class ToolCall:
+    id: str
+    name: str
+    input: dict[str, Any]
+
+
+@dataclass
+class AgentTurn:
+    """One model turn in the agent loop: its text, the tools it called, and what it cost."""
+
+    text: str
+    calls: list[ToolCall]
+    stop_reason: str | None
+    input_tokens: int
+    output_tokens: int
+    # The assistant message to append to the conversation, as plain dicts.
+    content: list[dict[str, Any]] = field(default_factory=list)
+
+
 class Embedder(Protocol):
     provider: str
     model: str
@@ -77,7 +97,20 @@ class AnswerModel(Protocol):
     provider: str
     model: str
 
-    async def count_tokens(self, system: str, messages: list[dict[str, Any]]) -> int: ...
+    async def count_tokens(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> int: ...
+
+    async def agent_turn(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        max_tokens: int,
+    ) -> AgentTurn: ...
 
     def stream_answer(
         self, system: str, messages: list[dict[str, Any]], max_tokens: int

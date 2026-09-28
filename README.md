@@ -8,7 +8,7 @@ A transparent Retrieval-Augmented Generation (RAG) teaching tool. Ask a question
 - the exact prompt;
 - the streamed answer and its citations.
 
-> Status: milestone 4 (reranking and the corpus map). See [docs/MILESTONES.md](docs/MILESTONES.md) and the changelog below.
+> Status: milestone 5 (agentic retrieval). See [docs/MILESTONES.md](docs/MILESTONES.md) and the changelog below.
 
 ## Run it locally (no API keys needed)
 
@@ -86,6 +86,7 @@ The Vercel project `highnet-rag` (team "highnet's projects") is linked to this r
 
 ## Changelog
 
+- **Milestone 5: agentic retrieval.** Switch the agent on and ask a question that joins two articles (ten suggestions are offered). Claude states a plan, writes one search per fact, runs each through the full retrieval pipeline, reads the results and decides whether to search again or answer. Each search is a numbered sub-step (3a, 3b, …) with its own stages, tokens and cost; the caps on searches and tokens are drawn as meters, and any cap that stops the loop says so.
 - **Milestone 4: reranking and the corpus map.** Switch the reranker on and a cross-encoder rescores every candidate against the question; the list settles as rows slide from their old ranks to their new ones, with each move labelled. The map step now draws the whole chunk set on its two PCA axes with your question dropped in, the retrieved passages marked by rank, and the article under your pointer lit up. A table carries the same positions.
 - **Milestone 3: visual aids.** Every step now has a small figure drawn from the run's own numbers: rate-limit and budget meters, the question vector as bars, BM25 term weights, distances on a number line with a zoom, fusion contributions as stacked bars, the context by passage, how much of the context window the prompt fills, the answer's cost split, and a grid of which passage backs which part of the answer. Each has a one-line "how to read this" caption and a text alternative with the same numbers.
 - **Milestone 2: hybrid retrieval and the settings strip.** Run the same question in BM25, vector and hybrid modes. The BM25 step shows the exact FTS5 MATCH string. The fusion step shows the two rankings side by side, then the fused list with each passage's rank in both inputs and its reciprocal-rank-fusion score, cut at top-k. Mode, top-k and chunk size (small, medium, large) sit in a settings strip; they and the question live in the URL, so a run can be shared by link. The background grid is gone; the pad is plain paper.

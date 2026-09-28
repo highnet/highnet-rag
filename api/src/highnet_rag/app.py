@@ -111,6 +111,10 @@ def create_app(
             "budget": budget_state(deps.state, settings).as_dict(),
             "corpus": deps.corpus.meta(),
             "max_query_chars": settings.max_query_chars,
+            "agent": {
+                "max_steps": settings.agent_max_steps,
+                "token_cap": settings.agent_token_cap,
+            },
         }
 
     @app.get("/api/corpus/map")
@@ -154,6 +158,7 @@ def create_app(
         k: Annotated[int, Query(ge=1, le=10)] = 5,
         chunk_set: Annotated[str, Query()] = "medium",
         rerank: Annotated[bool, Query()] = False,
+        agentic: Annotated[bool, Query()] = False,
     ) -> StreamingResponse:
         params = QueryParams(
             q=q.strip(),
@@ -161,6 +166,7 @@ def create_app(
             k=min(k, settings.max_top_k),
             chunk_set=chunk_set,
             rerank=rerank,
+            agentic=agentic,
         )
         ip_hash = hash_ip(client_ip(request), settings)
         return StreamingResponse(

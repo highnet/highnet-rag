@@ -7,7 +7,14 @@ import type { AnswerDelta, RunDone, TraceEvent } from '@/lib/generated/trace';
 
 export type RunStatus = 'idle' | 'running' | 'finished' | 'failed';
 
-export type RunInput = { q: string; k: number; chunkSet: string; mode: string; rerank: boolean };
+export type RunInput = {
+  q: string;
+  k: number;
+  chunkSet: string;
+  mode: string;
+  rerank: boolean;
+  agentic: boolean;
+};
 
 export type TraceState = {
   status: RunStatus;
@@ -49,6 +56,7 @@ export const useTraceStream = () => {
         chunk_set: input.chunkSet,
         mode: input.mode,
         rerank: String(input.rerank),
+        agentic: String(input.agentic),
       });
       const source = new EventSource(apiUrl(`/api/query?${params.toString()}`));
       sourceRef.current = source;

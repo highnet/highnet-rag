@@ -15,14 +15,22 @@ type SettingsStripProps = {
   settings: RunSettings;
   disabled: boolean;
   stale: boolean;
+  agentPaused: boolean;
   onChange: (settings: RunSettings) => void;
 };
 
 const S = COPY.settings;
 
 // Only settings that change something in this build are shown; more join per milestone.
-const SettingsStrip = ({ config, settings, disabled, stale, onChange }: SettingsStripProps) => {
-  const { mode, k, chunkSet, rerank } = settings;
+const SettingsStrip = ({
+  config,
+  settings,
+  disabled,
+  stale,
+  agentPaused,
+  onChange,
+}: SettingsStripProps) => {
+  const { mode, k, chunkSet, rerank, agentic } = settings;
   const set = config.chunk_sets.find((s) => s.name === chunkSet);
   const modeLabel = S.modes[mode]?.label ?? mode;
 
@@ -35,6 +43,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
           <span className="voice-data">
             {modeLabel} · k={k}
             {rerank && ` · ${S.rerankShort}`} · {chunkSet}
+            {agentic && !agentPaused && ` · ${S.agentShort}`}
           </span>
         </span>
         <ChevronDown
@@ -44,7 +53,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
       </CollapsibleTrigger>
       <CollapsibleContent
         forceMount
-        className="flex flex-col gap-y-4 pb-4 data-[state=closed]:hidden sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-8 sm:py-3 sm:data-[state=closed]:flex"
+        className="flex flex-col gap-y-4 pb-4 data-[state=closed]:hidden sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-6 sm:py-3 sm:data-[state=closed]:flex"
       >
         <div className="space-y-1.5">
           <Typography variant="small" color="muted" as="span" id="mode-label" className="block">
@@ -59,7 +68,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
             onChange={(value) => onChange({ ...settings, mode: value })}
             options={config.modes.map((m) => ({ value: m, label: S.modes[m]?.label ?? m }))}
           />
-          <Typography variant="small" color="muted" id="mode-description" className="max-w-[28ch]">
+          <Typography variant="small" color="muted" id="mode-description" className="max-w-[22ch]">
             {S.modes[mode]?.description}
           </Typography>
         </div>
@@ -113,7 +122,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
             variant="small"
             color="muted"
             id="rerank-description"
-            className="max-w-[28ch]"
+            className="max-w-[22ch]"
           >
             {rerank ? S.rerankDescription.on : S.rerankDescription.off}
           </Typography>
@@ -123,15 +132,11 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
           <div className="space-y-1.5">
             <Typography variant="small" color="muted" as="span" id="chunks-label" className="block">
               {S.chunks}
-              {set && (
-                <span className="voice-data ml-2 text-xs">
-                  {S.chunkSize(set.target_tokens, set.chunks)}
-                </span>
-              )}
             </Typography>
             <SegmentedControl
               name="chunks"
               labelledBy="chunks-label"
+              describedBy="chunks-description"
               value={chunkSet}
               disabled={disabled}
               onChange={(value) => onChange({ ...settings, chunkSet: value })}
@@ -141,8 +146,48 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
                 description: S.chunkSize(s.target_tokens, s.chunks),
               }))}
             />
+            {set && (
+              <Typography
+                variant="small"
+                color="muted"
+                id="chunks-description"
+                className="voice-data max-w-[22ch] text-xs"
+              >
+                {S.chunkSize(set.target_tokens, set.chunks)}
+              </Typography>
+            )}
           </div>
         )}
+
+        <div className="space-y-1.5">
+          <Typography variant="small" color="muted" as="span" id="agent-label" className="block">
+            {S.agent}
+          </Typography>
+          <SegmentedControl
+            name="agent"
+            labelledBy="agent-label"
+            describedBy="agent-description"
+            value={agentic && !agentPaused ? 'on' : 'off'}
+            disabled={disabled || agentPaused}
+            onChange={(value) => onChange({ ...settings, agentic: value === 'on' })}
+            options={[
+              { value: 'off', label: S.agentOptions.off },
+              { value: 'on', label: S.agentOptions.on },
+            ]}
+          />
+          <Typography
+            variant="small"
+            color={agentPaused ? 'warning' : 'muted'}
+            id="agent-description"
+            className="max-w-[22ch]"
+          >
+            {agentPaused
+              ? S.agentDescription.paused
+              : agentic
+                ? S.agentDescription.on
+                : S.agentDescription.off}
+          </Typography>
+        </div>
 
         {stale && (
           <Typography variant="marginNote" className="sm:basis-full">

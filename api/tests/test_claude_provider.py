@@ -101,3 +101,36 @@ async def test_missing_key_raises_on_first_use() -> None:
     m = ClaudeAnswerModel(Settings(_env_file=None), "claude-haiku-4-5")  # pyright: ignore[reportCallIssue]
     with pytest.raises(ProviderNotConfiguredError):
         await m.count_tokens("sys", [])
+
+
+async def test_agent_turn_returns_text_tool_calls_and_usage(model) -> None:
+    m, messages = model
+    response = SimpleNamespace(
+        content=[
+            SimpleNamespace(type="text", text="I'll search twice."),
+            SimpleNamespace(type="tool_use", id="t1", name="search", input={"query": "Harvard"}),
+        ],
+        stop_reason="tool_use",
+        usage=SimpleNamespace(input_tokens=90, output_tokens=20),
+    )
+
+    async def create(**kwargs: object) -> SimpleNamespace:
+        messages.calls.append({"create": kwargs})
+        return response
+
+    messages.create = create  # type: ignore[attr-defined]
+    tools = [{"name": "search", "input_schema": {"type": "object"}}]
+    turn = await m.agent_turn("sys", [{"role": "user", "content": "q"}], tools, 256)
+    assert turn.text == "I'll search twice." and turn.stop_reason == "tool_use"
+    assert [(c.name, c.input) for c in turn.calls] == [("search", {"query": "Harvard"})]
+    assert turn.content[-1] == {
+        "type": "tool_use",
+        "id": "t1",
+        "name": "search",
+        "input": {"query": "Harvard"},
+    }
+    assert (turn.input_tokens, turn.output_tokens) == (90, 20)
+    sent = messages.calls[-1]["create"]
+    assert sent["tools"] == tools and sent["max_tokens"] == 256
+    assert await m.count_tokens("sys", [], tools) == 321
+    assert messages.calls[-1]["count"]["tools"] == tools

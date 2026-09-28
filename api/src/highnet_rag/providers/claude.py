@@ -7,10 +7,12 @@ import anthropic
 
 from highnet_rag.config import Settings
 from highnet_rag.providers.base import (
+    AgentTurn,
     AnswerBlock,
     Citation,
     FinalAnswer,
     ProviderNotConfiguredError,
+    ToolCall,
 )
 
 
@@ -30,13 +32,54 @@ class ClaudeAnswerModel:
             self._client = anthropic.AsyncAnthropic(api_key=key.get_secret_value())
         return self._client
 
-    async def count_tokens(self, system: str, messages: list[dict[str, Any]]) -> int:
+    async def count_tokens(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> int:
         result = await self._get_client().messages.count_tokens(
             model=self.model,
             system=system,
             messages=messages,  # pyright: ignore[reportArgumentType]
+            tools=tools or [],  # pyright: ignore[reportArgumentType]
         )
         return result.input_tokens
+
+    # snippet: agent_plan,agent_step | One agent turn: Claude may call search or answer
+    async def agent_turn(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        max_tokens: int,
+    ) -> AgentTurn:
+        response = await self._get_client().messages.create(
+            model=self.model,
+            max_tokens=max_tokens,
+            system=system,
+            messages=messages,  # pyright: ignore[reportArgumentType]
+            tools=tools,  # pyright: ignore[reportArgumentType]
+        )
+        text = "".join(b.text for b in response.content if b.type == "text")
+        calls = [
+            ToolCall(id=b.id, name=b.name, input=dict(b.input))  # pyright: ignore[reportArgumentType]
+            for b in response.content
+            if b.type == "tool_use"
+        ]
+        content: list[dict[str, Any]] = [
+            {"type": "text", "text": b.text} for b in response.content if b.type == "text"
+        ] + [{"type": "tool_use", "id": c.id, "name": c.name, "input": c.input} for c in calls]
+        return AgentTurn(
+            text=text,
+            calls=calls,
+            stop_reason=response.stop_reason,
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            content=content,
+        )
+
+    # /snippet
 
     # snippet: generate | Claude streaming call
     async def stream_answer(

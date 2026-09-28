@@ -64,10 +64,10 @@ describe('api client', () => {
 describe('snippets', () => {
   it('are extracted per stage and link to their lines', () => {
     const [first] = snippetsFor('vector');
-    expect(first.file).toBe('api/src/highnet_rag/pipeline/classic.py');
+    expect(first.file).toBe('api/src/highnet_rag/pipeline/search.py');
     expect(first.html).toContain('hljs-');
-    expect(sourceUrl(first)).toMatch(/classic\.py#L\d+-L\d+$/);
-    expect(snippetsFor('agent_plan')).toEqual([]);
+    expect(sourceUrl(first)).toMatch(/search\.py#L\d+-L\d+$/);
+    expect(snippetsFor('unknown' as never)).toEqual([]);
   });
 });
 
@@ -83,14 +83,23 @@ describe('url state', () => {
   it('keeps valid values and replaces invalid ones with the defaults', () => {
     expect(
       parseUrlState('?q=%20Who%20won%20the%20cup%3F&mode=bm25&k=2&chunks=small', config),
-    ).toEqual({ q: 'Who won th', mode: 'bm25', k: 2, chunkSet: 'small', rerank: false });
+    ).toEqual({
+      q: 'Who won th',
+      mode: 'bm25',
+      k: 2,
+      chunkSet: 'small',
+      rerank: false,
+      agentic: false,
+    });
     expect(parseUrlState('?mode=agentic&k=11&chunks=huge', config)).toEqual({
       q: '',
       mode: 'hybrid',
       k: 5,
       chunkSet: 'medium',
       rerank: false,
+      agentic: false,
     });
+    expect(parseUrlState('?agent=1', config).agentic).toBe(true);
     expect(parseUrlState('?rerank=1', config).rerank).toBe(true);
     expect(parseUrlState('?k=2.5', config).k).toBe(5);
     expect(parseUrlState('?k=0', config).k).toBe(5);
@@ -104,12 +113,12 @@ describe('url state', () => {
   });
 
   it('leaves the question out of the link until there is one', () => {
-    expect(urlSearch({ q: '', mode: 'vector', k: 3, chunkSet: 'small', rerank: false })).toBe(
-      '?mode=vector&k=3&chunks=small',
-    );
-    expect(urlSearch({ q: 'x', mode: 'hybrid', k: 5, chunkSet: 'small', rerank: true })).toBe(
-      '?q=x&mode=hybrid&k=5&chunks=small&rerank=1',
-    );
+    expect(
+      urlSearch({ q: '', mode: 'vector', k: 3, chunkSet: 'small', rerank: false, agentic: false }),
+    ).toBe('?mode=vector&k=3&chunks=small');
+    expect(
+      urlSearch({ q: 'x', mode: 'hybrid', k: 5, chunkSet: 'small', rerank: true, agentic: true }),
+    ).toBe('?q=x&mode=hybrid&k=5&chunks=small&rerank=1&agent=1');
   });
 });
 
@@ -165,7 +174,9 @@ describe('step summaries', () => {
     [ev('citations', { abstained: true, citations: [] }), 'No answer in the passages'],
     [ev('citations', { abstained: false, citations: [{}] }), '1 citation'],
     [ev('citations', { abstained: false, citations: [{}, {}] }), '2 citations'],
-    [ev('agent_plan', {}), ''],
+    [ev('agent_plan', { queries: ['a', 'b'] }), '2 searches planned'],
+    [ev('agent_plan', { queries: ['a'] }), '1 search planned'],
+    [ev('agent_step', {}), ''],
   ];
   it.each(cases)('%#', (event, expected) => {
     expect(stepSummary(event)).toBe(expected);

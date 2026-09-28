@@ -50,5 +50,9 @@
     "licence": "CC BY-SA 4.0",
     "source_url": "https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v2.0.json"
   },
-  "max_query_chars": 500
+  "max_query_chars": 500,
+  "agent": {
+    "max_steps": 4,
+    "token_cap": 30000
+  }
 }
