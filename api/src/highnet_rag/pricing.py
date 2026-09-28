@@ -11,6 +11,12 @@ DEFAULT_PRICES: dict[str, ModelPrice] = {
     "rerank-2.5-lite": ModelPrice(input=0.02),
 }
 
+# Context window (input tokens) per answer model, for the prompt step's window bar. Only models
+# whose window is documented are listed; any other model simply draws no window.
+CONTEXT_WINDOWS: dict[str, int] = {
+    "claude-haiku-4-5": 200_000,
+}
+
 FAKE_PREFIX = "fake-"
 
 

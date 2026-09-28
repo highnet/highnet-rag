@@ -12,9 +12,10 @@ import numpy as np
 from highnet_rag.budget import budget_state, rate_state
 from highnet_rag.pipeline.deps import Deps, QueryParams
 from highnet_rag.pipeline.prompt import NOT_FOUND, SYSTEM_PROMPT, build_messages
-from highnet_rag.pipeline.retrieve import RRF_K, fts_query, rrf
-from highnet_rag.pricing import cost_usd
+from highnet_rag.pipeline.retrieve import RRF_K, bm25_idf, fts_query, question_words, rrf
+from highnet_rag.pricing import CONTEXT_WINDOWS, cost_usd
 from highnet_rag.providers.base import FinalAnswer
+from highnet_rag.providers.fake import approx_tokens
 from highnet_rag.storage.base import CorpusStore, Hit
 from highnet_rag.trace import AnswerDelta, RunDone, StageClock, TraceEvent, Tracer
 
@@ -170,12 +171,21 @@ async def run_classic(
             return
         lists["bm25"] = bm25_hits
         titles = doc_titles(corpus, bm25_hits)
+        containing = corpus.term_docs(terms, chunk_set.id)
         yield tracer.event(
             "bm25",
             clock,
             {
                 "fts_query": match,
-                "terms": terms,
+                "words": question_words(params.q),
+                "terms": [
+                    {
+                        "term": t,
+                        "chunks": containing[t],
+                        "idf": round(bm25_idf(chunk_set.chunk_count, containing[t]), 4),
+                    }
+                    for t in terms
+                ],
                 "chunk_set": chunk_set.name,
                 "searched": chunk_set.chunk_count,
                 "depth": depth,
@@ -320,6 +330,13 @@ async def run_classic(
         "messages": messages,
         "input_tokens": input_tokens,
         "worst_case_cost_usd": worst_case,
+        "context_window": CONTEXT_WINDOWS.get(answer.model),
+        # Word-count estimates of how the input splits; the exact total is input_tokens.
+        "parts_approx": {
+            "system": approx_tokens(SYSTEM_PROMPT),
+            "passages": context_tokens,
+            "question": approx_tokens(params.q),
+        },
     }
     budget = budget_state(state, settings)
     if worst_case > budget.remaining_usd:
@@ -367,6 +384,10 @@ async def run_classic(
                 "cache_read_input_tokens": final.cache_read_input_tokens,
             },
             "answer": final.text,
+            "cost_split": {
+                "input_usd": cost_usd(answer.model, settings, final.input_tokens),
+                "output_usd": cost_usd(answer.model, settings, 0, final.output_tokens),
+            },
         },
         status="warning" if final.stop_reason == "max_tokens" else "ok",
         tokens=final.input_tokens + final.output_tokens,

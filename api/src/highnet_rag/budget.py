@@ -15,6 +15,7 @@ class BudgetState:
     spent_usd: float
     cap_usd: float
     tier: Tier
+    degrade_at_usd: float
 
     @property
     def remaining_usd(self) -> float:
@@ -25,6 +26,7 @@ class BudgetState:
             "spent_usd": round(self.spent_usd, 6),
             "cap_usd": self.cap_usd,
             "remaining_usd": round(self.remaining_usd, 6),
+            "degrade_at_usd": round(self.degrade_at_usd, 6),
             "tier": self.tier,
         }
 
@@ -64,7 +66,7 @@ def budget_state(state: StateStore, settings: Settings) -> BudgetState:
         tier = "degraded"
     else:
         tier = "normal"
-    return BudgetState(spent, cap, tier)
+    return BudgetState(spent, cap, tier, cap * settings.budget_degrade_at)
 
 
 # /snippet

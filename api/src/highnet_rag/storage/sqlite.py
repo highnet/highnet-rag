@@ -124,6 +124,16 @@ class SqliteCorpusStore:
 
     # /snippet
 
+    def term_docs(self, terms: list[str], chunk_set_id: int) -> dict[str, int]:
+        """How many chunks of the set contain each term, counted the way BM25 counts them."""
+        return {
+            term: self._conn.execute(
+                "SELECT count(*) FROM chunks_fts WHERE chunks_fts MATCH ? AND chunk_set_id = ?",
+                (f'"{term}"', chunk_set_id),
+            ).fetchone()[0]
+            for term in terms
+        }
+
     # snippet: vector | sqlite-vec nearest neighbours
     def knn(self, vector: np.ndarray, chunk_set_id: int, k: int) -> list[Hit]:
         rows = self._conn.execute(
