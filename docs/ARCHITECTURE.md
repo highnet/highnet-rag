@@ -70,7 +70,8 @@ flowchart LR
 | Component             | Responsibility                                                                                                                                                                                                                                                                         |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `config.Settings`     | Reads and validates every env var at startup (see `.env.example`). Missing API keys do **not** crash startup; they fail the first request that needs them, as a clean `error` trace event.                                                                                             |
-| `providers.voyage`    | `embed(texts, input_type)` and `rerank(query, docs, top_k)`. Each returns results plus a token `usage`. The client is built lazily on first use (AGENTS.md rule).                                                                                                                      |
+| `providers.voyage`    | `embed(texts, input_type)` and `rerank(query, docs, top_k)` over Voyage's REST API with plain `httpx` (the `voyageai` SDK pulls in LangChain and tokenizers). Each returns results plus token usage. The HTTP client is built lazily on first use (AGENTS.md rule).                    |
+| `providers.fake`      | Deterministic offline stand-ins (`FAKE_PROVIDERS=true`, `ingest --fake`): hashed bag-of-words embeddings and an extractive "LLM". No keys and no cost; every event names `provider: "fake"` and the UI labels runs as illustrative.                                                  |
 | `providers.claude`    | `count_tokens`, `stream_answer` (streaming, with citations), `agent_turn` (tool use). The client is built lazily. Model IDs come from settings.                                                                                                                                        |
 | `storage.CorpusStore` | A read-only Protocol: `chunk_sets()`, `bm25(query, set, k)`, `knn(vector, set, k)`, `chunks(ids)`, `map_points(set)`, `pca(set)`, `meta()`. `SqliteCorpusStore` implements it today; a `PgvectorCorpusStore` can implement it later without touching the pipeline.                     |
 | `storage.StateStore`  | A writable Protocol: `record_spend(...)`, `month_spend()`, `record_run(...)`, `hits(ip_hash, window)`. It lives in a separate `state.sqlite`, so the corpus file can be swapped atomically.                                                                                            |
@@ -89,15 +90,15 @@ No LangChain or similar framework. Each stage is a plain function: `(inputs) -> 
 | --- | -------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | `request`                  | always                                               | `run_id`, echoed `settings`, `model`, `rate_limit` {remaining_min, remaining_day}, `budget` {spent_usd, cap_usd, tier: `normal`\|`degraded`\|`stopped`} |
 | 2   | `embed_query`              | always (if not stopped)                              | `model`, `dims`, `input_type: "query"`, `vector_preview` (first 8 dims), `norm`                                                                         |
-| 3   | `map_project`              | always                                               | `x`, `y` of the query in the chunk set's PCA space, `explained_variance`, `neighbors` (the 5 nearest chunk ids in 2D)                                   |
+| 3   | `map_project`              | always                                               | `x`, `y` of the query in the chunk set's PCA space, `explained_variance`, `neighbours_2d` (the 5 nearest chunk ids in 2D)                               |
 | 4   | `bm25`                     | mode ∈ {bm25, hybrid}; otherwise `status: "skipped"` | `fts_query` (the FTS5 MATCH string actually run), `results` [{chunk_id, rank, score}]                                                                   |
 | 5   | `vector`                   | mode ∈ {vector, hybrid}; otherwise skipped           | `metric: "cosine"`, `results` [{chunk_id, rank, distance}]                                                                                              |
 | 6   | `fuse`                     | mode = hybrid; otherwise skipped                     | `method: "rrf"`, `k: 60`, `results` [{chunk_id, rank, score, from: {bm25_rank, vector_rank}}]                                                           |
 | 7   | `rerank`                   | reranker on; otherwise skipped                       | `model`, `before` [{chunk_id, rank}], `after` [{chunk_id, rank, relevance}], `moved` (rank deltas)                                                      |
-| 8   | `select_context`           | always                                               | `top_k`, `chunks` [{chunk_id, doc_title, text, n_tokens}], `context_tokens`                                                                             |
-| 9   | `prompt`                   | always                                               | `system`, `messages` (the exact request body minus the API key), `input_tokens` (from `count_tokens`), `estimated_cost_usd`                             |
+| 8   | `select_context`           | always                                               | `top_k`, `chunks` [{chunk_id, rank, doc_title, distance, text, approx_tokens}], `context_tokens_approx`                                                 |
+| 9   | `prompt`                   | always                                               | `system`, `messages` (the exact request body minus the API key), `input_tokens` (from `count_tokens`), `max_tokens`, `worst_case_cost_usd`              |
 | 10  | `generate`                 | always                                               | `model`, `stop_reason`, `usage` {input_tokens, output_tokens, cache_read_input_tokens}, `answer`                                                        |
-| 11  | `citations`                | always                                               | `citations` [{chunk_id, cited_text, span}], `uncited_sentences`, `abstained` (bool: the model said the corpus doesn't contain the answer)               |
+| 11  | `citations`                | always                                               | `citations` [{block, chunk_id, doc_title, rank, cited_text}], `blocks` (answer text with citation markers), `unused_chunk_ids`, `abstained`            |
 | 12  | `done` (SSE `event: done`) | always, last                                         | totals: `ms`, `tokens`, `cost_usd`, `stages`                                                                                                            |
 
 **Agentic mode** replaces 2–9 with:
@@ -190,7 +191,7 @@ CREATE TABLE chunks (
   text TEXT NOT NULL,
   start_char INTEGER NOT NULL,     -- offsets into documents.text
   end_char INTEGER NOT NULL,
-  n_tokens INTEGER NOT NULL,       -- Voyage token count
+  approx_tokens INTEGER NOT NULL,  -- estimate (words × 4/3); exact counts come from the APIs
   x REAL NOT NULL, y REAL NOT NULL -- PCA 2D coordinates within its chunk set
 );
 CREATE INDEX chunks_set_doc ON chunks(chunk_set_id, doc_id, ord);
