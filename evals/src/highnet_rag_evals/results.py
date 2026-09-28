@@ -138,6 +138,7 @@ class EvalResults(BaseModel):
     run: RunInfo
     golden: list[GoldenSetInfo]
     retrieval: RetrievalResults
-    answers: AnswerResults
-    compound: list[CompoundResults]
+    # None when the run measured retrieval only (answers cost model calls; see `--retrieval-only`).
+    answers: AnswerResults | None
+    compound: list[CompoundResults] | None
     cost: CostResults

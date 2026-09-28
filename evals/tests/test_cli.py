@@ -55,6 +55,11 @@ def test_build_golden_run_and_schema(
     latest = json.loads((out / "latest.json").read_text(encoding="utf-8"))
     assert latest["golden"][0]["questions"] == 5
 
+    run_cli(monkeypatch, "run", "--golden", str(golden), "--out", str(out), "--retrieval-only")
+    latest = json.loads((out / "latest.json").read_text(encoding="utf-8"))
+    assert latest["answers"] is None and latest["compound"] is None
+    assert latest["cost"]["by_model"][0]["model"] == "fake-hashed-bow"
+
     schema = tmp_path / "evals.schema.json"
     run_cli(monkeypatch, "schema", "--out", str(schema))
     assert json.loads(schema.read_text(encoding="utf-8"))["title"] == "highnet-rag eval results"

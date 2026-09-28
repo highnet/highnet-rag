@@ -50,7 +50,7 @@ def cmd_run(args: argparse.Namespace) -> None:
         build_judge(settings),
         concurrency=args.concurrency,
     )
-    results = asyncio.run(evaluator.run(golden))
+    results = asyncio.run(evaluator.run(golden, retrieval_only=args.retrieval_only))
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -96,6 +96,11 @@ def main() -> None:
     p.add_argument("--fake", action="store_true", help="offline providers; illustrative numbers")
     p.add_argument("--limit", type=int, default=0, help="only the first N questions per set")
     p.add_argument("--concurrency", type=int, default=6)
+    p.add_argument(
+        "--retrieval-only",
+        action="store_true",
+        help="recall@k and MRR only: no answers, no judge (Voyage calls only, a few cents)",
+    )
     p.set_defaults(func=cmd_run)
 
     p = sub.add_parser("schema", help="export the results JSON Schema for the frontend")

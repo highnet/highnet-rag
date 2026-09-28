@@ -548,14 +548,28 @@
       "$ref": "#/$defs/RetrievalResults"
     },
     "answers": {
-      "$ref": "#/$defs/AnswerResults"
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AnswerResults"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "compound": {
-      "items": {
-        "$ref": "#/$defs/CompoundResults"
-      },
-      "title": "Compound",
-      "type": "array"
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/CompoundResults"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Compound"
     },
     "cost": {
       "$ref": "#/$defs/CostResults"

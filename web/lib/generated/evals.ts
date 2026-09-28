@@ -42,6 +42,7 @@ export type Errors2 = number;
 export type Faithfulness1 = number | null;
 export type MeanMs1 = number;
 export type MeanCostUsd = number;
+export type Compound = CompoundResults[] | null;
 export type Pipeline = 'classic' | 'agentic';
 export type Questions5 = number;
 export type Errors3 = number;
@@ -51,7 +52,6 @@ export type MeanSearches = number;
 export type MeanTokens = number;
 export type MeanMs2 = number;
 export type MeanCostUsd1 = number;
-export type Compound = CompoundResults[];
 export type TotalUsd = number;
 export type Provider1 = string;
 export type Model1 = string;
@@ -66,7 +66,7 @@ export interface HighnetRagEvalResults {
   run: RunInfo;
   golden: Golden;
   retrieval: RetrievalResults;
-  answers: AnswerResults;
+  answers: AnswerResults | null;
   compound: Compound;
   cost: CostResults;
 }

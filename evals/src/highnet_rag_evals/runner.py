@@ -531,12 +531,12 @@ class Evaluator:
 
     # The whole run ------------------------------------------------------------------------
 
-    async def run(self, golden: Golden) -> EvalResults:
+    async def run(self, golden: Golden, *, retrieval_only: bool = False) -> EvalResults:
         started, clock = datetime.now(UTC), time.monotonic()
         questions = gold_questions(golden, self.corpus)
         retrieval = await self.retrieval(questions)
-        answers = await self.answers(golden, questions)
-        compound = await self.compound(golden.compound)
+        answers = None if retrieval_only else await self.answers(golden, questions)
+        compound = None if retrieval_only else await self.compound(golden.compound)
         meta = self.corpus.meta()
         p = self.providers
         return EvalResults(

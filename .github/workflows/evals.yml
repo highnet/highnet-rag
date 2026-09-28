@@ -1,14 +1,19 @@
 name: Evals
 
 # Runs the offline evals against the live corpus with the real models, then pushes the results
-# to a new branch (evals/run-<id>) for review. It calls paid APIs (about $2.50 to $3.50 a run),
-# so it only runs by hand. Eval spend is not counted against the visitor budget.
+# to a new branch (evals/run-<id>) for review. By default it measures retrieval only (Voyage
+# calls, a few cents); `full` adds answers graded by the judge (about $2.50 to $3.50). It only
+# runs by hand, and eval spend is not counted against the visitor budget.
 on:
   workflow_dispatch:
     inputs:
       limit:
         description: Only the first N questions per golden set (0 = all)
         default: "0"
+      full:
+        description: Also generate and grade answers (about $2.50 to $3.50)
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -28,6 +33,7 @@ jobs:
       ANTHROPIC_MAX_RETRIES: "8"
       VOYAGE_MAX_RETRIES: "8"
       VOYAGE_MAX_RETRY_WAIT_SECONDS: "30"
+      SCOPE: ${{ inputs.full && ' ' || '--retrieval-only' }}
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
@@ -37,13 +43,14 @@ jobs:
         run: scripts/download-corpus.sh data/corpus.sqlite
       - name: Smoke test (one question per set; stops on any error)
         run: |
-          uv run highnet-rag-evals run --corpus data/corpus.sqlite --out /tmp/smoke --limit 1
-          jq -e '[.retrieval.configs[].errors, .answers.answerable.errors,
-                  .answers.unanswerable.errors, .compound[].errors] | add == 0' /tmp/smoke/latest.json
+          uv run highnet-rag-evals run --corpus data/corpus.sqlite --out /tmp/smoke --limit 1 $SCOPE
+          jq -e '[.retrieval.configs[].errors, .answers.answerable.errors // 0,
+                  .answers.unanswerable.errors // 0, (.compound // [])[].errors] | add == 0' \
+            /tmp/smoke/latest.json
       - name: Run the evals
         run: |
           uv run highnet-rag-evals run --corpus data/corpus.sqlite --limit "${{ inputs.limit }}" \
-            --concurrency 4 | tee evals-run.log
+            --concurrency 4 $SCOPE | tee evals-run.log
       - uses: actions/upload-artifact@v4
         with:
           name: eval-results

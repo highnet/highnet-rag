@@ -29,10 +29,11 @@ For an unanswerable row, set `"answerable": false` and leave `answer` and `evide
 
 ```bash
 uv run highnet-rag-evals run --fake            # offline providers; illustrative numbers, no cost
-uv run highnet-rag-evals run                   # real models: needs ANTHROPIC_API_KEY and VOYAGE_API_KEY
+uv run highnet-rag-evals run --retrieval-only  # recall@k and MRR only: Voyage calls, a few cents
+uv run highnet-rag-evals run                   # everything: needs ANTHROPIC_API_KEY and VOYAGE_API_KEY
 uv run highnet-rag-evals schema                # regenerate the results JSON Schema for web/
 ```
 
-A run writes `results/latest.json`, a dated copy and a dated `*.details.jsonl` with every question's answer and grade, and prints its cost. The real run normally goes through the **Evals** GitHub workflow (run by hand): it downloads the live corpus from Fly, runs a one-question smoke test, runs the full set and pushes the results to a new `evals/run-<id>` branch.
+A run writes `results/latest.json`, a dated copy and a dated `*.details.jsonl` with every question's answer and grade, and prints its cost. The real run normally goes through the **Evals** GitHub workflow (run by hand): it downloads the live corpus from Fly, runs a one-question smoke test, runs the full set (retrieval only unless its `full` input is ticked) and pushes the results to a new `evals/run-<id>` branch.
 
 Run the tests with `uv run pytest evals`.
