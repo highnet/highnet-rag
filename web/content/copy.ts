@@ -49,6 +49,8 @@ export const COPY = {
     fewer: 'Fewer',
     intro:
       'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand Claude the best passages and ask it to answer from those alone, with citations. Each question below was run once for every setting with the real models; pick one and its run is replayed step by step, with its real timing, tokens and cost. Change a setting to replay that setting’s run.',
+    introIllustrative:
+      'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand the passages to the answer step and ask it to answer from those alone, with citations. Each question below was run once for every setting; pick one and its run is replayed step by step. Change a setting to replay that setting’s run.',
     recorded: (date: string) => `Recorded ${date}.`,
   },
   questionLabel: 'Your question',

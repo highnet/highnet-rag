@@ -91,5 +91,5 @@ Acceptance criteria:
 - [x] Golden sets: `squad_auto` (150, auto-mapped) and `compound` (10) are in; `owner` is left for the owner to write (the dashboard shows it as "not written yet").
 - [x] `uv run highnet-rag-evals run` computes the metrics, writes `evals/results/latest.json` and a dated copy, and prints its cost. The Evals workflow runs it against the live corpus.
 - [x] The `/evals` page renders only numbers present in the JSON, with methodology notes ("what recall@5 means").
-- [ ] Full Impeccable finish on every page: critique, audit, polish, a finish-reviewer verdict of `ship`, and DESIGN.md current.
+- [x] Full Impeccable finish on every page: critique, audit, polish, a finish-reviewer verdict of `ship`, and DESIGN.md current.
 - [x] Accessibility pass: keyboard-only walkthrough, screen-reader announcement check, AA contrast in both themes (axe-core WCAG 2.2 AA: 0 violations on every page, both themes, 390 and 1440; no horizontal scroll at 320).
