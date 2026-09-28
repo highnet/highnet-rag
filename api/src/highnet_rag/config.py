@@ -45,6 +45,12 @@ class Settings(BaseSettings):
     state_db_path: Path = Path("data/state.sqlite")
     static_dir: Path = Path("web/out")
     evals_results_path: Path = Path("evals/results/latest.json")
+    # Visitors pick from pre-recorded questions and the page replays the recorded run (no model
+    # call, no cost). LIVE_QUERIES=true brings back free-text questions answered live.
+    live_queries: bool = False
+    recordings_db_path: Path = Path("data/recordings.sqlite")
+    # 1 replays at the recorded pace (pauses capped); 2 twice as fast.
+    replay_speed: float = 1.0
     sse_keepalive_seconds: float = 15.0
 
     # Budget and rate limits

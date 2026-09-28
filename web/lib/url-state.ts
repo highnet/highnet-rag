@@ -25,6 +25,11 @@ export const defaultSettings = (config: ApiConfig): RunSettings => ({
   agentic: false,
 });
 
+// The top-k values a visitor can pick: every value up to the maximum when questions run live,
+// only the recorded ones otherwise.
+export const kOptions = (config: ApiConfig): number[] =>
+  config.live ? Array.from({ length: config.top_k.max }, (_, i) => i + 1) : config.recorded.ks;
+
 export const parseUrlState = (search: string, config: ApiConfig): UrlState => {
   const params = new URLSearchParams(search);
   const fallback = defaultSettings(config);
@@ -34,7 +39,7 @@ export const parseUrlState = (search: string, config: ApiConfig): UrlState => {
   return {
     q: (params.get('q') ?? '').trim().slice(0, config.max_query_chars),
     mode: config.modes.includes(mode) ? mode : fallback.mode,
-    k: Number.isInteger(k) && k >= 1 && k <= config.top_k.max ? k : fallback.k,
+    k: kOptions(config).includes(k) ? k : fallback.k,
     chunkSet: config.chunk_sets.some((s) => s.name === chunkSet) ? chunkSet : fallback.chunkSet,
     rerank: params.get('rerank') === '1',
     agentic: params.get('agent') === '1',

@@ -1,0 +1,56 @@
+name: Record demo questions
+
+# Records every demo question (recordings/questions.json) at every setting with the real models
+# and uploads data/recordings.sqlite to the Fly volume; visitors then only ever replay these runs.
+# It calls paid APIs (about $6.50 for the full grid, once), so it only runs by hand. It resumes:
+# settings already on the volume are skipped, and progress is uploaded even if the job stops.
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: Only these question ids, comma-separated (empty = all)
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency: record
+
+jobs:
+  record:
+    name: Record
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+      ANTHROPIC_MAX_RETRIES: "8"
+      VOYAGE_MAX_RETRIES: "8"
+      VOYAGE_MAX_RETRY_WAIT_SECONDS: "30"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --no-dev
+      - name: Download the live corpus
+        run: scripts/download-corpus.sh data/corpus.sqlite
+      - name: Download earlier recordings, if any (the run resumes)
+        run: scripts/download-corpus.sh data/recordings.sqlite recordings.sqlite || rm -f data/recordings.sqlite
+      - name: Smoke test (one question; stops on any failure)
+        run: uv run highnet-rag record --corpus data/corpus.sqlite --only normandy
+      - name: Record
+        run: |
+          uv run highnet-rag record --corpus data/corpus.sqlite --concurrency 4 \
+            ${{ inputs.only && format('--only {0}', inputs.only) || '' }} | tee record.log
+      - name: Upload the recordings to the volume (also after a failure, to keep progress)
+        if: always()
+        run: |
+          [ -f data/recordings.sqlite ] && scripts/upload-corpus.sh data/recordings.sqlite recordings.sqlite
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recordings
+          path: |
+            data/recordings.sqlite
+            record.log

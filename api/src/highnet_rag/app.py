@@ -15,9 +15,11 @@ from highnet_rag.budget import budget_state, hash_ip
 from highnet_rag.config import Settings, get_settings
 from highnet_rag.pipeline.classic import new_run_id, run_classic
 from highnet_rag.pipeline.deps import DEFAULT_MODE, SUPPORTED_MODES, Deps, Mode, QueryParams
+from highnet_rag.pipeline.search import Event
 from highnet_rag.providers import Providers, build_providers
-from highnet_rag.storage.base import CorpusStore
-from highnet_rag.storage.sqlite import SqliteCorpusStore, SqliteStateStore
+from highnet_rag.recordings import RECORDED_KS, combo_key, replay
+from highnet_rag.storage.base import CorpusStore, RecordingStore
+from highnet_rag.storage.sqlite import SqliteCorpusStore, SqliteRecordingStore, SqliteStateStore
 from highnet_rag.trace import AnswerDelta, RunDone, TraceEvent
 
 SSE_HEADERS = {
@@ -62,6 +64,11 @@ def create_app(
             except FileNotFoundError as exc:
                 corpus_error = str(exc)
         app.state.corpus_error = corpus_error
+        app.state.recordings = (
+            SqliteRecordingStore(settings.recordings_db_path)
+            if settings.recordings_db_path.exists()
+            else None
+        )
         app.state.deps = (
             Deps(
                 settings=settings,
@@ -93,8 +100,9 @@ def create_app(
         }
 
     @app.get("/api/config")
-    def config(deps: DepsDep) -> dict[str, object]:
+    def config(request: Request, deps: DepsDep) -> dict[str, object]:
         p = deps.providers
+        recordings: RecordingStore | None = request.app.state.recordings
         return {
             "modes": list(SUPPORTED_MODES),
             "default_mode": DEFAULT_MODE,
@@ -114,6 +122,15 @@ def create_app(
             "agent": {
                 "max_steps": settings.agent_max_steps,
                 "token_cap": settings.agent_token_cap,
+            },
+            "live": settings.live_queries,
+            "questions": [
+                {"id": q.id, "question": q.question, "compound": q.compound}
+                for q in (recordings.questions() if recordings else [])
+            ],
+            "recorded": {
+                "ks": list(RECORDED_KS),
+                "at": recordings.recorded_at() if recordings else None,
             },
         }
 
@@ -212,34 +229,53 @@ def create_app(
     async def query(
         request: Request,
         deps: DepsDep,
-        q: Annotated[str, Query(min_length=1, max_length=500)],
+        q: Annotated[str | None, Query(min_length=1, max_length=500)] = None,
+        question_id: Annotated[str | None, Query(min_length=1, max_length=64)] = None,
         mode: Annotated[Mode, Query()] = DEFAULT_MODE,
         k: Annotated[int, Query(ge=1, le=10)] = 5,
         chunk_set: Annotated[str, Query()] = "medium",
         rerank: Annotated[bool, Query()] = False,
         agentic: Annotated[bool, Query()] = False,
     ) -> StreamingResponse:
-        params = QueryParams(
-            q=q.strip(),
-            mode=mode,
-            k=min(k, settings.max_top_k),
-            chunk_set=chunk_set,
-            rerank=rerank,
-            agentic=agentic,
-        )
         ip_hash = hash_ip(client_ip(request), settings)
+        settings_params = {
+            "mode": mode,
+            "k": min(k, settings.max_top_k),
+            "chunk_set": chunk_set,
+            "rerank": rerank,
+            "agentic": agentic,
+        }
+        if settings.live_queries:
+            if not q:
+                raise HTTPException(422, detail="Ask a question with ?q=…")
+            params = QueryParams(q=q.strip(), **settings_params)
+            events = run_classic(params, deps, ip_hash, new_run_id())
+        else:
+            # Pre-recorded questions only: replay the run recorded for exactly these settings.
+            recordings: RecordingStore | None = request.app.state.recordings
+            question = next(
+                (x for x in (recordings.questions() if recordings else []) if x.id == question_id),
+                None,
+            )
+            if recordings is None or question is None:
+                raise HTTPException(404, detail="Pick one of the listed questions.")
+            params = QueryParams(q=question.question, **settings_params)
+            recording = recordings.load(question.id, combo_key(params))
+            if recording is None:
+                raise HTTPException(
+                    404, detail="These settings were not recorded for this question."
+                )
+            events = replay(recording, params, deps, ip_hash)
         return StreamingResponse(
-            stream_run(params, deps, ip_hash),
-            media_type="text/event-stream",
-            headers=SSE_HEADERS,
+            stream_run(events), media_type="text/event-stream", headers=SSE_HEADERS
         )
 
-    async def stream_run(params: QueryParams, deps: Deps, ip_hash: str) -> AsyncIterator[str]:
+    async def stream_run(events: AsyncIterator[Event]) -> AsyncIterator[str]:
         queue: asyncio.Queue[TraceEvent | AnswerDelta | RunDone | None] = asyncio.Queue()
 
         async def produce() -> None:
             try:
-                async for item in run_classic(params, deps, ip_hash, new_run_id()):
+                async for item in events:
                     await queue.put(item)
             finally:
                 await queue.put(None)

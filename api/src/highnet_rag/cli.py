@@ -1,4 +1,4 @@
-"""`highnet-rag` command line: fetch-squad, ingest, schema, serve."""
+"""`highnet-rag` command line: fetch-squad, ingest, record, schema, serve."""
 
 import argparse
 import asyncio
@@ -46,6 +46,36 @@ def cmd_ingest(args: argparse.Namespace) -> None:
     print(f"  total embedding cost: ${report.cost_usd:.4f} ({report.embed_model})")
 
 
+def cmd_record(args: argparse.Namespace) -> None:
+    from highnet_rag.pipeline.deps import Deps
+    from highnet_rag.providers import build_providers
+    from highnet_rag.recordings import RecorderState, record
+    from highnet_rag.storage.base import DemoQuestion
+    from highnet_rag.storage.sqlite import SqliteCorpusStore, SqliteRecordingStore
+
+    settings = get_settings()
+    if args.fake:
+        settings = settings.model_copy(update={"fake_providers": True})
+    rows = json.loads(Path(args.questions).read_text(encoding="utf-8"))
+    questions = [DemoQuestion(r["id"], r["question"], r["compound"]) for r in rows]
+    if args.only:
+        questions = [q for q in questions if q.id in args.only.split(",")]
+    deps = Deps(
+        settings,
+        SqliteCorpusStore(Path(args.corpus) if args.corpus else settings.corpus_db_path),
+        RecorderState(),
+        build_providers(settings),
+    )
+    store = SqliteRecordingStore(Path(args.out))
+    report = asyncio.run(record(questions, deps, store, concurrency=args.concurrency))
+    print(
+        f"\nRecorded {report.recorded}, already there {report.skipped}, "
+        f"failed {len(report.failed)}; model and embedding cost ${report.cost_usd:.4f}"
+    )
+    if report.failed:
+        raise SystemExit(1)
+
+
 def cmd_schema(args: argparse.Namespace) -> None:
     from pydantic.json_schema import models_json_schema
 
@@ -85,6 +115,15 @@ def main() -> None:
     p.add_argument("--batch-size", type=int, default=128, help="texts per embedding request")
     p.add_argument("--fake", action="store_true", help="offline hashed embeddings, no API cost")
     p.set_defaults(func=cmd_ingest)
+
+    p = sub.add_parser("record", help="record the demo questions at every setting (resumable)")
+    p.add_argument("--questions", default="recordings/questions.json")
+    p.add_argument("--corpus", default="", help="corpus.sqlite (default: CORPUS_DB_PATH)")
+    p.add_argument("--out", default="data/recordings.sqlite")
+    p.add_argument("--only", default="", help="comma list of question ids")
+    p.add_argument("--fake", action="store_true", help="offline providers; illustrative runs")
+    p.add_argument("--concurrency", type=int, default=1, help="questions recorded side by side")
+    p.set_defaults(func=cmd_record)
 
     p = sub.add_parser("schema", help="export trace-event JSON Schema for the frontend")
     p.add_argument("--out", default="web/lib/generated/trace.schema.json")

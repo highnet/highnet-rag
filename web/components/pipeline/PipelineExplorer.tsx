@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import { AGENT_STAGE_ORDER, STAGE_ORDER, STAGES } from '@/content/stages';
-import { fetchConfig, type ApiConfig } from '@/lib/api';
+import { type ApiConfig, type DemoQuestion, fetchConfig } from '@/lib/api';
 import { runEvalsHref } from '@/lib/evals';
 import { formatMs, formatUsd } from '@/lib/format';
 import type { TraceEvent } from '@/lib/generated/trace';
@@ -26,6 +26,7 @@ import { parseUrlState, type RunSettings, writeUrlState } from '@/lib/url-state'
 import { AnswerResult } from './AnswerResult';
 import { PipelineDiagram } from './PipelineDiagram';
 import { QuestionForm } from './QuestionForm';
+import { QuestionPicker } from './QuestionPicker';
 import { SettingsStrip } from './SettingsStrip';
 import { StepList } from './StepList';
 
@@ -52,7 +53,21 @@ const PipelineExplorer = () => {
           setConfigState({ status: 'ready', config });
           setSettings(linkedSettings);
           setLinkedQuestion(q);
-          if (q && config.budget.tier !== 'stopped') run({ q, ...linkedSettings });
+          if (!q) return;
+          if (config.live) {
+            if (config.budget.tier !== 'stopped') run({ q, ...linkedSettings });
+            return;
+          }
+          // A replay costs nothing, so the budget never blocks it; the link names the question.
+          const picked = config.questions.find((x) => x.question === q);
+          if (picked) {
+            run({
+              q,
+              questionId: picked.id,
+              ...linkedSettings,
+              agentic: linkedSettings.agentic && picked.compound,
+            });
+          }
         })
         .catch((error: unknown) => {
           if (signal?.aborted) return;
@@ -116,9 +131,23 @@ const PipelineExplorer = () => {
   const config = configState.status === 'ready' ? configState.config : null;
   const tier = config?.budget.tier ?? 'normal';
   const running = trace.status === 'running';
+  // Replay: visitors pick a recorded question and see its recorded run for their settings.
+  const replay = config !== null && !config.live;
+  const shownQuestion = trace.input?.q ?? linkedQuestion;
+  const selected = replay
+    ? (config.questions.find((x) => x.question === shownQuestion) ?? null)
+    : null;
+  // The agent runs live only while the budget allows, and was recorded for compound questions.
+  const agentPause = replay
+    ? selected?.compound
+      ? null
+      : { reason: COPY.replay.agentNeedsCompound, warning: false }
+    : tier === 'normal'
+      ? null
+      : { reason: COPY.settings.agentDescription.paused, warning: true };
   // The steps drawn follow the run on screen, or the settings before the first run.
-  const agentOn = settings?.agentic === true && tier === 'normal';
-  const agentView = trace.input ? trace.input.agentic && tier === 'normal' : agentOn;
+  const agentOn = settings?.agentic === true && agentPause === null;
+  const agentView = trace.input ? trace.input.agentic : agentOn;
   const order = agentView ? AGENT_STAGE_ORDER : STAGE_ORDER;
 
   const runQuestion = (q: string) => {
@@ -128,13 +157,26 @@ const PipelineExplorer = () => {
     run({ q, ...settings, agentic: settings.agentic && tier === 'normal' });
   };
 
+  const replayQuestion = (question: DemoQuestion, next: RunSettings) => {
+    writeUrlState({ q: question.question, ...next });
+    run({
+      q: question.question,
+      questionId: question.id,
+      ...next,
+      agentic: next.agentic && question.compound,
+    });
+  };
+
   const changeSettings = (next: RunSettings) => {
     setSettings(next);
     writeUrlState({ q: trace.input?.q ?? '', ...next });
+    // A recorded run exists for every setting, so a change replays at once.
+    if (selected) replayQuestion(selected, next);
   };
 
   const ran = trace.input;
   const stale =
+    !replay &&
     ran !== null &&
     settings !== null &&
     (ran.mode !== settings.mode ||
@@ -147,7 +189,7 @@ const PipelineExplorer = () => {
     <div className="space-y-8 md:space-y-10">
       <section aria-labelledby="sheet-title" className="space-y-4 md:space-y-5">
         <Typography color="muted" className="max-w-[68ch]">
-          {COPY.intro}
+          {replay ? COPY.replay.intro : COPY.intro}
         </Typography>
         <PipelineDiagram order={order} statusOf={stepStatuses(order, trace.events, trace.status)} />
         <Typography variant="sheetTitle" id="sheet-title">
@@ -169,7 +211,14 @@ const PipelineExplorer = () => {
           </Notice>
         )}
         {config?.illustrative && <Notice tone="note">{COPY.illustrative}</Notice>}
-        {tier === 'degraded' && config && (
+        {replay && (
+          <Notice tone="note">
+            {config.recorded.at
+              ? COPY.replay.notice(config.recorded.at.slice(0, 10))
+              : COPY.replay.noticeUndated}
+          </Notice>
+        )}
+        {!replay && tier === 'degraded' && config && (
           <Notice tone="warning">
             {COPY.budgetDegraded(
               formatUsd(config.budget.spent_usd),
@@ -177,29 +226,39 @@ const PipelineExplorer = () => {
             )}
           </Notice>
         )}
-        {tier === 'stopped' && config && (
+        {!replay && tier === 'stopped' && config && (
           <Notice tone="error">{COPY.budgetStopped(formatUsd(config.budget.cap_usd))}</Notice>
         )}
 
-        <QuestionForm
-          key={linkedQuestion}
-          initialQuestion={linkedQuestion}
-          running={running}
-          disabled={!config || tier === 'stopped'}
-          maxLength={config?.max_query_chars ?? 500}
-          suggestions={agentOn ? COPY.agentSuggestions : COPY.suggestions}
-          suggestionsLabel={agentOn ? COPY.agentTryLabel : COPY.tryLabel}
-          lastNote={agentOn ? undefined : COPY.suggestionNote}
-          onRun={runQuestion}
-          onStop={trace.cancel}
-        />
+        {replay ? (
+          <QuestionPicker
+            questions={config.questions}
+            selectedId={selected?.id ?? null}
+            running={running}
+            onPick={(question) => settings && replayQuestion(question, settings)}
+            onStop={trace.cancel}
+          />
+        ) : (
+          <QuestionForm
+            key={linkedQuestion}
+            initialQuestion={linkedQuestion}
+            running={running}
+            disabled={!config || tier === 'stopped'}
+            maxLength={config?.max_query_chars ?? 500}
+            suggestions={agentOn ? COPY.agentSuggestions : COPY.suggestions}
+            suggestionsLabel={agentOn ? COPY.agentTryLabel : COPY.tryLabel}
+            lastNote={agentOn ? undefined : COPY.suggestionNote}
+            onRun={runQuestion}
+            onStop={trace.cancel}
+          />
+        )}
         {config && settings && (
           <SettingsStrip
             config={config}
             settings={settings}
             disabled={running}
             stale={stale && !running}
-            agentPaused={tier !== 'normal'}
+            agentPause={agentPause}
             onChange={changeSettings}
           />
         )}

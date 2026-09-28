@@ -1,7 +1,9 @@
 """SQLite implementations: corpus (sqlite-vec + FTS5, read-only at runtime) and state (spend
 ledger, runs). Schema documented in docs/ARCHITECTURE.md section 6."""
 
+import json
 import sqlite3
+import zlib
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
@@ -13,10 +15,12 @@ import sqlite_vec
 from highnet_rag.storage.base import (
     Chunk,
     ChunkSet,
+    DemoQuestion,
     Document,
     Hit,
     MapPoint,
     Projection,
+    Recording,
     Span,
 )
 
@@ -71,6 +75,16 @@ CREATE TABLE IF NOT EXISTS spend (
   output_tokens INTEGER NOT NULL, cost_usd REAL NOT NULL
 );
 CREATE INDEX IF NOT EXISTS spend_ts ON spend(ts);
+"""
+
+RECORDINGS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS questions (
+  id TEXT PRIMARY KEY, position INTEGER NOT NULL, question TEXT NOT NULL, compound INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS recordings (
+  question_id TEXT NOT NULL REFERENCES questions(id), combo TEXT NOT NULL,
+  recorded_at TEXT NOT NULL, items BLOB NOT NULL, PRIMARY KEY (question_id, combo)
+);
 """
 
 
@@ -292,3 +306,59 @@ class SqliteStateStore:
                 "SELECT COUNT(*) FROM runs WHERE ip_hash = ? AND ts >= ?", (ip_hash, since)
             ).fetchone()
         return int(n)
+
+
+class SqliteRecordingStore:
+    """Recorded runs for the demo questions: written by `highnet-rag record`, read on replay."""
+
+    def __init__(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._conn = sqlite3.connect(path, check_same_thread=False)
+        self._conn.executescript(RECORDINGS_SCHEMA)
+
+    def questions(self) -> list[DemoQuestion]:
+        rows = self._conn.execute(
+            "SELECT id, question, compound FROM questions ORDER BY position"
+        ).fetchall()
+        return [DemoQuestion(r[0], r[1], bool(r[2])) for r in rows]
+
+    def save_questions(self, questions: list[DemoQuestion]) -> None:
+        with self._conn:
+            self._conn.executemany(
+                "INSERT INTO questions (id, position, question, compound) VALUES (?, ?, ?, ?) "
+                "ON CONFLICT(id) DO UPDATE SET position = excluded.position, "
+                "question = excluded.question, compound = excluded.compound",
+                [(q.id, i, q.question, int(q.compound)) for i, q in enumerate(questions)],
+            )
+
+    def combos(self, question_id: str) -> set[str]:
+        rows = self._conn.execute(
+            "SELECT combo FROM recordings WHERE question_id = ?", (question_id,)
+        ).fetchall()
+        return {r[0] for r in rows}
+
+    def save(self, recording: Recording) -> None:
+        with self._conn:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO recordings (question_id, combo, recorded_at, items) "
+                "VALUES (?, ?, ?, ?)",
+                (
+                    recording.question_id,
+                    recording.combo,
+                    recording.recorded_at,
+                    # Traces repeat the same passages across settings: zlib shrinks them ~10x.
+                    zlib.compress(json.dumps(recording.items).encode()),
+                ),
+            )
+
+    def load(self, question_id: str, combo: str) -> Recording | None:
+        row = self._conn.execute(
+            "SELECT recorded_at, items FROM recordings WHERE question_id = ? AND combo = ?",
+            (question_id, combo),
+        ).fetchone()
+        if row is None:
+            return None
+        return Recording(question_id, combo, row[0], json.loads(zlib.decompress(row[1])))
+
+    def recorded_at(self) -> str | None:
+        return self._conn.execute("SELECT max(recorded_at) FROM recordings").fetchone()[0]

@@ -78,6 +78,8 @@ describe('url state', () => {
     top_k: { default: 5, max: 10 },
     chunk_sets: [{ name: 'small' }, { name: 'medium' }],
     max_query_chars: 10,
+    live: true,
+    recorded: { ks: [3, 5, 10], at: null },
   } as unknown as ApiConfig;
 
   it('keeps valid values and replaces invalid ones with the defaults', () => {
@@ -103,6 +105,10 @@ describe('url state', () => {
     expect(parseUrlState('?rerank=1', config).rerank).toBe(true);
     expect(parseUrlState('?k=2.5', config).k).toBe(5);
     expect(parseUrlState('?k=0', config).k).toBe(5);
+    // Replayed questions were recorded at k = 3, 5 and 10 only.
+    const replay = { ...config, live: false };
+    expect(parseUrlState('?k=2', replay).k).toBe(5);
+    expect(parseUrlState('?k=10', replay).k).toBe(10);
   });
 
   it('falls back to the first chunk set, then to medium, when medium is missing', () => {

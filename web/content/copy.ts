@@ -32,6 +32,23 @@ export const COPY = {
     agentOn:
       'Each box links to its step below and fills in as your question runs. With the agent on, each search Claude makes runs the embed, BM25, vector, fuse and rerank steps again, nested under 3a, 3b and so on.',
   },
+  replay: {
+    notice: (date: string) =>
+      `Every run here was recorded on ${date} with the real models, one run per question and setting, and is replayed step by step. No model is called and nothing is spent; every number is the recorded one.`,
+    noticeUndated:
+      'Every run here was recorded ahead of time with the real models and is replayed step by step. No model is called and nothing is spent.',
+    empty: 'No questions have been recorded yet, so there is nothing to replay.',
+    pickLabel: 'Pick a question',
+    single: 'One article',
+    compound: 'Two articles: switch the agent on',
+    agentNeedsCompound: 'Pick a two-article question to use the agent.',
+    changedReplays: 'Changing a setting replays that setting’s own recorded run.',
+    more: (n: number) => `${n} more`,
+    fewer: 'Fewer',
+    intro:
+      'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand Claude the best passages and ask it to answer from those alone, with citations. Each question below was run once for every setting with the real models; pick one and its run is replayed step by step, with its real timing, tokens and cost. Change a setting to replay that setting’s run.',
+    recorded: (date: string) => `Recorded ${date}.`,
+  },
   questionLabel: 'Your question',
   questionPlaceholder: 'Ask about the corpus…',
   run: 'Run',

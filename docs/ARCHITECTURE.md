@@ -380,3 +380,12 @@ Tests never call real APIs; providers are faked.
   - the compound questions through the classic pipeline and agentic mode: were all the needed articles found, correctness, searches, tokens, cost;
   - cost and latency per configuration, from the run's own ledger (eval runs never touch the visitor budget).
 - **Output:** `evals/results/latest.json`, a dated copy and a dated `*.details.jsonl` (every question's answer and grade), committed. The Evals workflow (manual) downloads the live corpus from Fly, runs a smoke test and the full set, and pushes the results to an `evals/run-<id>` branch. The web build reads `latest.json` at build time; the site never shows numbers that aren't in that file.
+
+## 12. Pre-recorded questions (replay)
+
+Owner decision: visitors only pick from recorded questions, so a visit costs nothing.
+
+- **Questions:** `recordings/questions.json` (id, question, compound).
+- **Recording:** `highnet-rag record` (the manual **Record demo questions** workflow) runs the real pipeline for every question at every setting a visitor can choose: search mode × top-k 3/5/10 × chunk size × reranker, and agentic mode for compound questions. It writes each run's SSE items with their time offsets to `data/recordings.sqlite` (zlib-compressed, via `RecordingStore`). A cache in front of the model reuses one call when two settings send the same prompt (same passages, or the agent's first turn); each recording still shows that call's own tokens and cost, and the recorder reports only what was actually paid. It resumes: settings already recorded are skipped, and the workflow uploads partial progress.
+- **Replay:** with `LIVE_QUERIES=false` (the default), `GET /api/query?question_id=…&mode=&k=&chunk_set=&rerank=&agentic=` looks up that recording and streams it under a fresh run id, at the recorded pace with pauses capped at 1.5 s (`REPLAY_SPEED` scales it). The `request` event is rebuilt live: rate limit and budget are checked now and shown, and `data.recording` says when the run was recorded. An unknown question or an unrecorded setting is a 404.
+- **Config:** `/api/config` adds `live`, `questions` and `recorded` (`ks`, `at`); the page shows the picker instead of the text box, limits top-k to the recorded values, enables the agent only for compound questions, and replays at once when a setting changes.

@@ -79,3 +79,31 @@ def test_serve_runs_uvicorn(monkeypatch) -> None:
     assert calls == [
         (("highnet_rag.app:app",), {"host": "127.0.0.1", "port": 9999, "reload": False})
     ]
+
+
+def test_record_fake_writes_recordings_and_fails_loudly(
+    monkeypatch, tmp_path: Path, corpus_path: Path, capsys
+) -> None:
+    from highnet_rag.recordings import RecordReport
+
+    monkeypatch.setenv("EMBED_DIMS", "64")
+    get_settings.cache_clear()
+    questions = tmp_path / "questions.json"
+    rows = [
+        {"id": "a", "question": "In what country is Normandy located?", "compound": False},
+        {"id": "b", "question": "Who discovered oxygen?", "compound": False},
+    ]
+    questions.write_text(json.dumps(rows), encoding="utf-8")
+    out = tmp_path / "rec.sqlite"
+    args = ("record", "--fake", "--questions", str(questions), "--corpus", str(corpus_path))
+    run_cli(monkeypatch, *args, "--out", str(out), "--only", "a")
+    assert "Recorded 36, already there 0, failed 0" in capsys.readouterr().out
+
+    async def failing(*_: object, **__: object) -> RecordReport:
+        return RecordReport(failed=["a x: error"])
+
+    monkeypatch.setattr("highnet_rag.recordings.record", failing)
+    monkeypatch.setenv("CORPUS_DB_PATH", str(corpus_path))
+    with pytest.raises(SystemExit):
+        run_cli(monkeypatch, "record", "--questions", str(questions), "--out", str(out))
+    get_settings.cache_clear()

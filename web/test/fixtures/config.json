@@ -54,5 +54,11 @@
   "agent": {
     "max_steps": 4,
     "token_cap": 30000
+  },
+  "live": true,
+  "questions": [],
+  "recorded": {
+    "ks": [3, 5, 10],
+    "at": null
   }
 }
