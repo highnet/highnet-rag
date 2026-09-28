@@ -216,3 +216,24 @@ def test_config_map_and_chunk_endpoints(client: TestClient) -> None:
     chunk = client.get(f"/api/chunks/{points[0][0]}").json()
     assert chunk["id"] == points[0][0] and chunk["text"]
     assert client.get("/api/health").json()["ok"] is True
+
+
+def test_corpus_documents_and_one_document(client: TestClient) -> None:
+    listing = client.get("/api/corpus/documents")
+    assert listing.headers["etag"].endswith('-documents"')
+    body = listing.json()
+    assert [s["name"] for s in body["chunk_sets"]] == ["small", "medium"]
+    titles = [d["title"] for d in body["documents"]]
+    assert titles == sorted(titles) and "Normans" in titles
+    normans = next(d for d in body["documents"] if d["title"] == "Normans")
+    assert normans["chars"] > 0 and normans["chunks"]["small"] >= normans["chunks"]["medium"] >= 1
+
+    doc = client.get(f"/api/corpus/documents/{normans['id']}", params={"chunk_set": "small"}).json()
+    assert doc["title"] == "Normans" and doc["chunk_set"] == "small"
+    assert [c["ord"] for c in doc["chunks"]] == sorted(c["ord"] for c in doc["chunks"])
+    first = doc["chunks"][0]
+    assert first["start"] == 0 and doc["text"][first["start"] : first["end"]]
+
+    assert client.get("/api/corpus/documents/999").status_code == 404
+    unknown = client.get(f"/api/corpus/documents/{normans['id']}", params={"chunk_set": "huge"})
+    assert unknown.status_code == 404

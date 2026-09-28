@@ -14,6 +14,8 @@ const buttonVariants = cva(
           'border border-input bg-card text-foreground hover:bg-accent aria-pressed:border-primary aria-pressed:bg-accent aria-pressed:text-primary disabled:border-border disabled:bg-transparent disabled:text-muted-foreground',
         ghost:
           'text-muted-foreground hover:bg-accent hover:text-foreground disabled:hover:bg-transparent',
+        // A symbol in a formula that explains itself when tapped or hovered.
+        term: 'voice-data rounded-sm px-0.5 font-normal text-primary underline decoration-dotted underline-offset-4 hover:bg-accent aria-expanded:bg-accent aria-expanded:decoration-solid',
         pencil:
           'voice-pencil h-auto px-0 text-primary underline decoration-dotted underline-offset-4 hover:decoration-solid disabled:text-muted-foreground disabled:no-underline',
       },

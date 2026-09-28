@@ -410,3 +410,15 @@ Opened by a pencil action with a code icon. Each excerpt has a caption over a da
 ## Evals report (`/evals`)
 
 Sheet 2 of the same pad: the sheet title "Sheet 2 · How well does it work?", a lede, and a run record on a dashed rule (date, corpus build, the models the run actually called, cost). Each question the evals answer is a raised sheet with its blue-pencil note in the margin from `lg` and above the working below it. Retrieval results are one small table per chunk size (modes down the side with their series markers, reranker off and on across): a thin bar in graphite (off) or rerank green (on) with the value in the data voice. The visitor's own setting, linked from an answer, sits on blue wash with a pencil "your settings". A section the run did not measure is a dashed box that says so and why, never an empty chart.
+
+## Pipeline diagram
+
+Under the page's opening paragraph, a figure between dashed rules draws the whole system in two labelled rows: what was built once ahead of time (dashed boxes, not interactive), then every step a question goes through, as small boxes joined by chevrons, numbered like the steps below and linked to them. BM25 and vector search stack as one pair because they run side by side; the row ends in an "= Answer" box outlined like the answer sheet. The boxes follow the run: dashed while waiting or skipped, raised paper once done, blue pencil while running, a red edge on failure. With the agent on, the row follows the agentic order.
+
+## Formulas
+
+Each step sheet carries its step as one line of relational algebra in a dashed box labelled "As a formula", under the step's paragraph. Readers are assumed to know relational algebra: standard operators are plain text, while the relations, the extended operators (τ, λ, γ), the domain functions (score, cos, rrf, relevance) and the values are underlined blue-pencil terms. Tapping or hovering a term writes its definition on the line below the formula, in place, so it works the same on a phone; nothing floats. Under the pipeline diagram a folded "The same pipeline, as formulas" lists these building blocks as small ruled blocks, grouped as relations, extended operators, functions and values, and ends with the whole run as one composition read right to left.
+
+## Corpus page (`/corpus`)
+
+Sheet 3 of the pad. A chunk-size switch and the article list (a native select on phones, a scrolling list from `lg`), then the chosen article on a raised sheet: its text with each chunk's start marked by its id in a small blue-pencil box, and any text held by two chunks at once on blue wash. The note above the text says which is true for this article and size: it never promises an overlap that is not there.

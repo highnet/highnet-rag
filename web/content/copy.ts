@@ -7,6 +7,7 @@ export const COPY = {
     label: 'Pages',
     links: [
       { key: 'pipeline', href: '/', text: 'Pipeline' },
+      { key: 'corpus', href: '/corpus/', text: 'Corpus' },
       { key: 'evals', href: '/evals/', text: 'Evals' },
     ],
   },
@@ -15,6 +16,22 @@ export const COPY = {
   // What the site is, for anyone arriving cold. Always shown at the top of the page.
   intro:
     'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand Claude the best passages and ask it to answer from those alone, with citations. Every step runs live below, with its real timing, tokens and cost. Change a setting and ask again to see what changes.',
+  diagram: {
+    title: 'The whole pipeline',
+    offline: 'Built once, ahead of time',
+    offlineSteps: [
+      '35 Wikipedia articles',
+      'Cut into chunks at 3 sizes',
+      'Each chunk embedded by Voyage',
+      'Stored in SQLite: a keyword index, the vectors and the map',
+    ],
+    online: 'Every question',
+    answer: 'Answer',
+    agentOff:
+      'Each box links to its step below and fills in as your question runs. Switch the agent on and Claude plans the searches first, then repeats the search steps once per part of the question.',
+    agentOn:
+      'Each box links to its step below and fills in as your question runs. With the agent on, each search Claude makes runs the embed, BM25, vector, fuse and rerank steps again, nested under 3a, 3b and so on.',
+  },
   questionLabel: 'Your question',
   questionPlaceholder: 'Ask about the corpus…',
   run: 'Run',

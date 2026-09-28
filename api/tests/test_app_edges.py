@@ -18,10 +18,12 @@ def test_missing_corpus_reports_unhealthy_and_503(make_settings, tmp_path: Path)
     assert response.status_code == 503
 
 
-def test_not_found_endpoints(client: TestClient) -> None:
+def test_not_found_endpoints(client: TestClient, make_settings, tmp_path: Path) -> None:
     assert client.get("/api/corpus/map", params={"chunk_set": "nope"}).status_code == 404
     assert client.get("/api/chunks/999999").status_code == 404
-    assert client.get("/api/evals").status_code == 404
+    unpublished = make_settings(evals_results_path=tmp_path / "none.json")
+    with TestClient(create_app(unpublished)) as c:
+        assert c.get("/api/evals").status_code == 404
 
 
 def test_evals_results_are_served_when_published(make_settings, tmp_path: Path) -> None:

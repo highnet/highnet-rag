@@ -1,8 +1,10 @@
 import { COPY } from '@/content/copy';
+import { STEP_FORMULAS } from '@/content/formal';
 import { STAGE_ORDER, STAGES } from '@/content/stages';
 import { type AgentStepData, agentSearches, topLevel } from '@/lib/agent';
 import type { Stage, TraceEvent } from '@/lib/generated/trace';
 import { snippetsFor } from '@/lib/snippets';
+import { stepStatuses } from '@/lib/step-status';
 import { stepSummary } from '@/lib/step-summary';
 import type { RunStatus } from '@/lib/use-trace-stream';
 
@@ -10,7 +12,6 @@ import { StageBody, type RunContext } from './StageBody';
 import type { AgentPlanData } from './stages/AgentPlanView';
 import { AgentStepsView } from './stages/AgentStepsView';
 import { GenerateView } from './stages/GenerateView';
-import type { StepStatus } from './StatusMark';
 import { StepSheet } from './StepSheet';
 
 type StepListProps = {
@@ -26,22 +27,11 @@ const total = (events: TraceEvent[]) => ({
   costUsd: events.reduce((t, e) => t + e.cost_usd, 0),
 });
 
-// The worst state among an agent's steps; a stop at a cap reads as a warning.
-const groupStatus = (events: TraceEvent[]): StepStatus =>
-  events.some((e) => e.status === 'error')
-    ? 'error'
-    : events.some((e) => e.status === 'warning')
-      ? 'warning'
-      : 'ok';
-
 // The pipeline's shape is visible before the first run; steps fill in as events arrive.
 const StepList = ({ order = STAGE_ORDER, events, runStatus, context }: StepListProps) => {
-  const top = topLevel(events);
-  const byStage = new Map(top.map((e) => [e.stage, e]));
+  const byStage = new Map(topLevel(events).map((e) => [e.stage, e]));
   const searches = agentSearches(events);
-  const has = (stage: Stage) => (stage === 'agent_step' ? searches.length > 0 : byStage.has(stage));
-  const firstMissing = order.find((stage) => !has(stage));
-  const stopped = runStatus !== 'running';
+  const statusOf = stepStatuses(order, events, runStatus);
   const plan = byStage.get('agent_plan');
 
   return (
@@ -52,15 +42,7 @@ const StepList = ({ order = STAGE_ORDER, events, runStatus, context }: StepListP
       {order.map((stage, index) => {
         if (stage === 'agent_step') {
           const all = events.filter((e) => e.stage === 'agent_step' || e.parent);
-          const settled = byStage.has('select_context') || stopped;
-          const status: StepStatus =
-            searches.length === 0
-              ? !stopped && stage === firstMissing
-                ? 'running'
-                : 'pending'
-              : settled
-                ? groupStatus(searches.map((s) => s.step))
-                : 'running';
+          const status = statusOf(stage);
           const found = searches
             .map((s) => (s.step.data as AgentStepData).found)
             .find((n) => n !== undefined);
@@ -70,6 +52,8 @@ const StepList = ({ order = STAGE_ORDER, events, runStatus, context }: StepListP
           return (
             <StepSheet
               key={stage}
+              anchor={`step-${stage}`}
+              formula={STEP_FORMULAS[stage]}
               number={index + 1}
               copy={STAGES[stage]}
               status={status}
@@ -90,15 +74,13 @@ const StepList = ({ order = STAGE_ORDER, events, runStatus, context }: StepListP
           );
         }
         const event = byStage.get(stage);
-        const running = !event && !stopped && stage === firstMissing;
-        const status: StepStatus = event
-          ? (event.status as StepStatus)
-          : running
-            ? 'running'
-            : 'pending';
+        const status = statusOf(stage);
+        const running = status === 'running';
         return (
           <StepSheet
             key={stage}
+            anchor={`step-${stage}`}
+            formula={STEP_FORMULAS[stage]}
             number={index + 1}
             copy={STAGES[stage]}
             status={status}

@@ -39,6 +39,14 @@ class Hit:
 
 
 @dataclass(frozen=True)
+class Document:
+    id: int
+    title: str
+    source_url: str
+    chars: int
+
+
+@dataclass(frozen=True)
 class Span:
     """A chunk's place in its article: character offsets into the article text."""
 
@@ -88,6 +96,8 @@ class CorpusStore(Protocol):
     # For the evals: where each chunk sits in its article, and the articles' text.
     def spans(self, chunk_set_id: int) -> list[Span]: ...
     def document_text(self, doc_id: int) -> str: ...
+    # For the corpus page: every article with its source and length.
+    def document_list(self) -> list[Document]: ...
 
 
 class StateStore(Protocol):

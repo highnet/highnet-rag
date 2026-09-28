@@ -4,7 +4,9 @@ import { type ReactNode, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
+import { Formula } from '@/components/formal/Formula';
 import { Typography } from '@/components/ui/Typography';
+import { FORMAL } from '@/content/formal';
 import type { StageCopy } from '@/content/stages';
 import { pad2 } from '@/lib/format';
 import type { Snippet } from '@/lib/snippets';
@@ -19,6 +21,10 @@ import { WhyThisStep } from './WhyThisStep';
 const WIDE = '(min-width: 768px)';
 
 type StepSheetProps = {
+  // The diagram at the top links here.
+  anchor: string;
+  // The step as a formula, its symbols explained on tap (see content/formal.ts).
+  formula?: string;
   number: number;
   copy: StageCopy;
   status: StepStatus;
@@ -31,6 +37,8 @@ type StepSheetProps = {
 // One numbered step of the calculation: number in the margin, the working on a sheet, and
 // the blue-pencil note beside it. On phones each step folds to one line so the page stays short.
 const StepSheet = ({
+  anchor,
+  formula,
   number,
   copy,
   status,
@@ -48,6 +56,14 @@ const StepSheet = ({
     <Readout ms={measure.ms} tokens={measure.tokens} costUsd={measure.costUsd} />
   );
   const note = <WhyThisStep copy={copy} layout="inline" className="lg:hidden" />;
+  const formal = formula && (
+    <div className="rounded-sm border border-dashed px-3 pt-2 pb-1">
+      <Typography variant="label" color="muted" as="p">
+        {FORMAL.label}
+      </Typography>
+      <Formula source={formula} id={`${anchor}-formula`} className="mt-1" />
+    </div>
+  );
   const details = (
     <>
       {children && <div className="mt-3">{children}</div>}
@@ -59,6 +75,7 @@ const StepSheet = ({
 
   return (
     <li
+      id={anchor}
       aria-labelledby={headingId}
       data-status={status}
       className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-x-4 lg:grid-cols-[3rem_minmax(0,1fr)_17rem] lg:gap-x-8"
@@ -101,6 +118,7 @@ const StepSheet = ({
           {status !== 'pending' && (
             <>
               <div className="mt-2">{note}</div>
+              {formal && <div className="mt-3">{formal}</div>}
               {details}
             </>
           )}
@@ -142,6 +160,7 @@ const StepSheet = ({
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 px-3 pb-3">
             {note}
+            {formal}
             {readout}
             {status !== 'pending' && details}
           </CollapsibleContent>
