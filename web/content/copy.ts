@@ -5,8 +5,9 @@ export const COPY = {
   tagline: 'Retrieval-augmented generation, worked out step by step.',
   sheetLabel: 'Sheet 1',
   emptyTitle: 'Ask the corpus a question',
+  // What the site is, for anyone arriving cold. Always shown at the top of the page.
   intro:
-    'Ask about any of the 35 Wikipedia articles in the corpus. Every step between your question and the answer is written out below as it runs, with its timing, tokens and cost.',
+    'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand Claude the best passages and ask it to answer from those alone, with citations. Every step runs live below, with its real timing, tokens and cost. Change a setting and ask again to see what changes.',
   questionLabel: 'Your question',
   questionPlaceholder: 'Ask about the corpus…',
   run: 'Run',
