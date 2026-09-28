@@ -2,10 +2,11 @@ import json
 
 import httpx
 import pytest
+from pydantic import SecretStr
+
 from highnet_rag.config import Settings
 from highnet_rag.providers.base import ProviderNotConfiguredError
 from highnet_rag.providers.voyage import VoyageClient, VoyageEmbedder, VoyageReranker
-from pydantic import SecretStr
 
 
 def voyage_with(handler) -> VoyageClient:

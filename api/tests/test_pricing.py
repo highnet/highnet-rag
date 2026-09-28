@@ -1,4 +1,5 @@
 import pytest
+
 from highnet_rag.config import Settings
 from highnet_rag.pricing import UnknownModelPriceError, cost_usd
 

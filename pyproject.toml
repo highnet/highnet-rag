@@ -32,6 +32,9 @@ extend-exclude = ["web", ".claude"]
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["highnet_rag", "highnet_rag_evals"]
+
 [tool.pyright]
 typeCheckingMode = "basic"
 pythonVersion = "3.12"

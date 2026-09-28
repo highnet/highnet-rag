@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+
 from highnet_rag.ingest.pca import fit_pca, project
 from highnet_rag.providers.fake import hashed_vector
 from highnet_rag.storage.sqlite import SqliteCorpusStore

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+
 from highnet_rag.app import create_app
 from highnet_rag.config import Settings
 from highnet_rag.ingest.build import build_corpus
