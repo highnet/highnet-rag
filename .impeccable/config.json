@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "web/app/globals.css"
+        ],
+        "createdAt": "2026-09-28T15:09:50.343Z",
+        "reason": "DESIGN.md: the engineer's computation pad is a measurement surface; the 20px grid is the pad itself (owner-pinned direction, seed cfb983fc)."
+      }
+    ]
+  }
+}
