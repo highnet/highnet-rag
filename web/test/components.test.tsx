@@ -104,10 +104,10 @@ describe('keyword search and fusion', () => {
     expect(screen.getByText(COPY.stageText.inputBm25)).toBeInTheDocument();
     expect(screen.getByText(COPY.stageText.inputVector)).toBeInTheDocument();
     expect(screen.getByText('0.0161 + 0.0164')).toBeInTheDocument();
-    // The candidate below the cut is folded until asked for.
-    expect(screen.queryByText(COPY.stageText.cut(1))).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: COPY.stageText.showDropped(1) }));
+    // The cut is always drawn; the candidate below it is folded until asked for.
     expect(screen.getByText(COPY.stageText.cut(1))).toBeInTheDocument();
+    expect(screen.queryByText('0.0164 + 0')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: COPY.stageText.showDropped(1) }));
     expect(screen.getByText('0.0164 + 0')).toBeInTheDocument();
     expect(screen.getByText('not in the vector list')).toBeInTheDocument();
     expect(screen.getByText(/below the top-k cut/)).toBeInTheDocument();

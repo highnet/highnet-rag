@@ -23,9 +23,9 @@ const Bm25View = ({ data }: Bm25ViewProps) => {
       </Typography>
       {data.results.length > 0 && (
         <RankTable
-          caption="BM25 keyword search results"
+          caption={T.captions.bm25}
           series="bm25"
-          valueLabel="score"
+          valueLabel={T.columns.score}
           rows={data.results.map((r) => ({ ...r, value: r.score.toFixed(2) }))}
         />
       )}

@@ -16,11 +16,12 @@ const segmentedControlVariants = cva(
   },
 );
 
-type SegmentedOption = { value: string; label: ReactNode; description?: string };
+type SegmentedOption = { value: string; label: ReactNode };
 
 type SegmentedControlProps = VariantProps<typeof segmentedControlVariants> & {
   name: string;
   labelledBy: string;
+  describedBy?: string;
   options: SegmentedOption[];
   value: string;
   disabled?: boolean;
@@ -33,6 +34,7 @@ type SegmentedControlProps = VariantProps<typeof segmentedControlVariants> & {
 const SegmentedControl = ({
   name,
   labelledBy,
+  describedBy,
   options,
   value,
   disabled,
@@ -44,6 +46,7 @@ const SegmentedControl = ({
     <div
       role="radiogroup"
       aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
       data-slot="segmented-control"
       className={cn(segmentedControlVariants({ size }), className)}
     >
@@ -51,7 +54,6 @@ const SegmentedControl = ({
         <label
           key={option.value}
           data-slot="segment"
-          title={option.description}
           className="voice-data inline-flex cursor-pointer items-center border-l border-input text-sm text-muted-foreground transition-colors select-none first:border-l-0 hover:bg-accent hover:text-foreground has-[:checked]:bg-accent has-[:checked]:font-semibold has-[:checked]:text-primary has-[:disabled]:cursor-not-allowed has-[:disabled]:hover:bg-transparent"
         >
           <input

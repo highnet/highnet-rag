@@ -57,7 +57,24 @@ export const COPY = {
   },
   // Sentences inside the step sheets, next to the tables they describe.
   stageText: {
-    matchLabel: 'FTS5 MATCH',
+    matchLabel: 'FTS5 query',
+    columns: {
+      rank: 'rank',
+      passage: 'passage',
+      from: 'from',
+      rrf: 'rrf',
+      score: 'score',
+      distance: 'distance',
+    },
+    captions: {
+      bm25: 'BM25 keyword search results',
+      vector: 'Vector search results',
+      bm25Input: 'BM25 ranking, input to fusion',
+      vectorInput: 'Vector ranking, input to fusion',
+    },
+    series: { bm25: 'BM25', vector: 'vector', fused: 'fused' },
+    inList: (series: string, rank: number) => `${series} rank ${rank}`,
+    notInList: (series: string) => `not in the ${series} list`,
     emptyMatch: '(nothing left to search for after dropping stop words)',
     bm25: (searched: string, set: string, depth: number) =>
       `Ranked by BM25 over all ${searched} ${set} chunks; the best ${depth} are kept.`,

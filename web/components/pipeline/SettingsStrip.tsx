@@ -43,7 +43,7 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
       </CollapsibleTrigger>
       <CollapsibleContent
         forceMount
-        className="flex flex-col gap-y-4 pb-4 data-[state=closed]:hidden sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-8 sm:py-3 sm:data-[state=closed]:flex"
+        className="flex flex-col gap-y-4 pb-4 data-[state=closed]:hidden sm:flex-row sm:flex-wrap sm:items-start sm:gap-x-8 sm:py-3 sm:data-[state=closed]:flex"
       >
         <div className="space-y-1.5">
           <Typography variant="small" color="muted" as="span" id="mode-label" className="block">
@@ -52,15 +52,15 @@ const SettingsStrip = ({ config, settings, disabled, stale, onChange }: Settings
           <SegmentedControl
             name="mode"
             labelledBy="mode-label"
+            describedBy="mode-description"
             value={mode}
             disabled={disabled}
             onChange={(value) => onChange({ ...settings, mode: value })}
-            options={config.modes.map((m) => ({
-              value: m,
-              label: S.modes[m]?.label ?? m,
-              description: S.modes[m]?.description,
-            }))}
+            options={config.modes.map((m) => ({ value: m, label: S.modes[m]?.label ?? m }))}
           />
+          <Typography variant="small" color="muted" id="mode-description" className="max-w-[36ch]">
+            {S.modes[mode]?.description}
+          </Typography>
         </div>
 
         <div className="space-y-1.5">

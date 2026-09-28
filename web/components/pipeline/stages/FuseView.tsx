@@ -23,6 +23,7 @@ const formatContribution = (value: number | undefined) =>
 // top-k cut. Candidates below the cut stay folded until asked for, to keep the step short.
 const FuseView = ({ data, bm25, vector }: FuseViewProps) => {
   const T = COPY.stageText;
+  const C = T.columns;
   const [showDropped, setShowDropped] = useState(false);
   const dropped = Math.max(data.results.length - data.kept, 0);
   const rows = showDropped ? data.results : data.results.slice(0, data.kept);
@@ -47,9 +48,9 @@ const FuseView = ({ data, bm25, vector }: FuseViewProps) => {
               </Typography>
               <RankTable
                 compact
-                caption="BM25 ranking, input to fusion"
+                caption={T.captions.bm25Input}
                 series="bm25"
-                valueLabel="score"
+                valueLabel={C.score}
                 rows={bm25.results.map((r) => ({ ...r, value: r.score.toFixed(2) }))}
               />
             </div>
@@ -59,9 +60,9 @@ const FuseView = ({ data, bm25, vector }: FuseViewProps) => {
               </Typography>
               <RankTable
                 compact
-                caption="Vector ranking, input to fusion"
+                caption={T.captions.vectorInput}
                 series="vector"
-                valueLabel="distance"
+                valueLabel={C.distance}
                 rows={vector.results.map((r) => ({ ...r, value: r.distance.toFixed(4) }))}
               />
             </div>
@@ -78,56 +79,48 @@ const FuseView = ({ data, bm25, vector }: FuseViewProps) => {
           <thead>
             <tr className="voice-data border-b text-left text-xs text-muted-foreground">
               <th scope="col" className="w-12 py-1.5 pr-3 font-medium">
-                rank
+                {C.rank}
               </th>
               <th scope="col" className="py-1.5 pr-3 font-medium">
-                passage
+                {C.passage}
               </th>
               <th scope="col" className="py-1.5 pr-3 font-medium">
-                from
+                {C.from}
               </th>
               <th scope="col" className="py-1.5 text-right font-medium">
-                rrf
+                {C.rrf}
               </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => {
-              const dropped = row.rank > data.kept;
+              const below = row.rank > data.kept;
               return (
                 <Fragment key={row.chunk_id}>
-                  {row.rank === data.kept + 1 && (
-                    <tr aria-hidden>
-                      <td colSpan={4} className="border-t border-primary pt-1 pb-0.5">
-                        <Typography variant="marginNote" as="span" className="text-sm">
-                          {T.cut(data.kept)}
-                        </Typography>
-                      </td>
-                    </tr>
-                  )}
                   <tr
                     className={cn(
-                      'border-b border-dashed last:border-b-0',
-                      dropped && 'text-muted-foreground',
+                      'border-b border-dashed',
+                      below && 'text-muted-foreground',
+                      row.rank === data.kept && 'border-b-0',
                     )}
                   >
-                    <td className="py-2 pr-3">
-                      <RankBadge series="fused" rank={row.rank} />
+                    <td className="py-1.5 pr-3 sm:py-2">
+                      <RankBadge series="fused" rank={row.rank} muted={below} />
                     </td>
-                    <td className="py-2 pr-3">
+                    <td className="py-1.5 pr-3 sm:py-2">
                       {row.doc_title}{' '}
-                      <span className="voice-data text-xs text-muted-foreground">
+                      <span className="voice-data block text-xs text-muted-foreground sm:inline">
                         #{row.chunk_id}
-                        {dropped && <span className="sr-only">, {T.droppedNote}</span>}
+                        {below && <span className="sr-only">, {T.droppedNote}</span>}
                       </span>
                     </td>
-                    <td className="py-2 pr-3">
-                      <span className="flex flex-wrap gap-x-3 gap-y-1">
-                        <RankBadge series="bm25" rank={row.from.bm25_rank} />
-                        <RankBadge series="vector" rank={row.from.vector_rank} />
+                    <td className="py-1.5 pr-3 sm:py-2">
+                      <span className="flex flex-nowrap gap-x-2 sm:gap-x-3">
+                        <RankBadge series="bm25" rank={row.from.bm25_rank} muted={below} />
+                        <RankBadge series="vector" rank={row.from.vector_rank} muted={below} />
                       </span>
                     </td>
-                    <td className="voice-data py-2 text-right whitespace-nowrap">
+                    <td className="voice-data py-1.5 text-right whitespace-nowrap sm:py-2">
                       {row.score.toFixed(4)}
                       <span className="block text-xs text-muted-foreground">
                         {T.contributions(
@@ -137,22 +130,42 @@ const FuseView = ({ data, bm25, vector }: FuseViewProps) => {
                       </span>
                     </td>
                   </tr>
+                  {row.rank === data.kept && (
+                    <tr>
+                      <td colSpan={4} className="border-t border-primary pt-1 pb-1.5">
+                        <span className="flex flex-wrap items-baseline justify-between gap-x-4">
+                          <Typography
+                            variant="marginNote"
+                            as="span"
+                            aria-hidden
+                            className="text-sm"
+                          >
+                            {T.cut(data.kept)}
+                          </Typography>
+                          {dropped > 0 && (
+                            <Button
+                              variant="pencil"
+                              size="inline"
+                              aria-expanded={showDropped}
+                              className="min-h-8 gap-1 text-sm"
+                              onClick={() => setShowDropped((open) => !open)}
+                            >
+                              <ChevronDown
+                                aria-hidden
+                                className={cn('transition-transform', showDropped && 'rotate-180')}
+                              />
+                              {showDropped ? T.hideDropped : T.showDropped(dropped)}
+                            </Button>
+                          )}
+                        </span>
+                      </td>
+                    </tr>
+                  )}
                 </Fragment>
               );
             })}
           </tbody>
         </table>
-        {dropped > 0 && (
-          <Button
-            variant="pencil"
-            size="inline"
-            aria-expanded={showDropped}
-            className="mt-2 min-h-8"
-            onClick={() => setShowDropped((open) => !open)}
-          >
-            {showDropped ? T.hideDropped : T.showDropped(dropped)}
-          </Button>
-        )}
       </div>
     </div>
   );

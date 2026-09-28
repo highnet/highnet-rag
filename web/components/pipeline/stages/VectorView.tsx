@@ -13,9 +13,9 @@ const VectorView = ({ data }: VectorViewProps) => {
         {COPY.stageText.vector(data.searched.toLocaleString('en'), data.chunk_set, data.depth)}
       </Typography>
       <RankTable
-        caption="Vector search results"
+        caption={COPY.stageText.captions.vector}
         series="vector"
-        valueLabel="distance"
+        valueLabel={COPY.stageText.columns.distance}
         rows={data.results.map((r) => ({ ...r, value: r.distance.toFixed(4) }))}
       />
     </div>

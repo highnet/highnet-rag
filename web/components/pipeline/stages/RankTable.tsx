@@ -1,3 +1,4 @@
+import { COPY } from '@/content/copy';
 import { cn } from '@/lib/utils';
 
 import { RankBadge, type Series } from './RankBadge';
@@ -14,16 +15,17 @@ type RankTableProps = {
 
 // Fixed columns; only the values change between runs, so rankings can be compared by eye.
 const RankTable = ({ caption, series, valueLabel, rows, compact }: RankTableProps) => {
+  const C = COPY.stageText.columns;
   return (
     <table className="w-full border-collapse text-sm">
       <caption className="sr-only">{caption}</caption>
       <thead>
         <tr className="voice-data border-b text-left text-xs text-muted-foreground">
           <th scope="col" className="w-12 py-1.5 pr-3 font-medium">
-            rank
+            {C.rank}
           </th>
           <th scope="col" className="py-1.5 pr-3 font-medium">
-            passage
+            {C.passage}
           </th>
           <th scope="col" className="w-20 py-1.5 text-right font-medium">
             {valueLabel}
