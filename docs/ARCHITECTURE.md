@@ -321,7 +321,7 @@ Below 768px each `StepSheet` folds to a single row: number, title, a one-line su
 | `--ring`                                        | `blue-pencil`                                                           | `lamp-blue-pencil`    | focus                                                 |
 | `--chart-1…5`                                   | `data-vector`, `data-bm25`, `data-fused`, `data-rerank`, `data-neutral` | `lamp-data-*`         | charts, rank badges                                   |
 | `--radius`                                      | `rounded.md` (4px)                                                      | same                  | `rounded-sm` = 2px                                    |
-| extra: `--warning`, `--success`, `--grid-line`  | `amber-note`, `green-tick`, `grid`                                      | `lamp-…`              | exposed as `text-warning`, `text-success`, `.grid-bg` |
+| extra: `--warning`, `--success`                 | `amber-note`, `green-tick`                                              | `lamp-…`              | exposed as `text-warning`, `text-success`             |
 
 The font is Recursive via `next/font/google` (self-hosted at build time, so the export makes no runtime request to Google), with the `CASL`, `MONO` and `slnt` axes. The typography roles become `Typography` CVA variants (`sheetTitle`, `stepHeading`, `body`, `marginNote`, `data`, `label`).
 
