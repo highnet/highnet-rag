@@ -1,3 +1,72 @@
+# Project: highnet-rag
+
+A transparent RAG teaching tool. Read these first: `docs/PROJECT_BRIEF.md` (decisions), `docs/ARCHITECTURE.md` (system design), `docs/MILESTONES.md` (plan), `PRODUCT.md` and `DESIGN.md` (design context). Do not change the fixed stack in the brief without asking the owner.
+
+## Non-negotiables
+
+- **Transparency is the product: if a stage runs, it emits a trace event.** That includes retries, fallbacks, skips (`status: "skipped"` with a reason), budget and rate-limit decisions, and errors. No work happens off-trace.
+- **Every number on screen is real.** Scores, tokens, cost and latency come from the trace or `evals/results/latest.json`. Never hard-code or invent them; label illustrative content as illustrative.
+- **All UI work goes through Impeccable.** Use the `impeccable` skill for every frontend change (`/impeccable` + command: `shape`, `critique`, `audit`, `polish`, ...). DESIGN.md is the visual authority. Never ship default shadcn styling. A UI milestone is not done until `impeccable detect` reports zero findings and the finish review has run.
+- **Simple, explicit code.** No LangChain or similar orchestration frameworks. Each pipeline stage is a plain function.
+- **Never hard-code secrets.** Every variable is listed in `.env.example`. SDK clients (Anthropic, Voyage) are built lazily on first use, in Python too (see the lazy-client rule below).
+- **Small, well-described commits.** When unsure, ask instead of guessing.
+
+## Layout
+
+| Path           | What                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------ |
+| `api/`         | FastAPI app + ingestion CLI, Python package `highnet_rag` (uv workspace member)            |
+| `web/`         | Next.js App Router, TypeScript, static export (`output: 'export'`), Tailwind v4, shadcn/ui |
+| `evals/`       | Golden sets, eval runner, `results/latest.json` (uv workspace member)                      |
+| `docs/`        | Brief, architecture, milestones                                                            |
+| `.claude/`     | Claude Code hooks (graphify, Impeccable), Impeccable skill and agents                      |
+| `.impeccable/` | Impeccable surface briefs (`surfaces/`) and config                                         |
+
+## Commands
+
+```bash
+# Python (from repo root)
+uv sync                                   # install api + evals
+uv run ruff check . && uv run ruff format --check .
+uv run pyright
+uv run pytest
+uv run highnet-rag ingest --source data/squad/dev-v2.0.json --out data/corpus.sqlite
+uv run highnet-rag schema                 # regenerate trace JSON Schema for web/
+uv run uvicorn highnet_rag.app:app --reload --port 8000
+
+# Web (from web/)
+npm ci
+npm run dev                               # http://localhost:3000, API at NEXT_PUBLIC_API_BASE
+npm run lint && npm run typecheck && npm test
+npm run build                             # static export to web/out
+
+# Design
+.claude/skills/impeccable/scripts/impeccable detect web/   # must report zero findings
+
+# Knowledge graph (optional)
+graphify update .
+```
+
+The exact scripts are defined when `/web` and `/api` are scaffolded (milestone 1); keep this list in sync with them.
+
+## Python conventions (`api/`, `evals/`)
+
+- Python 3.12, managed with uv. Ruff handles lint and format (line length 100, matching Prettier); pyright runs in basic mode. Both are configured in `pyproject.toml`.
+- Pydantic models for every boundary: settings, the API, trace events (one `data` model per stage), and golden-set rows. The Pydantic models are the source of truth for the TypeScript trace types (they are generated, never hand-edited).
+- Storage goes through the `CorpusStore` / `StateStore` Protocols in `storage/base.py`. Pipeline code never imports `sqlite3` directly.
+- Providers (`providers/claude.py`, `providers/voyage.py`) are the only modules that talk to external APIs. Tests replace them with fakes; **tests never call real APIs**.
+- Every external call records its tokens and cost through `pricing.py`, and the budget ledger records them too.
+- Type hints everywhere; `def` functions (the arrow-function rule below applies to TS/TSX only).
+
+## TypeScript deltas to the rules below
+
+- Hooks are `kebab-case.ts` (for example `use-trace-stream.ts`), matching the `use-mobile.ts` example below. The "camelCase" wording in File Naming is superseded for hooks.
+- shadcn components are added with the CLI, then **renamed to PascalCase** (`components/ui/Button.tsx`) and rewritten to these rules: arrow functions, `type` not `interface`, named React imports, CVA with `data-slot`, and `cn()`. Update `components.json` aliases accordingly.
+- Design tokens live only in `web/app/globals.css`, mapped from DESIGN.md (see `docs/ARCHITECTURE.md`, section 9, "Design tokens → Tailwind v4 & shadcn").
+- UI copy lives in `web/content/`, the English catalogue; no string literals for user-facing copy in components.
+
+---
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
