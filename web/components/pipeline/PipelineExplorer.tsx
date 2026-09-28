@@ -143,15 +143,15 @@ const PipelineExplorer = () => {
   return (
     <div className="space-y-8 md:space-y-10">
       <section aria-labelledby="sheet-title" className="space-y-4 md:space-y-5">
-        <div className="space-y-2">
-          <Typography variant="sheetTitle" id="sheet-title">
-            <span className="voice-data mr-3 align-[0.2em] text-sm font-normal tracking-normal text-muted-foreground">
-              {COPY.sheetLabel} ·
-            </span>
-            {trace.input?.q ?? COPY.emptyTitle}
-          </Typography>
-          {!trace.input && <Typography color="muted">{COPY.intro}</Typography>}
-        </div>
+        <Typography color="muted" className="max-w-[68ch]">
+          {COPY.intro}
+        </Typography>
+        <Typography variant="sheetTitle" id="sheet-title">
+          <span className="voice-data mr-3 align-[0.2em] text-sm font-normal tracking-normal text-muted-foreground">
+            {COPY.sheetLabel} ·
+          </span>
+          {trace.input?.q ?? COPY.emptyTitle}
+        </Typography>
 
         {configState.status === 'loading' && <Notice tone="note">{COPY.starting}</Notice>}
         {configState.status === 'error' && (

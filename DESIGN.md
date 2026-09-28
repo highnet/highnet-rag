@@ -300,7 +300,7 @@ Every step and the answer share one three-track grid, so numbers, sheets and not
 
 - **Phones, below 768px:** a 2rem number track and the sheet, 12px apart. Each step is a one-line collapsible row. The settings strip folds into a one-line summary below `sm` (640px); the Run and Stop buttons shrink to 44px squares showing only their icon.
 - **From `md`, 768px:** a 3rem number track and a 16px gap. A 1px vertical margin rule in `rule` runs the full height of the step list through the gutter between the numbers and the sheets (56px from the list's left edge). Steps render as open sheets.
-- **From `lg`, 1024px:** a third track, 17rem wide, holds each step's blue-pencil margin note beside its sheet, with 32px gaps. Below `lg` the note folds into the sheet as an inline "Why this step?" disclosure, open by default on phones.
+- **From `lg`, 1024px:** a third track, 17rem wide, holds each step's blue-pencil margin note beside its sheet, with 32px gaps. Below `lg` the note opens the sheet instead: a paragraph of three to five sentences in the pencil voice, always visible, above the readout and the figure, with "Under the hood" folded beneath it. Beside a waiting step the margin stays empty; the note is written in with its step.
 
 Motion belongs to the step. When a trace event arrives, the step is written in top to bottom with the write-in motion (a 4px rise and a top-down clip reveal on `cubic-bezier(0.16, 1, 0.3, 1)`), staged so the whole step lands in about 180ms: the number over 120ms, then the sheet over 140ms from 40ms, then the margin note over 90ms from 90ms. The answer sheet uses the same motion at 180ms. Pending and skipped steps do not animate.
 

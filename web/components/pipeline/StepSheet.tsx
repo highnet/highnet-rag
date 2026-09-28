@@ -47,19 +47,12 @@ const StepSheet = ({
   const readout = measure && status !== 'skipped' && (
     <Readout ms={measure.ms} tokens={measure.tokens} costUsd={measure.costUsd} />
   );
+  const note = <WhyThisStep copy={copy} layout="inline" className="lg:hidden" />;
   const details = (
     <>
       {children && <div className="mt-3">{children}</div>}
-      <div className="mt-3 space-y-1 border-t border-dashed pt-2">
-        {status !== 'pending' && (
-          <WhyThisStep
-            copy={copy}
-            layout="inline"
-            defaultOpen={!wide}
-            className="border-t-0 pt-0 lg:hidden"
-          />
-        )}
-        {status !== 'pending' && <CodeSnippet snippets={snippets} />}
+      <div className="mt-3 border-t border-dashed pt-2">
+        <CodeSnippet snippets={snippets} />
       </div>
     </>
   );
@@ -105,7 +98,12 @@ const StepSheet = ({
               <StatusMark status={status} />
             </div>
           </header>
-          {status !== 'pending' && details}
+          {status !== 'pending' && (
+            <>
+              <div className="mt-2">{note}</div>
+              {details}
+            </>
+          )}
         </article>
       ) : (
         <Collapsible
@@ -142,26 +140,26 @@ const StepSheet = ({
               )}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="px-3 pb-3">
+          <CollapsibleContent className="space-y-2 px-3 pb-3">
+            {note}
             {readout}
-            {status === 'pending' ? (
-              <WhyThisStep copy={copy} layout="inline" defaultOpen className="mt-2" />
-            ) : (
-              details
-            )}
+            {status !== 'pending' && details}
           </CollapsibleContent>
         </Collapsible>
       )}
 
-      <WhyThisStep
-        copy={copy}
-        layout="margin"
-        className={cn(
-          'hidden lg:block',
-          !quiet &&
-            'animate-write-in [animation-delay:90ms] [animation-duration:90ms] motion-reduce:[animation-delay:0ms]',
-        )}
-      />
+      {/* Beside a waiting step the note would stretch an empty sheet; it lands with the step. */}
+      {status !== 'pending' && (
+        <WhyThisStep
+          copy={copy}
+          layout="margin"
+          className={cn(
+            'hidden lg:block',
+            !quiet &&
+              'animate-write-in [animation-delay:90ms] [animation-duration:90ms] motion-reduce:[animation-delay:0ms]',
+          )}
+        />
+      )}
     </li>
   );
 };

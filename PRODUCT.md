@@ -17,7 +17,7 @@ Fixed by the owner (see `docs/PROJECT_BRIEF.md`): Next.js App Router + TypeScrip
 3. **Non-technical visitors.** Curious about "how AI answers questions from documents". They follow the plain-language layer and the answer; the technical layer is optional for them.
 4. **The author** uses it as a personal lab for trying retrieval ideas; that is a side benefit, not a design driver.
 
-Explanation depth targets an intermediate reader: basic programming and ML vocabulary is assumed. Each step has a short "Why this step?" and an expandable technical layer.
+Explanation depth targets an intermediate reader: basic programming and ML vocabulary is assumed. Each step opens with a plain-language paragraph (what it does, why RAG needs it, what to look for in its figure) and an expandable technical layer. The page opens with a short explanation of what the site does.
 
 ## Product Purpose
 
