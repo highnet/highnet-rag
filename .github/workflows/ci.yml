@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      rebuild_corpus:
+        description: Rebuild the corpus with real embeddings and upload it
+        type: boolean
+        default: false
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -61,12 +67,24 @@ jobs:
   deploy-api:
     name: Deploy API to Fly.io
     needs: [api, web]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     concurrency: deploy-production
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_ORG: ${{ vars.FLY_ORG }}
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - uses: astral-sh/setup-uv@v6
+      - name: Provision app, volume and secrets (idempotent)
+        run: scripts/fly-provision.sh
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+      - run: flyctl deploy --remote-only
+      - name: Build and upload the corpus if the API has none
+        run: scripts/fly-ensure-corpus.sh
+        env:
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+          FORCE_CORPUS: ${{ inputs.rebuild_corpus || false }}

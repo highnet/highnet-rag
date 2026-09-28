@@ -47,27 +47,33 @@ After changing `api/src/highnet_rag/trace.py`, regenerate the frontend types wit
 
 The web app is on **Vercel**; the API is on **Fly.io** (`fra`, `shared-cpu-1x`, 512MB, scaled to zero).
 
-### API (Fly.io)
+### API (Fly.io), provisioned by CI
 
-```bash
-fly apps create highnet-rag
-fly volumes create rag_data --app highnet-rag --region fra --size 1
-fly secrets set --app highnet-rag ANTHROPIC_API_KEY=... VOYAGE_API_KEY=... IP_HASH_SALT="$(openssl rand -hex 32)"
-fly deploy
-scripts/upload-corpus.sh data/corpus.sqlite        # built locally with real embeddings
-```
+Fly is driven entirely from GitHub Actions; no local `flyctl` is needed. Add these **repository secrets**:
 
-Then set `CORS_ORIGINS` in `fly.toml` to the Vercel production domain (preview deployments are matched by `CORS_ORIGIN_REGEX`). The corpus file is uploaded separately and is not part of the image; rebuild and upload it whenever ingestion changes.
+| Secret              | What                                          |
+| ------------------- | --------------------------------------------- |
+| `FLY_API_TOKEN`     | a Fly **org** token (`fly tokens create org`) |
+| `ANTHROPIC_API_KEY` | Claude API key                                |
+| `VOYAGE_API_KEY`    | Voyage key (also used to build the corpus)    |
+
+Optionally, set the **repository variable** `FLY_ORG` to your org slug; the default is the token's first org.
+
+On every push to `main`, the `deploy-api` job does three things:
+
+1. `scripts/fly-provision.sh` creates the `highnet-rag` app and the `rag_data` volume in `fra` if they are missing, and stages the secrets. It generates `IP_HASH_SALT` once.
+2. `flyctl deploy --remote-only`.
+3. `scripts/fly-ensure-corpus.sh`: if `/api/health` reports no corpus, it builds one with real Voyage embeddings (a few cents at most) and uploads it to the volume.
+
+To rebuild the corpus later, run the CI workflow manually on `main` with **rebuild_corpus** checked.
 
 ### Web (Vercel)
 
-1. Import the GitHub repository in Vercel and set **Root Directory** to `web`. The framework, install and build commands come from `web/vercel.json`.
-2. Add the environment variable `NEXT_PUBLIC_API_BASE=https://highnet-rag.fly.dev` for Production and Preview.
-3. Pushes to `main` deploy to production; other branches get preview URLs.
+The Vercel project `highnet-rag` (team "highnet's projects") is linked to this repository with Root Directory `web`, Node 22, and `NEXT_PUBLIC_API_BASE=https://highnet-rag.fly.dev` for Production and Preview. Pushes to `main` deploy to production; other branches get preview URLs. The API accepts the production domain and previews through `CORS_ORIGINS` / `CORS_ORIGIN_REGEX` in `fly.toml`.
 
 ### CI and spend limits
 
-- Save a Fly deploy token (`fly tokens create deploy --app highnet-rag`) as the `FLY_API_TOKEN` repository secret. Every push to `main` then runs the tests (100% coverage) and deploys the API (`.github/workflows/ci.yml`).
+- Every push to `main` runs the tests (100% coverage) and then deploys the API (`.github/workflows/ci.yml`).
 - Set monthly spend limits in the Anthropic and Voyage consoles to match `BUDGET_MONTHLY_USD` ($20). The app enforces the same cap itself; the console limits are the backstop.
 
 ## Docs
