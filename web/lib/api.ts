@@ -19,7 +19,13 @@ export type ApiConfig = {
   corpus: Record<string, string>;
   max_query_chars: number;
   agent: { max_steps: number; token_cap: number };
+  // false: visitors pick a recorded question and the page replays its run (no model call).
+  live: boolean;
+  questions: DemoQuestion[];
+  recorded: { ks: number[]; at: string | null };
 };
+
+export type DemoQuestion = { id: string; question: string; compound: boolean };
 
 export type BudgetTier = 'normal' | 'degraded' | 'stopped';
 

@@ -1,0 +1,77 @@
+[
+  {
+    "id": "normandy",
+    "question": "In what country is Normandy located?",
+    "compound": false
+  },
+  {
+    "id": "fresno",
+    "question": "What does the name Fresno mean in Spanish?",
+    "compound": false
+  },
+  {
+    "id": "yuan",
+    "question": "Who started the Yuan dynasty?",
+    "compound": false
+  },
+  {
+    "id": "harvard-presidents",
+    "question": "How many U.S. presidents studied at Harvard?",
+    "compound": false
+  },
+  {
+    "id": "world-cup",
+    "question": "Who won the 2018 FIFA World Cup?",
+    "compound": false
+  },
+  {
+    "id": "compound-01",
+    "question": "Which was founded first, Harvard University or the University of Chicago?",
+    "compound": true
+  },
+  {
+    "id": "compound-02",
+    "question": "How many years after the Yuan dynasty was proclaimed did the Black Death reach Europe?",
+    "compound": true
+  },
+  {
+    "id": "compound-03",
+    "question": "Which came first, Newcomen's atmospheric steam engine or the discovery of oxygen?",
+    "compound": true
+  },
+  {
+    "id": "compound-04",
+    "question": "Was the IPCC established before or after the new Scottish Parliament first met?",
+    "compound": true
+  },
+  {
+    "id": "compound-05",
+    "question": "How many years after the Duchy of Normandy began did Kublai Khan establish the Yuan dynasty?",
+    "compound": true
+  },
+  {
+    "id": "compound-06",
+    "question": "Did the French and Indian War end before or after oxygen was discovered?",
+    "compound": true
+  },
+  {
+    "id": "compound-07",
+    "question": "How many years after Harvard was founded did the French and Indian War begin?",
+    "compound": true
+  },
+  {
+    "id": "compound-08",
+    "question": "How many years before the IPCC was established did the 1973 oil crisis begin?",
+    "compound": true
+  },
+  {
+    "id": "compound-09",
+    "question": "Which happened first: Warsaw becoming capital of the Polish\u2013Lithuanian Commonwealth, or the end of the French Wars of Religion?",
+    "compound": true
+  },
+  {
+    "id": "compound-10",
+    "question": "Which is older, the University of Chicago or the IPCC, and by how many years?",
+    "compound": true
+  }
+]

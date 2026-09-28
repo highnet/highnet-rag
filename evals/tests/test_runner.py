@@ -8,11 +8,12 @@ from conftest import fake_settings
 from highnet_rag.ingest.squad import load_squad
 from highnet_rag.providers import Providers, build_providers
 from highnet_rag.providers.base import Embeddings, FinalAnswer, InputType, ToolAnswer
+from highnet_rag.providers.cache import CachedEmbedder
 from highnet_rag.providers.fake import FakeAnswerModel
 from highnet_rag.storage.sqlite import SqliteCorpusStore
 from highnet_rag_evals.golden import CompoundRow, Golden, OwnerRow, build_squad_auto
 from highnet_rag_evals.judge import FakeJudge
-from highnet_rag_evals.runner import CachedEmbedder, Evaluator, Ledger, read_outcome
+from highnet_rag_evals.runner import Evaluator, Ledger, read_outcome
 
 
 def golden_for(squad_path: Path) -> Golden:

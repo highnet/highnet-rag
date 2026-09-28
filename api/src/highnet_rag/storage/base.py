@@ -2,7 +2,7 @@
 implementation can replace SQLite later without touching pipeline code."""
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 
@@ -115,3 +115,31 @@ class StateStore(Protocol):
     ) -> None: ...
     def month_spend(self) -> float: ...
     def runs_since(self, ip_hash: str, seconds: int) -> int: ...
+
+
+@dataclass(frozen=True)
+class DemoQuestion:
+    """A question visitors can pick. Compound questions join two articles (agentic mode)."""
+
+    id: str
+    question: str
+    compound: bool
+
+
+@dataclass(frozen=True)
+class Recording:
+    """One recorded run: every SSE item it produced, each with its offset from the start."""
+
+    question_id: str
+    combo: str
+    recorded_at: str
+    items: list[dict[str, Any]]
+
+
+class RecordingStore(Protocol):
+    def questions(self) -> list[DemoQuestion]: ...
+    def save_questions(self, questions: list[DemoQuestion]) -> None: ...
+    def combos(self, question_id: str) -> set[str]: ...
+    def save(self, recording: Recording) -> None: ...
+    def load(self, question_id: str, combo: str) -> Recording | None: ...
+    def recorded_at(self) -> str | None: ...

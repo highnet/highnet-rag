@@ -23,7 +23,8 @@ RUN useradd --create-home --uid 1000 app && chmod +x /usr/local/bin/docker-entry
 
 ENV PATH=/app/.venv/bin:$PATH \
     CORPUS_DB_PATH=/data/corpus.sqlite \
-    STATE_DB_PATH=/data/state.sqlite
+    STATE_DB_PATH=/data/state.sqlite \
+    RECORDINGS_DB_PATH=/data/recordings.sqlite
 EXPOSE 8080
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["uvicorn", "highnet_rag.app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]

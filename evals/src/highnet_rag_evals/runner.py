@@ -28,7 +28,8 @@ from highnet_rag.pipeline.prompt import NOT_FOUND
 from highnet_rag.pipeline.search import Retrieval, retrieve
 from highnet_rag.pricing import cost_usd
 from highnet_rag.providers import Providers
-from highnet_rag.providers.base import Embedder, Embeddings, InputType, Judge
+from highnet_rag.providers.base import Judge
+from highnet_rag.providers.cache import CachedEmbedder
 from highnet_rag.storage.base import CorpusStore
 from highnet_rag.trace import RunDone, TraceEvent, Tracer
 from highnet_rag_evals.golden import CompoundRow, Golden, evidence_span
@@ -120,24 +121,6 @@ class Ledger:
             )
             for (provider, model), lines in sorted(groups.items())
         ]
-
-
-class CachedEmbedder:
-    """Each question is embedded once for the whole run; a repeat costs nothing and says so
-    (the trace shows 0 tokens for it)."""
-
-    def __init__(self, inner: Embedder) -> None:
-        self._inner = inner
-        self.provider, self.model, self.dims = inner.provider, inner.model, inner.dims
-        self._cache: dict[tuple[str, str], Embeddings] = {}
-
-    async def embed(self, texts: list[str], input_type: InputType) -> Embeddings:
-        key = ("\n".join(texts), input_type)
-        if key in self._cache:
-            return Embeddings(self._cache[key].vectors, tokens=0)
-        result = await self._inner.embed(texts, input_type)
-        self._cache[key] = result
-        return result
 
 
 @dataclass

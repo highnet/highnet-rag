@@ -9,6 +9,8 @@ export type RunStatus = 'idle' | 'running' | 'finished' | 'failed';
 
 export type RunInput = {
   q: string;
+  // A recorded question: the API replays its run instead of answering live.
+  questionId?: string;
   k: number;
   chunkSet: string;
   mode: string;
@@ -51,7 +53,7 @@ export const useTraceStream = () => {
       close();
       setState({ ...initialState, status: 'running', input });
       const params = new URLSearchParams({
-        q: input.q,
+        ...(input.questionId ? { question_id: input.questionId } : { q: input.q }),
         k: String(input.k),
         chunk_set: input.chunkSet,
         mode: input.mode,

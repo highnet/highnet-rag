@@ -8,14 +8,15 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { ApiConfig } from '@/lib/api';
-import type { RunSettings } from '@/lib/url-state';
+import { kOptions, type RunSettings } from '@/lib/url-state';
 
 type SettingsStripProps = {
   config: ApiConfig;
   settings: RunSettings;
   disabled: boolean;
   stale: boolean;
-  agentPaused: boolean;
+  // Why the agent cannot be switched on now, if it cannot; `warning` for a budget pause.
+  agentPause: { reason: string; warning: boolean } | null;
   onChange: (settings: RunSettings) => void;
 };
 
@@ -27,10 +28,13 @@ const SettingsStrip = ({
   settings,
   disabled,
   stale,
-  agentPaused,
+  agentPause,
   onChange,
 }: SettingsStripProps) => {
   const { mode, k, chunkSet, rerank, agentic } = settings;
+  const agentPaused = agentPause !== null;
+  const ks = kOptions(config);
+  const at = ks.indexOf(k);
   const set = config.chunk_sets.find((s) => s.name === chunkSet);
   const modeLabel = S.modes[mode]?.label ?? mode;
 
@@ -82,8 +86,8 @@ const SettingsStrip = ({
               variant="quiet"
               size="icon"
               aria-label={S.fewer}
-              disabled={disabled || k <= 1}
-              onClick={() => onChange({ ...settings, k: k - 1 })}
+              disabled={disabled || at <= 0}
+              onClick={() => onChange({ ...settings, k: ks[at - 1] })}
             >
               <Minus aria-hidden />
             </Button>
@@ -94,8 +98,8 @@ const SettingsStrip = ({
               variant="quiet"
               size="icon"
               aria-label={S.more}
-              disabled={disabled || k >= config.top_k.max}
-              onClick={() => onChange({ ...settings, k: k + 1 })}
+              disabled={disabled || at >= ks.length - 1}
+              onClick={() => onChange({ ...settings, k: ks[at + 1] })}
             >
               <Plus aria-hidden />
             </Button>
@@ -177,12 +181,12 @@ const SettingsStrip = ({
           />
           <Typography
             variant="small"
-            color={agentPaused ? 'warning' : 'muted'}
+            color={agentPause?.warning ? 'warning' : 'muted'}
             id="agent-description"
             className="max-w-[22ch]"
           >
-            {agentPaused
-              ? S.agentDescription.paused
+            {agentPause
+              ? agentPause.reason
               : agentic
                 ? S.agentDescription.on
                 : S.agentDescription.off}

@@ -101,6 +101,9 @@ def make_settings(tmp_path: Path, corpus_path: Path):
             "corpus_db_path": corpus_path,
             "state_db_path": tmp_path / "state.sqlite",
             "static_dir": tmp_path / "no-static",
+            # Most tests drive the live pipeline; replay tests switch this off.
+            "live_queries": True,
+            "recordings_db_path": tmp_path / "recordings.sqlite",
             "_env_file": None,
         }
         return Settings(**{**base, **overrides})  # pyright: ignore[reportArgumentType]

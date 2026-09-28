@@ -21,6 +21,8 @@ export type RequestData = {
     degrade_at_usd: number;
     tier: string;
   };
+  // Present when the run is a replay: when it was recorded, and what that means.
+  recording?: { recorded_at: string; note: string };
   error?: StageError;
 };
 

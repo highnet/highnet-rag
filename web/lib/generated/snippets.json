@@ -71,8 +71,8 @@
     {
       "title": "FTS5 BM25 ranking",
       "file": "api/src/highnet_rag/storage/sqlite.py",
-      "startLine": 124,
-      "endLine": 131,
+      "startLine": 138,
+      "endLine": 145,
       "code": "def bm25(self, fts_query: str, chunk_set_id: int, k: int) -> list[Hit]:\n    rows = self._conn.execute(\n        \"SELECT rowid, bm25(chunks_fts) AS score FROM chunks_fts \"\n        \"WHERE chunks_fts MATCH ? AND chunk_set_id = ? ORDER BY score LIMIT ?\",\n        (fts_query, chunk_set_id, k),\n    )\n    # FTS5 bm25() is lower-is-better (negative); flip the sign so higher = more relevant.\n    return [Hit(r[\"rowid\"], i + 1, -float(r[\"score\"])) for i, r in enumerate(rows)]",
       "html": "<span class=\"hljs-keyword\">def</span> <span class=\"hljs-title function_\">bm25</span>(<span class=\"hljs-params\">self, fts_query: <span class=\"hljs-built_in\">str</span>, chunk_set_id: <span class=\"hljs-built_in\">int</span>, k: <span class=\"hljs-built_in\">int</span></span>) -&gt; <span class=\"hljs-built_in\">list</span>[Hit]:\n    rows = <span class=\"hljs-variable language_\">self</span>._conn.execute(\n        <span class=\"hljs-string\">&quot;SELECT rowid, bm25(chunks_fts) AS score FROM chunks_fts &quot;</span>\n        <span class=\"hljs-string\">&quot;WHERE chunks_fts MATCH ? AND chunk_set_id = ? ORDER BY score LIMIT ?&quot;</span>,\n        (fts_query, chunk_set_id, k),\n    )\n    <span class=\"hljs-comment\"># FTS5 bm25() is lower-is-better (negative); flip the sign so higher = more relevant.</span>\n    <span class=\"hljs-keyword\">return</span> [Hit(r[<span class=\"hljs-string\">&quot;rowid&quot;</span>], i + <span class=\"hljs-number\">1</span>, -<span class=\"hljs-built_in\">float</span>(r[<span class=\"hljs-string\">&quot;score&quot;</span>])) <span class=\"hljs-keyword\">for</span> i, r <span class=\"hljs-keyword\">in</span> <span class=\"hljs-built_in\">enumerate</span>(rows)]"
     }
@@ -235,8 +235,8 @@
     {
       "title": "sqlite-vec nearest neighbours",
       "file": "api/src/highnet_rag/storage/sqlite.py",
-      "startLine": 146,
-      "endLine": 152,
+      "startLine": 160,
+      "endLine": 166,
       "code": "def knn(self, vector: np.ndarray, chunk_set_id: int, k: int) -> list[Hit]:\n    rows = self._conn.execute(\n        \"SELECT chunk_id, distance FROM chunk_vec \"\n        \"WHERE embedding MATCH ? AND k = ? AND chunk_set_id = ? ORDER BY distance\",\n        (vector.astype(np.float32).tobytes(), k, chunk_set_id),\n    )\n    return [Hit(r[\"chunk_id\"], i + 1, float(r[\"distance\"])) for i, r in enumerate(rows)]",
       "html": "<span class=\"hljs-keyword\">def</span> <span class=\"hljs-title function_\">knn</span>(<span class=\"hljs-params\">self, vector: np.ndarray, chunk_set_id: <span class=\"hljs-built_in\">int</span>, k: <span class=\"hljs-built_in\">int</span></span>) -&gt; <span class=\"hljs-built_in\">list</span>[Hit]:\n    rows = <span class=\"hljs-variable language_\">self</span>._conn.execute(\n        <span class=\"hljs-string\">&quot;SELECT chunk_id, distance FROM chunk_vec &quot;</span>\n        <span class=\"hljs-string\">&quot;WHERE embedding MATCH ? AND k = ? AND chunk_set_id = ? ORDER BY distance&quot;</span>,\n        (vector.astype(np.float32).tobytes(), k, chunk_set_id),\n    )\n    <span class=\"hljs-keyword\">return</span> [Hit(r[<span class=\"hljs-string\">&quot;chunk_id&quot;</span>], i + <span class=\"hljs-number\">1</span>, <span class=\"hljs-built_in\">float</span>(r[<span class=\"hljs-string\">&quot;distance&quot;</span>])) <span class=\"hljs-keyword\">for</span> i, r <span class=\"hljs-keyword\">in</span> <span class=\"hljs-built_in\">enumerate</span>(rows)]"
     }

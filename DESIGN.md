@@ -422,3 +422,7 @@ Each step sheet carries its step as one line of relational algebra in a dashed b
 ## Corpus page (`/corpus`)
 
 Sheet 3 of the pad. A chunk-size switch and the article list (a native select on phones, a scrolling list from `lg`), then the chosen article on a raised sheet: its text with each chunk's start marked by its id in a small blue-pencil box, and any text held by two chunks at once on blue wash. The note above the text says which is true for this article and size: it never promises an overlap that is not there.
+
+## Question picker (replay)
+
+With live questions off, the question box becomes "Pick a question": two groups under label headings, "One article" and "Two articles: switch the agent on", each a grid of quiet buttons (one column on phones, two from `sm`) whose pressed state is the blue wash with blue-pencil text. Groups longer than four fold to three behind a pencil "N more" toggle, and a folded question that is selected keeps its group open. A note-tone notice under the title says the runs are recordings, when they were made, and that nothing is spent. Changing a setting replays at once, so the stale-settings note never shows.
