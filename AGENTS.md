@@ -9,18 +9,20 @@ A transparent RAG teaching tool. Read these first: `docs/PROJECT_BRIEF.md` (deci
 - **All UI work goes through Impeccable.** Use the `impeccable` skill for every frontend change (`/impeccable` + command: `shape`, `critique`, `audit`, `polish`, ...). DESIGN.md is the visual authority. Never ship default shadcn styling. A UI milestone is not done until `impeccable detect` reports zero findings and the finish review has run.
 - **Simple, explicit code.** No LangChain or similar orchestration frameworks. Each pipeline stage is a plain function.
 - **Never hard-code secrets.** Every variable is listed in `.env.example`. SDK clients (Anthropic, Voyage) are built lazily on first use, in Python too (see the lazy-client rule below).
+- **Live code comes from the source.** The page's code excerpts are extracted from `# snippet: <stages> | <title>` ... `# /snippet` regions in `api/src`. Never paste code into the frontend; move or add markers instead, then run `npm run gen:snippets`.
+- **100% test coverage** for `api/`, `evals/` and `web/` (lines and branches), enforced in CI. `# pragma: no cover` is not allowed.
 - **Small, well-described commits.** When unsure, ask instead of guessing.
 
 ## Layout
 
-| Path           | What                                                                                       |
-| -------------- | ------------------------------------------------------------------------------------------ |
-| `api/`         | FastAPI app + ingestion CLI, Python package `highnet_rag` (uv workspace member)            |
-| `web/`         | Next.js App Router, TypeScript, static export (`output: 'export'`), Tailwind v4, shadcn/ui |
-| `evals/`       | Golden sets, eval runner, `results/latest.json` (uv workspace member)                      |
-| `docs/`        | Brief, architecture, milestones                                                            |
-| `.claude/`     | Claude Code hooks (graphify, Impeccable), Impeccable skill and agents                      |
-| `.impeccable/` | Impeccable surface briefs (`surfaces/`) and config                                         |
+| Path           | What                                                                                                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `api/`         | FastAPI app + ingestion CLI, Python package `highnet_rag` (uv workspace member); deployed on Fly               |
+| `web/`         | Next.js App Router, TypeScript, static export (`output: 'export'`), Tailwind v4, shadcn/ui; deployed on Vercel |
+| `evals/`       | Golden sets, eval runner, `results/latest.json` (uv workspace member)                                          |
+| `docs/`        | Brief, architecture, milestones                                                                                |
+| `.claude/`     | Claude Code hooks (graphify, Impeccable), Impeccable skill and agents                                          |
+| `.impeccable/` | Impeccable surface briefs (`surfaces/`) and config                                                             |
 
 ## Commands
 
@@ -38,7 +40,8 @@ uv run uvicorn highnet_rag.app:app --reload --port 8000
 npm ci
 npm run dev                               # http://localhost:3000, API at NEXT_PUBLIC_API_BASE
 npm run lint && npm run typecheck && npm test
-npm run build                             # static export to web/out
+npm run gen:snippets                      # re-extract live code excerpts from api/src
+npm run build                             # static export to web/out (runs gen:snippets first)
 
 # Design
 .claude/skills/impeccable/scripts/impeccable detect web/   # must report zero findings

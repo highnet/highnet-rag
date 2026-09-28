@@ -31,7 +31,7 @@ uv run highnet-rag ingest         # real Voyage embeddings; prints the cost (cen
 uv run highnet-rag serve
 ```
 
-To work on the frontend with hot reload, add `DEV_CORS_ORIGIN=http://localhost:3000` to `.env`, run `uv run highnet-rag serve`, and run `NEXT_PUBLIC_API_BASE=http://localhost:8000 npm run dev` in `web/`.
+To work on the frontend with hot reload, keep `CORS_ORIGINS=http://localhost:3000` in `.env`, run `uv run highnet-rag serve`, and run `NEXT_PUBLIC_API_BASE=http://localhost:8000 npm run dev` in `web/`.
 
 ### Checks
 
@@ -43,9 +43,11 @@ cd web && npm run lint && npm run typecheck && npm test && npm run build
 
 After changing `api/src/highnet_rag/trace.py`, regenerate the frontend types with `npm run gen:types` in `web/`.
 
-## Deploy (Fly.io)
+## Deploy
 
-One app in `fra` on a `shared-cpu-1x` machine with 512MB, scaled to zero when idle. FastAPI serves the site and `/api` from the same origin.
+The web app is on **Vercel**; the API is on **Fly.io** (`fra`, `shared-cpu-1x`, 512MB, scaled to zero).
+
+### API (Fly.io)
 
 ```bash
 fly apps create highnet-rag
@@ -55,12 +57,18 @@ fly deploy
 scripts/upload-corpus.sh data/corpus.sqlite        # built locally with real embeddings
 ```
 
-Then:
+Then set `CORS_ORIGINS` in `fly.toml` to the Vercel production domain (preview deployments are matched by `CORS_ORIGIN_REGEX`). The corpus file is uploaded separately and is not part of the image; rebuild and upload it whenever ingestion changes.
 
-1. **Continuous deploys:** create a deploy token with `fly tokens create deploy --app highnet-rag` and save it as the `FLY_API_TOKEN` repository secret on GitHub. From then on, every push to `main` runs the tests and then deploys (`.github/workflows/ci.yml`).
-2. **Spend limits:** set monthly spend limits in the Anthropic and Voyage consoles to match `BUDGET_MONTHLY_USD` ($20). The app enforces the same cap on its own; the console limits are the backstop.
+### Web (Vercel)
 
-The corpus file is uploaded separately and is not part of the image. Rebuild and upload it whenever ingestion changes.
+1. Import the GitHub repository in Vercel and set **Root Directory** to `web`. The framework, install and build commands come from `web/vercel.json`.
+2. Add the environment variable `NEXT_PUBLIC_API_BASE=https://highnet-rag.fly.dev` for Production and Preview.
+3. Pushes to `main` deploy to production; other branches get preview URLs.
+
+### CI and spend limits
+
+- Save a Fly deploy token (`fly tokens create deploy --app highnet-rag`) as the `FLY_API_TOKEN` repository secret. Every push to `main` then runs the tests (100% coverage) and deploys the API (`.github/workflows/ci.yml`).
+- Set monthly spend limits in the Anthropic and Voyage consoles to match `BUDGET_MONTHLY_USD` ($20). The app enforces the same cap itself; the console limits are the backstop.
 
 ## Docs
 

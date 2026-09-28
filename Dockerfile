@@ -1,14 +1,7 @@
 # syntax=docker/dockerfile:1
 
-# --- 1. Build the static Next.js export ------------------------------------------------------
-FROM node:22.22.2-slim AS web
-WORKDIR /app/web
-COPY web/package.json web/package-lock.json ./
-RUN npm ci
-COPY web/ ./
-RUN npm run build
-
-# --- 2. Python runtime: FastAPI serves /api and the export from one origin -------------------
+# API only: the web app is deployed separately on Vercel and calls this API cross-origin.
+# --- Python runtime: FastAPI + uv ------------------------------------------------------------
 FROM python:3.12-slim AS runtime
 COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /usr/local/bin/uv
 ENV UV_COMPILE_BYTECODE=1 \
@@ -25,12 +18,10 @@ RUN uv sync --frozen --no-dev --package highnet-rag --no-install-workspace
 COPY api/ api/
 RUN uv sync --frozen --no-dev --package highnet-rag
 
-COPY --from=web /app/web/out /app/static
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN useradd --create-home --uid 1000 app && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV PATH=/app/.venv/bin:$PATH \
-    STATIC_DIR=/app/static \
     CORPUS_DB_PATH=/data/corpus.sqlite \
     STATE_DB_PATH=/data/state.sqlite
 EXPOSE 8080

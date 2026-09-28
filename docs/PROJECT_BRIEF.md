@@ -59,7 +59,7 @@ Product context for design lives in [`PRODUCT.md`](../PRODUCT.md), the visual sy
 Changing any of this needs the owner's approval.
 
 - **Frontend:** Next.js App Router + TypeScript as a static export (`output: 'export'`), Tailwind CSS v4, shadcn/ui primitives restyled to DESIGN.md. Impeccable is the design authority; default shadcn styling never ships.
-- **Backend:** Python, FastAPI, Pydantic, managed with uv. FastAPI also serves the exported frontend: one origin, no CORS in production.
+- **Backend:** Python, FastAPI, Pydantic, managed with uv. The API allows the web origins by CORS (see Hosting).
 - **LLM:** Claude via the Anthropic Python SDK. Model names come from env vars:
   - cheap model for live traffic and development: default `claude-haiku-4-5`;
   - stronger model for demos: default `claude-opus-5`;
@@ -67,7 +67,10 @@ Changing any of this needs the owner's approval.
 - **Embeddings:** API only (Voyage). The 2D map uses PCA in numpy, fitted at ingest time.
 - **Storage:** SQLite on a Fly volume, with sqlite-vec for vectors and FTS5 for BM25, behind a storage interface.
 - **Streaming:** SSE with one trace event per pipeline stage.
-- **Hosting:** Fly.io, one app, region `fra`, shared-cpu-1x (512MB), scales to zero; secrets via `fly secrets`; SSE unbuffered.
+- **Hosting (changed by the owner, 2026-09-28):**
+  - The **web app** (static export) is deployed on **Vercel**.
+  - The **API** stays on **Fly.io**: one app in region `fra`, shared-cpu-1x (512MB), scaled to zero, secrets via `fly secrets`, SSE unbuffered.
+  - Two origins, so the API allows the Vercel production domain and preview deployments by CORS. This replaces the original single-origin setup.
 - **Ingestion** runs locally, and the built SQLite file is uploaded to the volume.
 
 ## Tooling (Phase 0)
@@ -77,6 +80,14 @@ Changing any of this needs the owner's approval.
 - shadcn components are renamed to PascalCase and rewritten to the AGENTS.md rules.
 - graphify is optional tooling, with its hooks enabled.
 - Impeccable skill, agents and design-detector hooks are installed in `.claude/`.
+
+## Additional owner decisions (2026-09-28)
+
+- **Deploy target:** web on Vercel, API on Fly (see Hosting).
+- **Mobile:** avoid very long pages. On phones each step folds to one line (title, key value, status) and expands on tap.
+- **Live code:** every step has a collapsible code excerpt highlighted with highlight.js. The source files are the single source of truth: excerpts are extracted from marked regions at build time and never copied by hand.
+- **Coverage:** 100% line and branch coverage for the Python packages and the web app, enforced in CI.
+- **Conventions:** the Python conventions are also added to `highnet/config` for future projects.
 
 ## Open items (not blocking milestone 1)
 

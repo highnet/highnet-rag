@@ -77,9 +77,12 @@ def create_app(
         yield
 
     app = FastAPI(title="highnet-rag", version="0.1.0", lifespan=lifespan, docs_url="/api/docs")
-    if settings.dev_cors_origin:
+    if settings.cors_origin_list or settings.cors_origin_regex:
         app.add_middleware(
-            CORSMiddleware, allow_origins=[settings.dev_cors_origin], allow_methods=["GET"]
+            CORSMiddleware,
+            allow_origins=settings.cors_origin_list,
+            allow_origin_regex=settings.cors_origin_regex,
+            allow_methods=["GET"],
         )
 
     @app.get("/api/health")

@@ -2,13 +2,13 @@
 
 There is no deadline; each milestone ships when its acceptance criteria pass. Every milestone ends with:
 
-- CI green and deployed to Fly;
+- CI green, the API deployed to Fly and the web app to Vercel;
 - a short demo note in the README changelog;
 - for UI work, Impeccable `audit` and `polish` passes with **zero detector findings**.
 
 ## M1 · Walking skeleton: one question, fully traced, live
 
-**Demo:** open the Fly URL on a phone, ask "What is the Norman conquest?" and watch the steps being filled in (embed → vector search → context → prompt → answer with citations), each with its "Why this step?", ms, tokens and cost.
+**Demo:** open the Vercel URL on a phone, ask "What is the Norman conquest?" and watch the steps being filled in (embed → vector search → context → prompt → answer with citations), each with its "Why this step?", ms, tokens and cost.
 
 Acceptance criteria:
 
@@ -20,7 +20,9 @@ Acceptance criteria:
 - [ ] The frontend pipeline view renders trace events as live step cards, each with a plain-language "Why this step?", following DESIGN.md (the computation pad) in light and dark themes, mobile-first.
 - [ ] shadcn primitives are restyled and renamed per AGENTS.md; `Button` and `Typography` CVA components exist.
 - [ ] Tests: pytest (chunking, PCA projection, tracer, SSE endpoint with fake providers, budget stop) and a Vitest smoke test (SSE fixture → every stage renders).
-- [ ] GitHub Action: test, then `fly deploy` on push to `main`.
+- [ ] GitHub Action: test (100% coverage), then `fly deploy` of the API on push to `main`; the web app deploys through Vercel's GitHub integration.
+- [ ] Every step has a collapsible live code excerpt, extracted from the Python source at build time and highlighted with highlight.js.
+- [ ] On phones, steps fold to one-line rows so a full run stays short.
 - [ ] README: local setup in under 5 commands, plus deploy steps.
 - [ ] Impeccable finish: audit and polish, zero detector findings, and DESIGN.md re-documented from the built UI (the seed marker removed).
 

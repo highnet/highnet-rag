@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Fixed by the owner (see `docs/PROJECT_BRIEF.md`): Next.js App Router + TypeScript as a static export, Tailwind CSS v4, shadcn/ui primitives restyled to DESIGN.md; FastAPI (Python, uv) serves the export and the API from one origin on one Fly.io machine. Claude via the Anthropic Python SDK; Voyage for embeddings and reranking; SQLite (sqlite-vec + FTS5).
+Fixed by the owner (see `docs/PROJECT_BRIEF.md`): Next.js App Router + TypeScript as a static export, Tailwind CSS v4, shadcn/ui primitives restyled to DESIGN.md; the web app is deployed on Vercel; FastAPI (Python, uv) serves the API from one Fly.io machine. Claude via the Anthropic Python SDK; Voyage for embeddings and reranking; SQLite (sqlite-vec + FTS5).
 
 ## Users
 

@@ -54,8 +54,14 @@ class Settings(BaseSettings):
     max_top_k: int = 10
     agent_max_steps: int = 4
 
-    # Development only: allow `next dev` on another origin.
-    dev_cors_origin: str | None = None
+    # The web app is hosted on Vercel and calls this API cross-origin. Comma-separated exact
+    # origins (production domain, `next dev`) plus an optional regex for preview deployments.
+    cors_origins: str = ""
+    cors_origin_regex: str | None = None
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
     @property
     def answer_model(self) -> str:

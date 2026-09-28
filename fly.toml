@@ -1,4 +1,4 @@
-# One Fly.io app: FastAPI serves the static export and /api (SSE) from a single machine.
+# The API on Fly.io: FastAPI serves /api (SSE) from a single machine. The web app is on Vercel.
 # Secrets (never here): fly secrets set ANTHROPIC_API_KEY=... VOYAGE_API_KEY=... IP_HASH_SALT=...
 app = "highnet-rag"
 primary_region = "fra"
@@ -12,6 +12,9 @@ primary_region = "fra"
   BUDGET_MONTHLY_USD = "20"
   RATE_LIMIT_PER_MIN = "20"
   RATE_LIMIT_PER_DAY = "200"
+  # The Vercel production domain (edit once known) plus Vercel preview deployments.
+  CORS_ORIGINS = "https://highnet-rag.vercel.app"
+  CORS_ORIGIN_REGEX = '^https://highnet-rag(-[a-z0-9-]+)?\.vercel\.app$'
 
 [http_service]
   internal_port = 8080

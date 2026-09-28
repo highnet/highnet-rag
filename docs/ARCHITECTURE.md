@@ -17,10 +17,13 @@ flowchart LR
 
   CDB -. "fly sftp upload" .-> VOL
 
-  subgraph Fly["Fly.io app · fra · shared-cpu-1x · 512MB"]
+  subgraph Vercel["Vercel"]
+    ST[Next.js static export<br/>+ live code excerpts]
+  end
+
+  subgraph Fly["Fly.io API · fra · shared-cpu-1x · 512MB"]
     direction TB
-    UV[uvicorn + FastAPI] --> ST[static: web/out]
-    UV --> API["/api/*"]
+    UV[uvicorn + FastAPI] --> API["/api/* (CORS: Vercel origins)"]
     API --> PIPE[pipeline<br/>stages emit TraceEvents]
     PIPE --> STORE[CorpusStore<br/>sqlite-vec + FTS5]
     PIPE --> BUD[Budget + RateLimit]
@@ -31,12 +34,17 @@ flowchart LR
   PIPE -->|embed query · rerank| VOY2[(Voyage API)]
   PIPE -->|generate · agent tools| CL2[(Claude API)]
 
-  B[Browser<br/>Next.js static export] -->|GET /| ST
+  B[Browser] -->|GET /| ST
   B -->|"GET /api/query (SSE)"| API
   API -->|"event: trace × N · event: answer_delta · event: done"| B
 ```
 
-**One origin.** FastAPI serves the exported Next.js site and `/api/*` from the same process, so production needs no CORS. In development, `next dev` (port 3000) calls `uvicorn` (port 8000) through `NEXT_PUBLIC_API_BASE`. CORS is enabled only when `DEV_CORS_ORIGIN` is set.
+**Two origins (owner decision, 2026-09-28).**
+
+- The web app is a static export deployed on Vercel.
+- The API runs on Fly.io. It allows the Vercel production domain (`CORS_ORIGINS`) and preview deployments (`CORS_ORIGIN_REGEX`) with GET-only CORS.
+- The browser finds the API through `NEXT_PUBLIC_API_BASE`, set in the Vercel project.
+- Locally, `highnet-rag serve` can still serve `web/out` itself (same origin, no CORS needed).
 
 ## 2. Repository layout
 
@@ -280,6 +288,17 @@ Upload: `scripts/upload-corpus.sh` copies the file to `/data/corpus.sqlite.new` 
   - The map has a table alternative, and every control is keyboard-reachable.
 - **Tests:** Vitest with Testing Library, as a smoke test. A recorded SSE fixture is fed through `useTraceStream`, and the test asserts that every stage renders a card with its "Why this step?".
 
+### Live code excerpts (single source of truth)
+
+- **Markers in the source.** Each step's code is marked in `api/src` with `# snippet: <stage[,stage]> | <title>` and `# /snippet` comments. The stage section in `pipeline/classic.py` comes first, then the storage or provider functions it calls.
+- **Generator.** `web/scripts/gen-snippets.mjs` runs as `prebuild` and as `npm run gen:snippets`. It extracts and dedents each region, records `file:startLine–endLine`, pre-highlights it with highlight.js (Python grammar only, at build time, so no highlighter ships to the browser), and writes `web/lib/generated/snippets.json`.
+- **Drift check.** CI regenerates the file and fails if the committed copy differs.
+- **Rendering.** `CodeSnippet` renders each excerpt collapsed under "Show the code", with a link to the lines on GitHub. Token colours come from the pad palette (`.hljs-*` in `globals.css`).
+
+### Phones: one line per step
+
+Below 768px each `StepSheet` folds to a single row: number, title, a one-line summary of the key value (`lib/step-summary.ts`), and status. Tapping it expands the details, the "Why this step?" note and the code. A full run page is about 2,000px tall on a 390px screen instead of about 5,500px.
+
 ### Design tokens → Tailwind v4 & shadcn
 
 `DESIGN.md` frontmatter is normative. `web/app/globals.css` maps it onto shadcn's CSS variables and exposes them through `@theme inline` (AGENTS.md: tokens live only in `globals.css`). Dark mode uses the `lamp-*` values under `.dark`, and a class set from `prefers-color-scheme` plus the toggle.
@@ -306,31 +325,41 @@ Upload: `scripts/upload-corpus.sh` copies the file to `/data/corpus.sqlite.new` 
 
 The font is Recursive via `next/font/google` (self-hosted at build time, so the export makes no runtime request to Google), with the `CASL`, `MONO` and `slnt` axes. The typography roles become `Typography` CVA variants (`sheetTitle`, `stepHeading`, `body`, `marginNote`, `data`, `label`).
 
-## 10. Deployment (Fly.io)
+## 10. Deployment
+
+### API on Fly.io
 
 - **`fly.toml`:**
   - app `highnet-rag`, `primary_region = "fra"`;
-  - `[http_service]`: `internal_port = 8080`, `force_https = true`, `auto_stop_machines = "stop"`, `auto_start_machines = true`, `min_machines_running = 0`;
+  - `[http_service]`: `internal_port = 8080`, `force_https = true`, `auto_stop_machines = "stop"`, `auto_start_machines = true`, `min_machines_running = 0`, connection-based concurrency for SSE;
   - an HTTP check on `/api/health`;
   - `[[vm]]`: `size = "shared-cpu-1x"`, `memory = "512mb"`;
-  - `[mounts]`: `source = "rag_data"`, `destination = "/data"`.
-- **Dockerfile (multi-stage):**
-  1. `node:22.22.2-slim` runs `npm ci && npm run build` in `/web` and produces `web/out`.
-  2. `python:3.12-slim` plus the `uv` binary runs `uv sync --frozen --no-dev --package highnet-rag`, copies `web/out` to `/app/static`, and runs as a non-root user with `CMD uvicorn highnet_rag.app:app --host 0.0.0.0 --port 8080 --workers 1`.
+  - `[mounts]`: `source = "rag_data"`, `destination = "/data"`;
+  - `[env]`: `CORS_ORIGINS` and `CORS_ORIGIN_REGEX` for the Vercel domains.
+- **Dockerfile (API only):**
+  - `python:3.12-slim` plus the `uv` binary runs `uv sync --frozen --no-dev --package highnet-rag`.
+  - An entrypoint hands the root-owned volume to a non-root user, then runs `uvicorn highnet_rag.app:app --port 8080 --workers 1`.
 - **SSE unbuffered:**
   - the response has `Content-Type: text/event-stream`, `Cache-Control: no-cache, no-transform`, `X-Accel-Buffering: no`;
-  - no GZip middleware on `/api/query`;
-  - keep-alive comments every 15 s;
-  - Fly's proxy streams chunked responses as they are written.
-- **Secrets** (`fly secrets set`): `ANTHROPIC_API_KEY`, `VOYAGE_API_KEY`, `IP_HASH_SALT`. Everything else is a non-secret `[env]` value or a default in `config.py`.
-- **CI** (`.github/workflows/ci.yml`):
-  - an `api` job: Ruff, pyright, pytest;
-  - a `web` job: ESLint, `tsc`, Vitest, `next build`, `impeccable detect` on `web/`;
-  - a `deploy` job: `flyctl deploy --remote-only`, only on push to `main`, after both jobs pass, using the `FLY_API_TOKEN` secret.
-
-  Tests never call real APIs; providers are faked.
-
+  - no GZip middleware;
+  - keep-alive comments every 15 s.
+- **Secrets** (`fly secrets set`): `ANTHROPIC_API_KEY`, `VOYAGE_API_KEY`, `IP_HASH_SALT`.
 - **Cold start:** the machine scales to zero. The first request starts it in about 2–5 s, and the UI shows "starting the lab…" until `/api/config` answers.
+
+### Web on Vercel
+
+- A Vercel project with **Root Directory `web/`**, deploying through the GitHub integration: production on `main`, previews on every other branch and PR.
+- `web/vercel.json` pins the install and build commands and adds basic security headers.
+- `prebuild` regenerates the code excerpts from `api/src`; Vercel includes files outside the root directory by default. If those files are missing, the committed JSON is kept.
+- **Environment:** `NEXT_PUBLIC_API_BASE=https://highnet-rag.fly.dev` for Production and Preview.
+
+### CI (`.github/workflows/ci.yml`)
+
+- **`api` job:** Ruff, pyright, pytest with 100% coverage, and the trace-schema drift check.
+- **`web` job:** ESLint, `tsc`, Vitest with 100% coverage, the snippet drift check, `next build`, and `impeccable detect`.
+- **`deploy-api` job:** `flyctl deploy --remote-only` on push to `main`, after both jobs pass.
+
+Tests never call real APIs; providers are faked.
 
 ## 11. Evals
 

@@ -53,8 +53,9 @@ jobs:
         working-directory: .
         run: .claude/skills/impeccable/scripts/impeccable detect web/app web/components web/content
 
-  deploy:
-    name: Deploy to Fly.io
+  # The web app deploys through Vercel's GitHub integration (project root: web/).
+  deploy-api:
+    name: Deploy API to Fly.io
     needs: [api, web]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest

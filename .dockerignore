@@ -8,10 +8,7 @@ graphify-out
 .claude
 .impeccable
 docs
-web/node_modules
-web/.next
-web/out
-web/test
+web
 **/.env
 **/.env.*
 !.env.example
