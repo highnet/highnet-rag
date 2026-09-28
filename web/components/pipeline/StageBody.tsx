@@ -76,7 +76,7 @@ const StageBody = ({ event, context }: StageBodyProps) => {
         />
       );
     case 'citations':
-      return <CitationsView data={data as CitationsData} />;
+      return <CitationsView data={data as CitationsData} passages={context.chunks.size} />;
     default:
       return null;
   }

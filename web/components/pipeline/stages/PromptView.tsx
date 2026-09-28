@@ -6,6 +6,7 @@ import { COPY } from '@/content/copy';
 import { formatUsd } from '@/lib/format';
 import type { PromptData } from '@/lib/stage-data';
 
+import { WindowFigure } from '../figures/WindowFigure';
 import { Facts } from './Facts';
 
 type PromptViewProps = { data: PromptData };
@@ -28,6 +29,7 @@ const PromptView = ({ data }: PromptViewProps) => {
           { term: 'Worst case', value: formatUsd(data.worst_case_cost_usd) },
         ]}
       />
+      <WindowFigure data={data} />
       <blockquote className="border-l border-input pl-3">
         <Typography variant="small" color="muted" className="max-w-[72ch]">
           {data.system}

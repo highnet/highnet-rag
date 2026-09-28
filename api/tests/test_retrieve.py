@@ -1,4 +1,6 @@
-from highnet_rag.pipeline.retrieve import RRF_K, fts_query, rrf
+import math
+
+from highnet_rag.pipeline.retrieve import RRF_K, bm25_idf, fts_query, question_words, rrf
 from highnet_rag.storage.base import Hit
 
 
@@ -31,3 +33,17 @@ def test_rrf_sums_reciprocal_ranks_and_records_each_contribution() -> None:
 def test_rrf_breaks_ties_by_best_rank_then_id() -> None:
     fused = rrf({"a": [Hit(7, 1, 0), Hit(5, 2, 0)], "b": [Hit(5, 1, 0), Hit(7, 2, 0)]})
     assert [f.chunk_id for f in fused] == [5, 7]
+
+
+def test_bm25_idf_matches_fts5_and_floors_common_terms() -> None:
+    assert bm25_idf(1000, 9) == math.log((1000 - 9 + 0.5) / (9 + 0.5))
+    assert bm25_idf(1000, 9) > bm25_idf(1000, 90)
+    assert bm25_idf(10, 9) == 1e-6  # in nearly every chunk: weighs (almost) nothing
+
+
+def test_question_words_mark_stop_words() -> None:
+    assert question_words("Who founded Rome?") == [
+        {"word": "Who", "term": None},
+        {"word": "founded", "term": "founded"},
+        {"word": "Rome", "term": "rome"},
+    ]

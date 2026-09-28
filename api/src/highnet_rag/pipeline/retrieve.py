@@ -3,6 +3,7 @@
 Both are plain functions so the trace can show exactly what they produced.
 """
 
+import math
 import re
 from dataclasses import dataclass
 
@@ -33,6 +34,24 @@ def fts_query(question: str) -> tuple[str, list[str]]:
         if word not in STOPWORDS and word not in terms:
             terms.append(word)
     return " OR ".join(f'"{t}"' for t in terms), terms
+
+
+# /snippet
+
+
+def question_words(question: str) -> list[dict[str, str | None]]:
+    """Each word of the question with the search term it became, or None for a stop word."""
+    return [
+        {"word": word, "term": None if word.lower() in STOPWORDS else word.lower()}
+        for word in re.findall(r"\w+", question)
+    ]
+
+
+# snippet: bm25 | How much each term weighs
+def bm25_idf(chunks: int, containing: int) -> float:
+    """The IDF that SQLite FTS5's bm25() uses: rare terms weigh more, near-universal ones ~0."""
+    idf = math.log((chunks - containing + 0.5) / (containing + 0.5))
+    return idf if idf > 0 else 1e-6
 
 
 # /snippet

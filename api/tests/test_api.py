@@ -120,6 +120,9 @@ def test_bm25_mode_skips_the_embedding_and_shows_the_match_string(client: TestCl
     for stage in ("embed_query", "map_project", "vector", "fuse"):
         assert t[stage]["status"] == "skipped", stage
     assert t["bm25"]["data"]["fts_query"] == '"normandy" OR "located"'
+    terms = {x["term"]: x for x in t["bm25"]["data"]["terms"]}
+    assert terms["normandy"]["chunks"] >= 1 and terms["normandy"]["idf"] > 0
+    assert [w["term"] for w in t["bm25"]["data"]["words"]] == [None, None, "normandy", "located"]
     assert t["bm25"]["tokens"] == 0 and t["embed_query"]["cost_usd"] == 0
     context = t["select_context"]["data"]
     assert context["ranking"] == "bm25" and context["score_name"] == "bm25"
@@ -150,6 +153,19 @@ def test_hybrid_mode_fuses_deeper_lists_with_rrf(client: TestClient) -> None:
     assert [c["chunk_id"] for c in context["chunks"]] == [
         r["chunk_id"] for r in fuse["results"][:2]
     ]
+
+
+def test_figures_get_real_numbers(client: TestClient) -> None:
+    t = by_stage(run(client, q="Where is Normandy?", k=2))
+    budget = t["request"]["data"]["budget"]
+    assert budget["degrade_at_usd"] == budget["cap_usd"] * 0.8
+    prompt = t["prompt"]["data"]
+    assert prompt["context_window"] is None  # fake model: no documented window
+    parts = prompt["parts_approx"]
+    assert parts["passages"] == t["select_context"]["data"]["context_tokens_approx"]
+    assert parts["system"] > 0 and parts["question"] > 0
+    split = t["generate"]["data"]["cost_split"]
+    assert split == {"input_usd": 0.0, "output_usd": 0.0}  # fake models are free
 
 
 def test_changing_a_setting_changes_the_trace(client: TestClient) -> None:

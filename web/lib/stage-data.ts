@@ -14,7 +14,13 @@ export type RequestData = {
     limit_minute: number;
     limit_day: number;
   };
-  budget: { spent_usd: number; cap_usd: number; remaining_usd: number; tier: string };
+  budget: {
+    spent_usd: number;
+    cap_usd: number;
+    remaining_usd: number;
+    degrade_at_usd: number;
+    tier: string;
+  };
   error?: StageError;
 };
 
@@ -39,7 +45,8 @@ export type RankedHit = { chunk_id: number; rank: number; doc_title: string };
 
 export type Bm25Data = {
   fts_query: string;
-  terms: string[];
+  words: { word: string; term: string | null }[];
+  terms: { term: string; chunks: number; idf: number }[];
   chunk_set: string;
   searched: number;
   depth: number;
@@ -86,6 +93,8 @@ export type PromptData = ProviderModel & {
   messages: unknown[];
   input_tokens: number;
   worst_case_cost_usd: number;
+  context_window: number | null;
+  parts_approx: { system: number; passages: number; question: number };
   error?: StageError;
 };
 
@@ -93,6 +102,7 @@ export type GenerateData = ProviderModel & {
   stop_reason: string | null;
   usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens: number };
   answer: string;
+  cost_split: { input_usd: number; output_usd: number };
 };
 
 export type CitationRef = {

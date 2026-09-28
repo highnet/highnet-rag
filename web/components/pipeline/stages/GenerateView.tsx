@@ -1,6 +1,7 @@
 import { Typography } from '@/components/ui/Typography';
 import type { GenerateData } from '@/lib/stage-data';
 
+import { CostFigure } from '../figures/CostFigure';
 import { Facts } from './Facts';
 
 type GenerateViewProps = { data: GenerateData | null; streamed: string; streaming: boolean };
@@ -17,6 +18,7 @@ const GenerateView = ({ data, streamed, streaming }: GenerateViewProps) => {
           />
         )}
       </Typography>
+      {data && <CostFigure data={data} />}
       {data && (
         <Facts
           facts={[
