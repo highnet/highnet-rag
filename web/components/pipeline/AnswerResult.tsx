@@ -1,5 +1,6 @@
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
+import { EVALS } from '@/content/evals';
 import { formatMs, formatTokens, formatUsd } from '@/lib/format';
 import type { RunDone } from '@/lib/generated/trace';
 import type { CitationsData } from '@/lib/stage-data';
@@ -7,10 +8,12 @@ import type { CitationsData } from '@/lib/stage-data';
 type AnswerResultProps = {
   citations: CitationsData;
   done: RunDone | null;
+  // Where this run's settings sit in the published evals (absent before the first eval run).
+  evalsHref?: string;
 };
 
 // The last line of the calculation: the answer, with each claim tied to its passage.
-const AnswerResult = ({ citations, done }: AnswerResultProps) => {
+const AnswerResult = ({ citations, done, evalsHref }: AnswerResultProps) => {
   const sources = new Map(citations.citations.map((c) => [c.rank, c]));
   return (
     <section
@@ -65,6 +68,16 @@ const AnswerResult = ({ citations, done }: AnswerResultProps) => {
           <p className="voice-data mt-4 text-xs text-muted-foreground">
             {COPY.totals} · {formatMs(done.ms)} · {formatTokens(done.tokens)} ·{' '}
             {formatUsd(done.cost_usd)} · {COPY.stagesRun(done.stages)}
+          </p>
+        )}
+        {evalsHref && (
+          <p className="mt-3">
+            <a
+              href={evalsHref}
+              className="voice-pencil text-sm text-primary underline decoration-dotted underline-offset-4 hover:decoration-solid"
+            >
+              {EVALS.fromPipeline}
+            </a>
           </p>
         )}
       </div>

@@ -272,7 +272,9 @@ class Evaluator:
         if out.failed:
             failure = next(e for e in events if e.status == "error")
             raise RuntimeError(failure.data["error"]["message"])
-        ms = sum(e.ms for e in events)
+        # The question is embedded once per run and cached, so its time is left out everywhere:
+        # every configuration's time is comparable (search, fusion, rerank).
+        ms = sum(e.ms for e in events if e.stage != "embed_query")
         return [cid for cid, _ in out.selected], ms
 
     async def retrieval(self, questions: list[Question]) -> RetrievalResults:

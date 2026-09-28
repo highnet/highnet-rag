@@ -5,7 +5,7 @@ import { SiteHeader } from '@/components/site/SiteHeader';
 const Page = () => {
   return (
     <>
-      <SiteHeader />
+      <SiteHeader current="pipeline" />
       <main className="mx-auto w-full max-w-6xl px-4 pt-4 md:px-8 md:pt-12">
         <PipelineExplorer />
       </main>

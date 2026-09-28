@@ -359,7 +359,7 @@ describe('site chrome and primitives', () => {
   it('renders header, footer, notices and buttons', () => {
     render(
       <>
-        <SiteHeader />
+        <SiteHeader current="pipeline" />
         <SiteFooter />
         <Notice tone="warning">careful</Notice>
         <Notice tone="error">broken</Notice>
