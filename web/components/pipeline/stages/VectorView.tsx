@@ -2,6 +2,7 @@ import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { VectorData } from '@/lib/stage-data';
 
+import { DistanceFigure } from '../figures/DistanceFigure';
 import { RankTable } from './RankTable';
 
 type VectorViewProps = { data: VectorData };
@@ -12,6 +13,7 @@ const VectorView = ({ data }: VectorViewProps) => {
       <Typography variant="small" color="muted">
         {COPY.stageText.vector(data.searched.toLocaleString('en'), data.chunk_set, data.depth)}
       </Typography>
+      {data.results.length > 0 && <DistanceFigure data={data} />}
       <RankTable
         caption={COPY.stageText.captions.vector}
         series="vector"

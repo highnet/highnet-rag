@@ -95,6 +95,69 @@ export const COPY = {
     context: (n: number, ranking: string, tokens: string) =>
       `The top ${n} of the ${ranking} ranking, about ${tokens} tokens of context.`,
   },
+  // Captions ("how to read this") and text alternatives for the step figures.
+  figures: {
+    request: {
+      minute: 'This minute',
+      day: 'Today',
+      budget: 'Budget',
+      caption: 'Filled = used. The tick on the budget bar is where expensive features switch off.',
+      alt: (minute: string, day: string, spent: string, cap: string) =>
+        `Rate limit: ${minute} this minute, ${day} today. Budget: ${spent} of ${cap} spent.`,
+    },
+    embed: {
+      caption: (shown: number, dims: number) =>
+        `Each bar is one of the question’s ${dims.toLocaleString('en')} coordinates; the first ${shown} are drawn. Up is positive, down is negative.`,
+      alt: (values: string) => `First coordinates of the question vector: ${values}.`,
+    },
+    bm25: {
+      stopWord: 'stop word, dropped',
+      caption:
+        'Words in blue pencil became search terms. A longer bar means a rarer word, which counts more when it matches.',
+      inChunks: (n: number, of: string) => `in ${n.toLocaleString('en')} of ${of} chunks`,
+      alt: (terms: string) => `Search terms and their weights: ${terms}.`,
+    },
+    distance: {
+      full: 'full scale',
+      zoom: 'zoomed in',
+      caption:
+        'Top line: where the results sit on the whole 0 to 1 scale. Bottom line: the same stretch magnified, each circle a passage by rank.',
+      alt: (n: number, from: string, to: string) =>
+        `${n} passages between cosine distance ${from} and ${to}.`,
+    },
+    context: {
+      caption: 'The context, passage by passage: wider means more tokens.',
+      citedNote: 'Blue: cited in the answer.',
+      alt: (parts: string) => `Context passages by estimated tokens: ${parts}.`,
+    },
+    window: {
+      used: 'input',
+      reserved: 'room for the answer',
+      window: (n: string) => `${n}-token context window`,
+      share: (pct: string) => `${pct} of the window`,
+      noWindow: 'This model’s window size is not recorded, so only the input is drawn.',
+      parts: { system: 'system prompt', passages: 'passages', question: 'question' },
+      caption:
+        'Top: how much of the model’s window this request fills. Bottom: what the input is made of (split estimated from word counts; the total is exact).',
+      captionNoWindow:
+        'What the input is made of (split estimated from word counts; the total is exact).',
+      alt: (tokens: string, share: string) => `The request uses ${tokens} input tokens${share}.`,
+    },
+    cost: {
+      input: 'input',
+      output: 'output',
+      caption: 'Where this answer’s cost went: reading the prompt versus writing the answer.',
+      alt: (input: string, output: string) => `Input cost ${input}, output cost ${output}.`,
+    },
+    citations: {
+      sentence: 'answer text',
+      caption:
+        'Which passage backs which part of the answer. An empty column is a passage the model never cited.',
+      cited: 'cited',
+      notCited: 'not cited',
+      unused: 'unused',
+    },
+  },
   why: 'Why this step?',
   underTheHood: 'Under the hood',
   showCode: (n: number) => `Show the code (${n} ${n === 1 ? 'excerpt' : 'excerpts'})`,

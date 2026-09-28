@@ -2,6 +2,7 @@ import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { Bm25Data } from '@/lib/stage-data';
 
+import { Bm25Figure } from '../figures/Bm25Figure';
 import { RankTable } from './RankTable';
 
 type Bm25ViewProps = { data: Bm25Data };
@@ -18,6 +19,7 @@ const Bm25View = ({ data }: Bm25ViewProps) => {
           {data.fts_query || T.emptyMatch}
         </code>
       </div>
+      <Bm25Figure data={data} />
       <Typography variant="small" color="muted">
         {T.bm25(data.searched.toLocaleString('en'), data.chunk_set, data.depth)}
       </Typography>

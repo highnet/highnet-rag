@@ -37,6 +37,7 @@
     "spent_usd": 0.0,
     "cap_usd": 20.0,
     "remaining_usd": 20.0,
+    "degrade_at_usd": 16.0,
     "tier": "normal"
   },
   "corpus": {

@@ -2,14 +2,19 @@ import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import type { CitationsData } from '@/lib/stage-data';
 
-type CitationsViewProps = { data: CitationsData };
+import { CitationGrid } from '../figures/CitationGrid';
 
-const CitationsView = ({ data }: CitationsViewProps) => {
+type CitationsViewProps = { data: CitationsData; passages: number };
+
+const CitationsView = ({ data, passages }: CitationsViewProps) => {
   return (
     <div className="space-y-3">
       {data.abstained && <Typography color="success">{COPY.abstained}</Typography>}
       {!data.abstained && data.citations.length === 0 && (
         <Typography color="warning">{COPY.noCitations}</Typography>
+      )}
+      {data.citations.length > 0 && passages > 0 && (
+        <CitationGrid data={data} passages={passages} />
       )}
       {data.citations.length > 0 && (
         <ul className="space-y-2">

@@ -10,6 +10,7 @@ import { COPY } from '@/content/copy';
 import type { Bm25Data, FuseData, VectorData } from '@/lib/stage-data';
 import { cn } from '@/lib/utils';
 
+import { Bar } from '../figures/Bar';
 import { RankBadge } from './RankBadge';
 import { RankTable } from './RankTable';
 
@@ -122,6 +123,23 @@ const FuseView = ({ data, bm25, vector }: FuseViewProps) => {
                     </td>
                     <td className="voice-data py-1.5 text-right whitespace-nowrap sm:py-2">
                       {row.score.toFixed(4)}
+                      <Bar
+                        size="sm"
+                        max={2 / (data.k + 1)}
+                        className="my-1 ml-auto w-20"
+                        segments={[
+                          {
+                            key: 'bm25',
+                            value: row.contributions.bm25 ?? 0,
+                            tone: below ? 'neutral' : 'bm25',
+                          },
+                          {
+                            key: 'vector',
+                            value: row.contributions.vector ?? 0,
+                            tone: below ? 'neutral' : 'vector',
+                          },
+                        ]}
+                      />
                       <span className="block text-xs text-muted-foreground">
                         {T.contributions(
                           formatContribution(row.contributions.bm25),

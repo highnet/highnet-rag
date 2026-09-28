@@ -35,7 +35,16 @@ describe('keyword search and fusion', () => {
     body(
       ev('bm25', {
         fts_query: '"normandy" OR "located"',
-        terms: ['normandy', 'located'],
+        words: [
+          { word: 'Where', term: null },
+          { word: 'is', term: null },
+          { word: 'Normandy', term: 'normandy' },
+          { word: 'located', term: 'located' },
+        ],
+        terms: [
+          { term: 'normandy', chunks: 3, idf: 1.2 },
+          { term: 'located', chunks: 5, idf: 0.8 },
+        ],
         chunk_set: 'small',
         searched: 12,
         depth: 1,
@@ -44,11 +53,21 @@ describe('keyword search and fusion', () => {
     );
     expect(screen.getByText('"normandy" OR "located"')).toBeInTheDocument();
     expect(screen.getByText('7.50')).toBeInTheDocument();
+    expect(screen.getByText(/idf 1\.20 · in 3 of 12 chunks/)).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /normandy 1\.20, located 0\.80/ })).toBeInTheDocument();
     expect(screen.getByText('BM25 rank 1')).toBeInTheDocument();
     body(
       ev(
         'bm25',
-        { fts_query: '', terms: [], chunk_set: 'small', searched: 12, depth: 1, results: [] },
+        {
+          fts_query: '',
+          words: [{ word: 'What', term: null }],
+          terms: [],
+          chunk_set: 'small',
+          searched: 12,
+          depth: 1,
+          results: [],
+        },
         'warning',
       ),
     );
@@ -82,7 +101,8 @@ describe('keyword search and fusion', () => {
           ...context,
           bm25: {
             fts_query: '"x"',
-            terms: ['x'],
+            words: [],
+            terms: [],
             chunk_set: 'medium',
             searched: 2,
             depth: 2,
@@ -136,7 +156,7 @@ describe('stage bodies', () => {
         'request',
         {
           rate_limit: { remaining_minute: 0, limit_minute: 20, remaining_day: 5, limit_day: 200 },
-          budget: { spent_usd: 20, cap_usd: 20, tier: 'stopped' },
+          budget: { spent_usd: 20, cap_usd: 20, degrade_at_usd: 16, tier: 'stopped' },
           models: { embed: { model: 'e' }, answer: { model: 'a' } },
           error: { type: 'budget_exhausted', message: 'Budget used up.' },
         },
@@ -144,14 +164,24 @@ describe('stage bodies', () => {
       ),
     );
     expect(screen.getByText('Budget used up.')).toBeInTheDocument();
-    expect(screen.getByText(/0\/20 left this minute/)).toBeInTheDocument();
+    expect(screen.getByText('20/20')).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: /20 of 20 this minute, 195 of 200 today/ }),
+    ).toBeInTheDocument();
   });
 
   it('renders embedding, map, vector, prompt and generate details', () => {
     body(
-      ev('embed_query', { provider: 'p', model: 'm', dims: 16, norm: 1, vector_preview: [0.5] }),
+      ev('embed_query', {
+        provider: 'p',
+        model: 'm',
+        dims: 16,
+        norm: 1,
+        vector_preview: [0.5, -0.25],
+      }),
     );
-    expect(screen.getByText(/0\.5000, … 8 more/)).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /0\.5000, -0\.2500/ })).toBeInTheDocument();
+    expect(screen.getByText('-0.250')).toBeInTheDocument();
     body(ev('map_project', { x: 1, y: 2, explained_variance: [0.1, 0.05], neighbours_2d: [3] }));
     expect(screen.getByText(/15\.0%/)).toBeInTheDocument();
     body(ev('map_project', { error: { type: 'L', message: 'No PCA stored' } }, 'warning'));
@@ -178,6 +208,8 @@ describe('stage bodies', () => {
           messages: [],
           input_tokens: 5,
           worst_case_cost_usd: 1,
+          context_window: null,
+          parts_approx: { system: 3, passages: 1, question: 1 },
           error: { type: 'budget_guard', message: 'Could overspend.' },
         },
         'error',
@@ -195,6 +227,7 @@ describe('stage bodies', () => {
         stop_reason: null,
         answer: 'France.',
         usage: { input_tokens: 1, output_tokens: 2, cache_read_input_tokens: 0 },
+        cost_split: { input_usd: 0, output_usd: 0 },
       }),
     );
     expect(screen.getByText('unknown')).toBeInTheDocument();
