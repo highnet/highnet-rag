@@ -104,6 +104,7 @@ def test_record_fake_writes_recordings_and_fails_loudly(
 
     monkeypatch.setattr("highnet_rag.recordings.record", failing)
     monkeypatch.setenv("CORPUS_DB_PATH", str(corpus_path))
+    get_settings.cache_clear()
     with pytest.raises(SystemExit):
         run_cli(monkeypatch, "record", "--questions", str(questions), "--out", str(out))
     get_settings.cache_clear()
