@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import EvalsPage from '@/app/evals/page';
 import { EvalsReport } from '@/components/evals/EvalsReport';
 import { AnswerResult } from '@/components/pipeline/AnswerResult';
+import { COPY } from '@/content/copy';
 import { EVALS } from '@/content/evals';
 import {
   detailsUrl,
@@ -112,7 +113,11 @@ describe('evals page', () => {
     unmount();
     render(<EvalsPage />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(EVALS.title);
-    expect(screen.getByRole('link', { name: 'Evals' })).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(screen.getByRole('navigation', { name: COPY.nav.label })).getByRole('link', {
+        name: 'Evals',
+      }),
+    ).toHaveAttribute('aria-current', 'page');
   });
 
   it('renders on the server without a highlight, and names unknown modes as they are', () => {

@@ -62,19 +62,23 @@ const Arrow = () => (
 type PipelineDiagramProps = {
   order: Stage[];
   statusOf: (stage: Stage) => StepStatus;
+  className?: string;
 };
 
 // The whole system on one figure: what was built ahead of time, then every step a question
 // goes through, in the order of the steps below. It follows the current run as it streams.
-const PipelineDiagram = ({ order, statusOf }: PipelineDiagramProps) => {
+const PipelineDiagram = ({ order, statusOf, className }: PipelineDiagramProps) => {
   const number = (stage: Stage) => order.indexOf(stage) + 1;
   return (
-    <figure aria-labelledby="diagram-title" className="space-y-3 border-y border-dashed py-4">
+    <figure
+      aria-labelledby="diagram-title"
+      className={cn('@container space-y-3 border-y border-dashed py-4', className)}
+    >
       <Typography variant="label" as="figcaption" id="diagram-title">
         {D.title}
       </Typography>
 
-      <div className="grid gap-x-4 gap-y-1 md:grid-cols-[9rem_minmax(0,1fr)]">
+      <div className="grid gap-x-4 gap-y-1 @2xl:grid-cols-[9rem_minmax(0,1fr)]">
         <Typography variant="label" color="muted" as="p" className="pt-1.5">
           {D.offline}
         </Typography>
@@ -89,7 +93,7 @@ const PipelineDiagram = ({ order, statusOf }: PipelineDiagramProps) => {
           ))}
         </ol>
 
-        <Typography variant="label" color="muted" as="p" className="pt-3 md:pt-1.5">
+        <Typography variant="label" color="muted" as="p" className="pt-3 @2xl:pt-1.5">
           {D.online}
         </Typography>
         <ol className="flex flex-wrap items-center gap-x-1 gap-y-1.5">

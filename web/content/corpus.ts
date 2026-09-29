@@ -3,7 +3,7 @@
 export const CORPUS = {
   sheetLabel: 'Sheet 3',
   title: 'The corpus',
-  metaTitle: 'Corpus · highnet-rag',
+  metaTitle: 'Corpus: the 35 Wikipedia articles',
   metaDescription:
     'The 35 Wikipedia articles highnet-rag answers from, with the text of each and where its chunks fall at every chunk size.',
   lede: 'Every answer comes from these 35 English Wikipedia articles, the SQuAD 2.0 dev set (CC BY-SA 4.0). Before any question is asked, we cut each article into chunks at three sizes. The searches only ever see chunks, never whole articles. Pick an article to read it and see where its chunks fall.',

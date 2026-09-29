@@ -25,6 +25,7 @@ import { parseUrlState, type RunSettings, writeUrlState } from '@/lib/url-state'
 
 import { AnswerResult } from './AnswerResult';
 import { PipelineDiagram } from './PipelineDiagram';
+import { PipelineHero } from './PipelineHero';
 import { QuestionForm } from './QuestionForm';
 import { QuestionPicker } from './QuestionPicker';
 import { SettingsStrip } from './SettingsStrip';
@@ -187,29 +188,24 @@ const PipelineExplorer = () => {
 
   return (
     <div className="space-y-8 md:space-y-10">
-      <section aria-labelledby="sheet-title" className="space-y-4 md:space-y-5">
-        <dl className="max-w-[68ch]">
-          <dt className="flex flex-wrap items-baseline gap-x-2">
-            <Typography variant="data" as="dfn" className="text-base font-semibold not-italic">
-              {COPY.rag.term}
-            </Typography>
-            <Typography variant="small" color="muted" as="span">
-              {COPY.rag.expansion}
-            </Typography>
-          </dt>
-          <dd className="mt-1">
-            <Typography>{COPY.rag.definition}</Typography>
-          </dd>
-        </dl>
-        <Typography color="muted" className="max-w-[68ch]">
-          {replay
+      <PipelineHero
+        intro={
+          replay
             ? config.illustrative
               ? COPY.replay.introIllustrative
               : COPY.replay.intro
-            : COPY.intro}
-        </Typography>
-        <PipelineDiagram order={order} statusOf={stepStatuses(order, trace.events, trace.status)} />
-        <Typography variant="sheetTitle" id="sheet-title">
+            : COPY.intro
+        }
+        diagram={
+          <PipelineDiagram
+            order={order}
+            statusOf={stepStatuses(order, trace.events, trace.status)}
+            className="rounded-md border border-solid px-4 md:px-5"
+          />
+        }
+      />
+      <section aria-labelledby="sheet-title" className="space-y-4 md:space-y-5">
+        <Typography variant="sheetTitle" as="h2" id="sheet-title">
           <span className="voice-data mr-3 align-[0.2em] text-sm font-normal tracking-normal text-muted-foreground">
             {COPY.sheetLabel} ·
           </span>

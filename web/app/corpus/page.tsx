@@ -4,11 +4,13 @@ import { CorpusBrowser } from '@/components/corpus/CorpusBrowser';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { CORPUS } from '@/content/corpus';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: CORPUS.metaTitle,
-  description: CORPUS.metaDescription,
-};
+export const metadata: Metadata = pageMetadata(
+  '/corpus/',
+  CORPUS.metaTitle,
+  CORPUS.metaDescription,
+);
 
 const CorpusPage = () => {
   return (

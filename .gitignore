@@ -81,3 +81,7 @@ graphify-out/
 .claude/settings.local.json
 .coverage
 .coverage.*
+
+# Coverage reports written by CI's test run (scripts/coverage_report.py reads them)
+/coverage.json
+/junit.xml
