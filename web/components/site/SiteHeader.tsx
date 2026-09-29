@@ -12,8 +12,9 @@ type SiteHeaderProps = {
 
 const SiteHeader = ({ current }: SiteHeaderProps) => {
   return (
-    <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 pt-4 pb-1 md:px-8 md:pt-5 md:pb-2">
-      <div className="flex min-w-0 items-baseline gap-3">
+    <header className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-4 pb-1 md:px-8 md:pt-5 md:pb-2">
+      {/* When large text leaves no room, the links wrap under the name instead of overlapping it. */}
+      <div className="flex shrink-0 items-baseline gap-3">
         <Typography variant="data" as="span" className="text-base font-semibold whitespace-nowrap">
           {COPY.siteName}
         </Typography>
@@ -21,7 +22,7 @@ const SiteHeader = ({ current }: SiteHeaderProps) => {
           {COPY.tagline}
         </Typography>
       </div>
-      <div className="flex items-center gap-1 sm:gap-3">
+      <div className="-ml-1.5 flex flex-wrap items-center gap-1 sm:gap-3">
         <nav aria-label={COPY.nav.label}>
           <ul className="flex items-center sm:gap-1">
             {COPY.nav.links.map((link) => (
