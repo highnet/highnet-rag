@@ -30,7 +30,7 @@ const AlgebraKey = ({ agentic }: AlgebraKeyProps) => {
         </Typography>
         {GROUPS.map((group) => (
           <div key={group}>
-            <Typography variant="label" color="muted" as="h3">
+            <Typography variant="label" color="muted" as="h2">
               {FORMAL.groups[group]}
             </Typography>
             <dl className="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -54,7 +54,7 @@ const AlgebraKey = ({ agentic }: AlgebraKeyProps) => {
           </div>
         ))}
         <div>
-          <Typography variant="label" color="muted" as="h3">
+          <Typography variant="label" color="muted" as="h2">
             {FORMAL.whole}
           </Typography>
           <Formula

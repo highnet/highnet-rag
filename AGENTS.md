@@ -43,6 +43,9 @@ npm run lint && npm run typecheck && npm test
 npm run gen:snippets                      # re-extract live code excerpts from api/src
 npm run build                             # static export to web/out (runs gen:snippets first)
 
+# Coverage report for /coverage (from repo root; CI fails if it is stale)
+scripts/gen-coverage.sh                   # runs pytest + vitest, writes web/lib/generated/coverage.json
+
 # Design
 .claude/skills/impeccable/scripts/impeccable detect web/   # must report zero findings
 

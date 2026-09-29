@@ -9,13 +9,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./test/setup.ts'],
     include: ['test/**/*.test.{ts,tsx}'],
+    // The JSON reports feed the /coverage page (scripts/coverage_report.py).
+    reporters: ['default', ['json', { outputFile: 'coverage/tests.json' }]],
     coverage: {
       provider: 'v8',
       include: ['app/**', 'components/**', 'content/**', 'lib/**'],
       // Generated from the Python source (types, snippets) and CSS: not hand-written logic.
       exclude: ['lib/generated/**', '**/*.css', '**/*.svg'],
       thresholds: { lines: 100, branches: 100, functions: 100, statements: 100 },
-      reporter: ['text'],
+      reporter: ['text', 'json-summary'],
     },
   },
   resolve: {

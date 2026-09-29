@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import CorpusPage from '@/app/corpus/page';
 import { ArticleText } from '@/components/corpus/ArticleText';
+import { COPY } from '@/content/copy';
 import { CORPUS } from '@/content/corpus';
 import type { CorpusDocument, CorpusDocuments } from '@/lib/api';
 import { chunkSegments } from '@/lib/chunk-segments';
@@ -66,7 +67,11 @@ describe('corpus page', () => {
     serve();
     window.history.replaceState(null, '', '/corpus/?doc=2&chunks=small');
     render(<CorpusPage />);
-    expect(screen.getByRole('link', { name: 'Corpus' })).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(screen.getByRole('navigation', { name: COPY.nav.label })).getByRole('link', {
+        name: 'Corpus',
+      }),
+    ).toHaveAttribute('aria-current', 'page');
     expect(await screen.findByRole('heading', { name: 'Oxygen' })).toBeInTheDocument();
     expect(screen.getByText(CORPUS.listMeta(2, 30))).toBeInTheDocument();
   });

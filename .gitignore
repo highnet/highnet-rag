@@ -11,7 +11,9 @@ node_modules/
 !.yarn/versions
 
 # testing
-coverage/
+# Test coverage reports (anchored: web/app/coverage and web/components/coverage are source)
+/coverage/
+/web/coverage/
 .nyc_output
 
 # next.js
@@ -81,3 +83,7 @@ graphify-out/
 .claude/settings.local.json
 .coverage
 .coverage.*
+
+# Coverage reports written by CI's test run (scripts/coverage_report.py reads them)
+/coverage.json
+/junit.xml

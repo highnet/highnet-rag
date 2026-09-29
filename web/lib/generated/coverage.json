@@ -1,0 +1,1440 @@
+{
+  "python": {
+    "runner": "pytest + coverage.py",
+    "tests": 117,
+    "packages": [
+      {
+        "name": "api",
+        "root": "api/src/highnet_rag",
+        "totals": {
+          "lines": {
+            "covered": 1681,
+            "total": 1681
+          },
+          "branches": {
+            "covered": 280,
+            "total": 280
+          }
+        },
+        "empty_files": 4,
+        "files": [
+          {
+            "path": "app.py",
+            "lines": {
+              "covered": 147,
+              "total": 147
+            },
+            "branches": {
+              "covered": 38,
+              "total": 38
+            }
+          },
+          {
+            "path": "budget.py",
+            "lines": {
+              "covered": 42,
+              "total": 42
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "cli.py",
+            "lines": {
+              "covered": 94,
+              "total": 94
+            },
+            "branches": {
+              "covered": 12,
+              "total": 12
+            }
+          },
+          {
+            "path": "config.py",
+            "lines": {
+              "covered": 55,
+              "total": 55
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "ingest/build.py",
+            "lines": {
+              "covered": 77,
+              "total": 77
+            },
+            "branches": {
+              "covered": 14,
+              "total": 14
+            }
+          },
+          {
+            "path": "ingest/chunk.py",
+            "lines": {
+              "covered": 52,
+              "total": 52
+            },
+            "branches": {
+              "covered": 14,
+              "total": 14
+            }
+          },
+          {
+            "path": "ingest/pca.py",
+            "lines": {
+              "covered": 11,
+              "total": 11
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "ingest/squad.py",
+            "lines": {
+              "covered": 39,
+              "total": 39
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "pipeline/agent.py",
+            "lines": {
+              "covered": 112,
+              "total": 112
+            },
+            "branches": {
+              "covered": 34,
+              "total": 34
+            }
+          },
+          {
+            "path": "pipeline/classic.py",
+            "lines": {
+              "covered": 107,
+              "total": 107
+            },
+            "branches": {
+              "covered": 30,
+              "total": 30
+            }
+          },
+          {
+            "path": "pipeline/deps.py",
+            "lines": {
+              "covered": 30,
+              "total": 30
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "pipeline/prompt.py",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "pipeline/retrieve.py",
+            "lines": {
+              "covered": 35,
+              "total": 35
+            },
+            "branches": {
+              "covered": 10,
+              "total": 10
+            }
+          },
+          {
+            "path": "pipeline/search.py",
+            "lines": {
+              "covered": 132,
+              "total": 132
+            },
+            "branches": {
+              "covered": 20,
+              "total": 20
+            }
+          },
+          {
+            "path": "pricing.py",
+            "lines": {
+              "covered": 18,
+              "total": 18
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "providers/__init__.py",
+            "lines": {
+              "covered": 20,
+              "total": 20
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "providers/base.py",
+            "lines": {
+              "covered": 70,
+              "total": 70
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "providers/cache.py",
+            "lines": {
+              "covered": 58,
+              "total": 58
+            },
+            "branches": {
+              "covered": 16,
+              "total": 16
+            }
+          },
+          {
+            "path": "providers/claude.py",
+            "lines": {
+              "covered": 49,
+              "total": 49
+            },
+            "branches": {
+              "covered": 12,
+              "total": 12
+            }
+          },
+          {
+            "path": "providers/fake.py",
+            "lines": {
+              "covered": 84,
+              "total": 84
+            },
+            "branches": {
+              "covered": 18,
+              "total": 18
+            }
+          },
+          {
+            "path": "providers/voyage.py",
+            "lines": {
+              "covered": 54,
+              "total": 54
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "recordings.py",
+            "lines": {
+              "covered": 125,
+              "total": 125
+            },
+            "branches": {
+              "covered": 22,
+              "total": 22
+            }
+          },
+          {
+            "path": "storage/base.py",
+            "lines": {
+              "covered": 68,
+              "total": 68
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "storage/sqlite.py",
+            "lines": {
+              "covered": 138,
+              "total": 138
+            },
+            "branches": {
+              "covered": 12,
+              "total": 12
+            }
+          },
+          {
+            "path": "trace.py",
+            "lines": {
+              "covered": 57,
+              "total": 57
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          }
+        ]
+      },
+      {
+        "name": "evals",
+        "root": "evals/src/highnet_rag_evals",
+        "totals": {
+          "lines": {
+            "covered": 550,
+            "total": 550
+          },
+          "branches": {
+            "covered": 52,
+            "total": 52
+          }
+        },
+        "empty_files": 1,
+        "files": [
+          {
+            "path": "cli.py",
+            "lines": {
+              "covered": 72,
+              "total": 72
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "golden.py",
+            "lines": {
+              "covered": 62,
+              "total": 62
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "judge.py",
+            "lines": {
+              "covered": 49,
+              "total": 49
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "metrics.py",
+            "lines": {
+              "covered": 14,
+              "total": 14
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "results.py",
+            "lines": {
+              "covered": 104,
+              "total": 104
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "runner.py",
+            "lines": {
+              "covered": 249,
+              "total": 249
+            },
+            "branches": {
+              "covered": 32,
+              "total": 32
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "web": {
+    "runner": "Vitest + V8",
+    "tests": 133,
+    "packages": [
+      {
+        "name": "web",
+        "root": "web",
+        "totals": {
+          "lines": {
+            "covered": 1169,
+            "total": 1169
+          },
+          "branches": {
+            "covered": 1005,
+            "total": 1005
+          }
+        },
+        "empty_files": 2,
+        "files": [
+          {
+            "path": "app/corpus/page.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "app/coverage/page.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "app/evals/page.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "app/layout.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "app/og.png/route.tsx",
+            "lines": {
+              "covered": 15,
+              "total": 15
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "app/page.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "app/robots.ts",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "app/sitemap.ts",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/corpus/ArticleText.tsx",
+            "lines": {
+              "covered": 6,
+              "total": 6
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/corpus/CorpusBrowser.tsx",
+            "lines": {
+              "covered": 55,
+              "total": 55
+            },
+            "branches": {
+              "covered": 35,
+              "total": 35
+            }
+          },
+          {
+            "path": "components/coverage/CoverageReport.tsx",
+            "lines": {
+              "covered": 19,
+              "total": 19
+            },
+            "branches": {
+              "covered": 20,
+              "total": 20
+            }
+          },
+          {
+            "path": "components/evals/AnswersSection.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/evals/CompoundSection.tsx",
+            "lines": {
+              "covered": 18,
+              "total": 18
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/evals/EvalSection.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/evals/EvalsReport.tsx",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 16,
+              "total": 16
+            }
+          },
+          {
+            "path": "components/evals/Measure.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 7,
+              "total": 7
+            }
+          },
+          {
+            "path": "components/evals/NotMeasured.tsx",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/evals/RetrievalSection.tsx",
+            "lines": {
+              "covered": 34,
+              "total": 34
+            },
+            "branches": {
+              "covered": 22,
+              "total": 22
+            }
+          },
+          {
+            "path": "components/evals/RunCostSection.tsx",
+            "lines": {
+              "covered": 6,
+              "total": 6
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/formal/AlgebraKey.tsx",
+            "lines": {
+              "covered": 6,
+              "total": 6
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/formal/Formula.tsx",
+            "lines": {
+              "covered": 21,
+              "total": 21
+            },
+            "branches": {
+              "covered": 14,
+              "total": 14
+            }
+          },
+          {
+            "path": "components/pipeline/AnswerResult.tsx",
+            "lines": {
+              "covered": 6,
+              "total": 6
+            },
+            "branches": {
+              "covered": 8,
+              "total": 8
+            }
+          },
+          {
+            "path": "components/pipeline/CodeSnippet.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/pipeline/PipelineDiagram.tsx",
+            "lines": {
+              "covered": 19,
+              "total": 19
+            },
+            "branches": {
+              "covered": 19,
+              "total": 19
+            }
+          },
+          {
+            "path": "components/pipeline/PipelineExplorer.tsx",
+            "lines": {
+              "covered": 69,
+              "total": 69
+            },
+            "branches": {
+              "covered": 119,
+              "total": 119
+            }
+          },
+          {
+            "path": "components/pipeline/PipelineHero.tsx",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/pipeline/QuestionForm.tsx",
+            "lines": {
+              "covered": 19,
+              "total": 19
+            },
+            "branches": {
+              "covered": 26,
+              "total": 26
+            }
+          },
+          {
+            "path": "components/pipeline/QuestionPicker.tsx",
+            "lines": {
+              "covered": 15,
+              "total": 15
+            },
+            "branches": {
+              "covered": 22,
+              "total": 22
+            }
+          },
+          {
+            "path": "components/pipeline/Readout.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/pipeline/SettingsStrip.tsx",
+            "lines": {
+              "covered": 17,
+              "total": 17
+            },
+            "branches": {
+              "covered": 35,
+              "total": 35
+            }
+          },
+          {
+            "path": "components/pipeline/StageBody.tsx",
+            "lines": {
+              "covered": 20,
+              "total": 20
+            },
+            "branches": {
+              "covered": 20,
+              "total": 20
+            }
+          },
+          {
+            "path": "components/pipeline/StatusMark.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/pipeline/StepList.tsx",
+            "lines": {
+              "covered": 24,
+              "total": 24
+            },
+            "branches": {
+              "covered": 25,
+              "total": 25
+            }
+          },
+          {
+            "path": "components/pipeline/StepSheet.tsx",
+            "lines": {
+              "covered": 12,
+              "total": 12
+            },
+            "branches": {
+              "covered": 43,
+              "total": 43
+            }
+          },
+          {
+            "path": "components/pipeline/WhyThisStep.tsx",
+            "lines": {
+              "covered": 6,
+              "total": 6
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/pipeline/figures/Bar.tsx",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/pipeline/figures/Bm25Figure.tsx",
+            "lines": {
+              "covered": 10,
+              "total": 10
+            },
+            "branches": {
+              "covered": 8,
+              "total": 8
+            }
+          },
+          {
+            "path": "components/pipeline/figures/CitationGrid.tsx",
+            "lines": {
+              "covered": 9,
+              "total": 9
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "components/pipeline/figures/ContextFigure.tsx",
+            "lines": {
+              "covered": 11,
+              "total": 11
+            },
+            "branches": {
+              "covered": 8,
+              "total": 8
+            }
+          },
+          {
+            "path": "components/pipeline/figures/CorpusMap.tsx",
+            "lines": {
+              "covered": 126,
+              "total": 126
+            },
+            "branches": {
+              "covered": 73,
+              "total": 73
+            }
+          },
+          {
+            "path": "components/pipeline/figures/CostFigure.tsx",
+            "lines": {
+              "covered": 4,
+              "total": 4
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/pipeline/figures/DistanceFigure.tsx",
+            "lines": {
+              "covered": 13,
+              "total": 13
+            },
+            "branches": {
+              "covered": 10,
+              "total": 10
+            }
+          },
+          {
+            "path": "components/pipeline/figures/EmbedFigure.tsx",
+            "lines": {
+              "covered": 9,
+              "total": 9
+            },
+            "branches": {
+              "covered": 8,
+              "total": 8
+            }
+          },
+          {
+            "path": "components/pipeline/figures/Figure.tsx",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/pipeline/figures/RequestFigure.tsx",
+            "lines": {
+              "covered": 9,
+              "total": 9
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/pipeline/figures/WindowFigure.tsx",
+            "lines": {
+              "covered": 11,
+              "total": 11
+            },
+            "branches": {
+              "covered": 14,
+              "total": 14
+            }
+          },
+          {
+            "path": "components/pipeline/stages/AgentPlanView.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/pipeline/stages/AgentStepsView.tsx",
+            "lines": {
+              "covered": 12,
+              "total": 12
+            },
+            "branches": {
+              "covered": 21,
+              "total": 21
+            }
+          },
+          {
+            "path": "components/pipeline/stages/Bm25View.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/pipeline/stages/CitationsView.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 12,
+              "total": 12
+            }
+          },
+          {
+            "path": "components/pipeline/stages/ContextView.tsx",
+            "lines": {
+              "covered": 4,
+              "total": 4
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/pipeline/stages/EmbedView.tsx",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/pipeline/stages/Facts.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/pipeline/stages/FuseView.tsx",
+            "lines": {
+              "covered": 14,
+              "total": 14
+            },
+            "branches": {
+              "covered": 29,
+              "total": 29
+            }
+          },
+          {
+            "path": "components/pipeline/stages/GenerateView.tsx",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 10,
+              "total": 10
+            }
+          },
+          {
+            "path": "components/pipeline/stages/MapView.tsx",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/pipeline/stages/PromptView.tsx",
+            "lines": {
+              "covered": 4,
+              "total": 4
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/pipeline/stages/RankBadge.tsx",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 15,
+              "total": 15
+            }
+          },
+          {
+            "path": "components/pipeline/stages/RankTable.tsx",
+            "lines": {
+              "covered": 4,
+              "total": 4
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "components/pipeline/stages/RequestView.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/pipeline/stages/RerankView.tsx",
+            "lines": {
+              "covered": 18,
+              "total": 18
+            },
+            "branches": {
+              "covered": 30,
+              "total": 30
+            }
+          },
+          {
+            "path": "components/pipeline/stages/SkippedView.tsx",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/pipeline/stages/VectorView.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/site/HeaderBar.tsx",
+            "lines": {
+              "covered": 9,
+              "total": 9
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/site/Notice.tsx",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "components/site/SiteFooter.tsx",
+            "lines": {
+              "covered": 6,
+              "total": 6
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/site/SiteHeader.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "components/site/ThemeToggle.tsx",
+            "lines": {
+              "covered": 18,
+              "total": 18
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "components/ui/Button.tsx",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "components/ui/Collapsible.tsx",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/ui/Input.tsx",
+            "lines": {
+              "covered": 2,
+              "total": 2
+            },
+            "branches": {
+              "covered": 1,
+              "total": 1
+            }
+          },
+          {
+            "path": "components/ui/SegmentedControl.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "components/ui/Typography.tsx",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          {
+            "path": "content/copy.ts",
+            "lines": {
+              "covered": 60,
+              "total": 60
+            },
+            "branches": {
+              "covered": 22,
+              "total": 22
+            }
+          },
+          {
+            "path": "content/corpus.ts",
+            "lines": {
+              "covered": 8,
+              "total": 8
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "content/coverage.ts",
+            "lines": {
+              "covered": 8,
+              "total": 8
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "content/evals.ts",
+            "lines": {
+              "covered": 18,
+              "total": 18
+            },
+            "branches": {
+              "covered": 30,
+              "total": 30
+            }
+          },
+          {
+            "path": "content/formal.ts",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "content/stages.ts",
+            "lines": {
+              "covered": 3,
+              "total": 3
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "lib/agent.ts",
+            "lines": {
+              "covered": 11,
+              "total": 11
+            },
+            "branches": {
+              "covered": 9,
+              "total": 9
+            }
+          },
+          {
+            "path": "lib/api.ts",
+            "lines": {
+              "covered": 26,
+              "total": 26
+            },
+            "branches": {
+              "covered": 10,
+              "total": 10
+            }
+          },
+          {
+            "path": "lib/chunk-segments.ts",
+            "lines": {
+              "covered": 9,
+              "total": 9
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "lib/coverage.ts",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "lib/evals.ts",
+            "lines": {
+              "covered": 20,
+              "total": 20
+            },
+            "branches": {
+              "covered": 15,
+              "total": 15
+            }
+          },
+          {
+            "path": "lib/format.ts",
+            "lines": {
+              "covered": 9,
+              "total": 9
+            },
+            "branches": {
+              "covered": 9,
+              "total": 9
+            }
+          },
+          {
+            "path": "lib/formula.ts",
+            "lines": {
+              "covered": 8,
+              "total": 8
+            },
+            "branches": {
+              "covered": 12,
+              "total": 12
+            }
+          },
+          {
+            "path": "lib/map-labels.ts",
+            "lines": {
+              "covered": 28,
+              "total": 28
+            },
+            "branches": {
+              "covered": 25,
+              "total": 25
+            }
+          },
+          {
+            "path": "lib/site.ts",
+            "lines": {
+              "covered": 7,
+              "total": 7
+            },
+            "branches": {
+              "covered": 6,
+              "total": 6
+            }
+          },
+          {
+            "path": "lib/snippets.ts",
+            "lines": {
+              "covered": 5,
+              "total": 5
+            },
+            "branches": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          {
+            "path": "lib/step-status.ts",
+            "lines": {
+              "covered": 16,
+              "total": 16
+            },
+            "branches": {
+              "covered": 20,
+              "total": 20
+            }
+          },
+          {
+            "path": "lib/step-summary.ts",
+            "lines": {
+              "covered": 32,
+              "total": 32
+            },
+            "branches": {
+              "covered": 35,
+              "total": 35
+            }
+          },
+          {
+            "path": "lib/url-state.ts",
+            "lines": {
+              "covered": 24,
+              "total": 24
+            },
+            "branches": {
+              "covered": 24,
+              "total": 24
+            }
+          },
+          {
+            "path": "lib/use-media-query.ts",
+            "lines": {
+              "covered": 9,
+              "total": 9
+            },
+            "branches": {
+              "covered": 0,
+              "total": 0
+            }
+          },
+          {
+            "path": "lib/use-trace-stream.ts",
+            "lines": {
+              "covered": 36,
+              "total": 36
+            },
+            "branches": {
+              "covered": 8,
+              "total": 8
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

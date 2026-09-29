@@ -31,7 +31,11 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pyright
-      - run: uv run pytest
+      - run: uv run pytest --cov-report=json:coverage.json --junitxml=junit.xml
+      - name: The /coverage page matches this test run
+        run: |
+          python3 scripts/coverage_report.py python --coverage coverage.json --junit junit.xml
+          git diff --exit-code web/lib/generated/coverage.json
       - name: Trace and eval-results schemas are up to date
         run: |
           uv run highnet-rag schema
@@ -63,6 +67,10 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test # Vitest with 100% coverage thresholds
+      - name: The /coverage page matches this test run
+        run: |
+          python3 ../scripts/coverage_report.py web --summary coverage/coverage-summary.json --tests coverage/tests.json
+          git diff --exit-code lib/generated/coverage.json
       - run: npm run build
       - name: Impeccable design detector (zero findings required)
         working-directory: .

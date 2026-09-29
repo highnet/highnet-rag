@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 const typographyVariants = cva('', {
   variants: {
     variant: {
+      display:
+        'text-[clamp(2rem,1.4rem+2.4vw,3.5rem)] leading-[1.04] font-[650] tracking-[-0.02em] text-balance',
       sheetTitle:
         'text-[clamp(1.5rem,1.2rem+1.5vw,2.25rem)] leading-[1.1] font-[650] tracking-[-0.01em] text-balance',
       stepHeading: 'text-lg leading-snug font-semibold',
@@ -36,6 +38,7 @@ const typographyVariants = cva('', {
 });
 
 const defaultElement: Record<string, ElementType> = {
+  display: 'h1',
   sheetTitle: 'h1',
   stepHeading: 'h3',
   body: 'p',

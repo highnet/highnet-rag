@@ -155,7 +155,7 @@ const CorpusBrowser = () => {
               </select>
             </label>
 
-            <nav aria-label={CORPUS.articlesLabel} className="hidden lg:sticky lg:top-4 lg:block">
+            <nav aria-label={CORPUS.articlesLabel} className="hidden lg:sticky lg:top-20 lg:block">
               <Typography variant="label" color="muted" as="p">
                 {CORPUS.articleCount(list.data.documents.length)}
               </Typography>

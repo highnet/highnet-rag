@@ -4,6 +4,7 @@ import { type ReactNode } from 'react';
 
 import { themeScript } from '@/components/site/ThemeToggle';
 import { COPY } from '@/content/copy';
+import { SITE_DESCRIPTION, SITE_URL, structuredData } from '@/lib/site';
 
 import './globals.css';
 
@@ -15,9 +16,20 @@ const recursive = Recursive({
 });
 
 export const metadata: Metadata = {
-  title: `${COPY.siteName}: ${COPY.tagline}`,
-  description:
-    'A transparent RAG teaching tool: every step between a question and its cited answer, traced live with timing, tokens and cost.',
+  metadataBase: new URL(SITE_URL),
+  title: { default: `${COPY.siteName}: ${COPY.tagline}`, template: `%s · ${COPY.siteName}` },
+  description: SITE_DESCRIPTION,
+  applicationName: COPY.siteName,
+  authors: [{ name: 'highnet', url: 'https://highnet.at' }],
+  keywords: [
+    'RAG',
+    'retrieval-augmented generation',
+    'BM25',
+    'vector search',
+    'reranking',
+    'Claude',
+  ],
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
@@ -37,7 +49,13 @@ const RootLayout = ({ children }: RootLayoutProps) => {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </body>
     </html>
   );
 };

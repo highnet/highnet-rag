@@ -223,6 +223,10 @@
     @apply bg-background text-foreground font-sans voice-prose;
     text-rendering: optimizeLegibility;
     scrollbar-color: var(--rule) var(--paper);
+    /* From md, linked steps and sections land below the sticky header, not under it. */
+    @variant md {
+      scroll-padding-top: 5rem;
+    }
   }
 
   body {

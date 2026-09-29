@@ -6,7 +6,7 @@ const CHUNK_NAMES: Record<string, string> = { small: 'Small', medium: 'Medium', 
 export const EVALS = {
   title: 'How well does it work?',
   sheetLabel: 'Sheet 2',
-  metaTitle: 'Evals · highnet-rag',
+  metaTitle: 'Evals: how well the retrieval works',
   metaDescription:
     'Recall, MRR, faithfulness and abstention for the highnet-rag pipeline, measured offline over golden question sets with real models.',
 

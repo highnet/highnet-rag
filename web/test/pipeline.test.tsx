@@ -33,6 +33,17 @@ describe('pipeline view (smoke)', () => {
   it('shows the pipeline shape before the first run', async () => {
     render(<PipelineExplorer />);
     await screen.findByText(COPY.settings.topK);
+    // The page opens with its hero: one headline, the jump to the questions and the corpus.
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(COPY.hero.title);
+    expect(screen.getByRole('link', { name: COPY.hero.action })).toHaveAttribute(
+      'href',
+      '#sheet-title',
+    );
+    // next/link drops the trailing slash under test; the static build (trailingSlash) keeps it.
+    expect(screen.getByRole('link', { name: COPY.hero.corpus })).toHaveAttribute(
+      'href',
+      expect.stringMatching(/^\/corpus\/?$/),
+    );
     // The page opens by defining the term it is about.
     expect(screen.getAllByRole('term')[0]).toHaveTextContent(COPY.rag.term);
     expect(screen.getAllByRole('definition')[0]).toHaveTextContent(COPY.rag.definition);

@@ -4,15 +4,22 @@ export const COPY = {
   siteName: 'highnet-rag',
   tagline: 'Retrieval-augmented generation, worked out step by step.',
   nav: {
-    label: 'Pages',
+    label: 'Main',
     links: [
       { key: 'pipeline', href: '/', text: 'Pipeline' },
       { key: 'corpus', href: '/corpus/', text: 'Corpus' },
       { key: 'evals', href: '/evals/', text: 'Evals' },
+      { key: 'coverage', href: '/coverage/', text: 'Coverage' },
     ],
   },
   sheetLabel: 'Sheet 1',
   emptyTitle: 'Ask the corpus a question',
+  // The opening of the pipeline page: what you are looking at, before the working starts.
+  hero: {
+    title: 'Watch a RAG system work out an answer, step by step.',
+    action: 'Try a question',
+    corpus: 'Browse the corpus',
+  },
   // The one term the whole site is about, defined before anything else on the page.
   rag: {
     term: 'RAG',
@@ -22,7 +29,7 @@ export const COPY = {
   },
   // What the site is, for anyone arriving cold. Always shown at the top of the page.
   intro:
-    'highnet-rag shows, step by step, how one RAG system answers a question: it searches 35 Wikipedia articles, then hands Claude the best passages. Every step runs live below, with its real timing, tokens and cost. Change a setting and ask again to see what changes.',
+    'One RAG system over 35 Wikipedia articles, with Claude writing the answers. Every step runs live below, with its real timing, tokens and cost; change a setting and ask again to see what changes.',
   diagram: {
     title: 'The whole pipeline',
     offline: 'Built once, ahead of time',
@@ -55,9 +62,9 @@ export const COPY = {
     more: (n: number) => `${n} more`,
     fewer: 'Fewer',
     intro:
-      'highnet-rag shows, step by step, how one RAG system answers a question: it searches 35 Wikipedia articles, then hands Claude the best passages. Each question below was run once for every setting with the real models; pick one and its run is replayed step by step, with its real timing, tokens and cost. Change a setting to replay that setting’s run.',
+      'One RAG system over 35 Wikipedia articles, with Claude writing the answers. Each question below was run once for every setting with the real models and is replayed step by step, with its real timing, tokens and cost; change a setting to replay that setting’s run.',
     introIllustrative:
-      'highnet-rag shows, step by step, how one RAG system answers a question: it searches 35 Wikipedia articles, then hands the best passages to the answer step. Each question below was run once for every setting; pick one and its run is replayed step by step. Change a setting to replay that setting’s run.',
+      'One RAG system over 35 Wikipedia articles. Each question below was run once for every setting and is replayed step by step; change a setting to replay that setting’s run.',
     recorded: (date: string) => `Recorded ${date}.`,
   },
   questionLabel: 'Your question',
@@ -341,9 +348,13 @@ export const COPY = {
     `This month’s ${cap} API budget is used up, so live questions are paused until the 1st (UTC).`,
   theme: { toDark: 'Switch to the dark pad', toLight: 'Switch to the light pad' },
   footer: {
+    pages: 'Pages',
+    project: 'Project',
+    projectLinks: [
+      { href: 'https://github.com/highnet/highnet-rag', text: 'Source on GitHub' },
+      { href: 'https://highnet.at', text: 'highnet.at' },
+    ],
     corpus: 'Corpus: SQuAD 2.0 dev set (Rajpurkar et al.), Wikipedia text under CC BY-SA 4.0.',
-    code: 'Source on GitHub',
-    author: 'highnet.at',
   },
   announce: (label: string, title: string, status: string, ms: string) =>
     `Step ${label}, ${title}: ${status} in ${ms}.`,

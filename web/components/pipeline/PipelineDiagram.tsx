@@ -1,6 +1,7 @@
 import { ChevronRight, Equal } from 'lucide-react';
 
 import { AlgebraKey } from '@/components/formal/AlgebraKey';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
 import { Typography } from '@/components/ui/Typography';
 import { COPY } from '@/content/copy';
 import { STAGES } from '@/content/stages';
@@ -62,34 +63,53 @@ const Arrow = () => (
 type PipelineDiagramProps = {
   order: Stage[];
   statusOf: (stage: Stage) => StepStatus;
+  className?: string;
 };
 
 // The whole system on one figure: what was built ahead of time, then every step a question
 // goes through, in the order of the steps below. It follows the current run as it streams.
-const PipelineDiagram = ({ order, statusOf }: PipelineDiagramProps) => {
+const PipelineDiagram = ({ order, statusOf, className }: PipelineDiagramProps) => {
   const number = (stage: Stage) => order.indexOf(stage) + 1;
+  const offline = (
+    <ol className="flex flex-wrap items-center gap-x-1 gap-y-1.5">
+      {D.offlineSteps.map((text, i) => (
+        <li key={text} className="flex items-center gap-1">
+          {i > 0 && <Arrow />}
+          <span className="rounded-sm border border-dashed px-2 py-1 text-xs leading-snug text-muted-foreground">
+            {text}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
   return (
-    <figure aria-labelledby="diagram-title" className="space-y-3 border-y border-dashed py-4">
+    <figure
+      aria-labelledby="diagram-title"
+      className={cn('@container space-y-3 border-y border-dashed py-4', className)}
+    >
       <Typography variant="label" as="figcaption" id="diagram-title">
         {D.title}
       </Typography>
 
-      <div className="grid gap-x-4 gap-y-1 md:grid-cols-[9rem_minmax(0,1fr)]">
-        <Typography variant="label" color="muted" as="p" className="pt-1.5">
+      <div className="grid gap-x-4 gap-y-1 @2xl:grid-cols-[9rem_minmax(0,1fr)]">
+        {/* The corpus build is context, not something to click: from lg it is always shown; on
+            smaller screens it folds away so the steps a question takes come first. */}
+        <Typography variant="label" color="muted" as="p" className="hidden pt-1.5 lg:block">
           {D.offline}
         </Typography>
-        <ol className="flex flex-wrap items-center gap-x-1 gap-y-1.5">
-          {D.offlineSteps.map((text, i) => (
-            <li key={text} className="flex items-center gap-1">
-              {i > 0 && <Arrow />}
-              <span className="rounded-sm border border-dashed px-2 py-1 text-xs leading-snug text-muted-foreground">
-                {text}
-              </span>
-            </li>
-          ))}
-        </ol>
+        <div className="hidden lg:block">{offline}</div>
+        <Collapsible className="@2xl:col-span-2 lg:hidden">
+          <CollapsibleTrigger className="group voice-pencil inline-flex min-h-10 cursor-pointer items-center gap-1 text-left text-sm text-primary underline decoration-dotted underline-offset-4 hover:decoration-solid">
+            <ChevronRight
+              aria-hidden
+              className="size-3.5 transition-transform group-data-[state=open]:rotate-90"
+            />
+            {D.offline}
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-1 pb-2">{offline}</CollapsibleContent>
+        </Collapsible>
 
-        <Typography variant="label" color="muted" as="p" className="pt-3 md:pt-1.5">
+        <Typography variant="label" color="muted" as="p" className="pt-1.5">
           {D.online}
         </Typography>
         <ol className="flex flex-wrap items-center gap-x-1 gap-y-1.5">

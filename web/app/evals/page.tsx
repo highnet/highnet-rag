@@ -5,11 +5,9 @@ import { SiteFooter } from '@/components/site/SiteFooter';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { EVALS } from '@/content/evals';
 import { publishedResults } from '@/lib/evals';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: EVALS.metaTitle,
-  description: EVALS.metaDescription,
-};
+export const metadata: Metadata = pageMetadata('/evals/', EVALS.metaTitle, EVALS.metaDescription);
 
 const EvalsPage = () => {
   return (

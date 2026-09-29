@@ -276,6 +276,7 @@ One colour per retrieval series, for rank columns, chart series and badges: **BM
 
 ### Hierarchy
 
+- **Display** (650, clamp 2rem to 3.5rem, 1.04, -0.02em, balanced): the pipeline page's one headline, in the hero. Nothing else uses it.
 - **Sheet title** (650, clamp 1.5rem to 2.25rem, 1.1, -0.01em, balanced): the question at the top of the sheet, preceded by "Sheet 1 ·" in the muted data voice.
 - **Step heading** (600, 1.125rem, 1.375): a step's title. Pending and skipped steps drop to 500 at 1rem in muted graphite; the compact phone row uses 1rem.
 - **Answer** (400, 1.125rem, 1.625, max 68ch): the result line in the answer sheet.
@@ -294,7 +295,7 @@ One colour per retrieval series, for rank columns, chart series and badges: **BM
 
 ## Layout
 
-The page is one centred column capped at 72rem, with 16px side padding on phones and 32px from `md`. The body is flat paper. Spacing follows Tailwind's 4px steps: sheets are padded 16px by 20px, steps are 8px apart on phones and 16px from `md`, and the question block and the working are 32px apart (40px from `md`).
+The page is one centred column capped at 72rem, with 16px side padding on phones and 32px from `md`. The body is flat paper. The header holds the site name (a link home), the tagline from `lg` (except on the pipeline page, whose hero headline already says it), the four pages and the theme switch; when space runs out the links wrap under the name instead of overlapping it. From `md` it stays at the top while the page scrolls, on paper, and draws its 1px `rule` underneath only once the page has moved under it (no shadow). On phones it scrolls away with the page, because wrapped to two rows it would take too much of a small screen; `scroll-padding-top` keeps linked steps clear of it from `md`. The footer sits above a solid rule: a site map (every page), the project links, and the site's name with the corpus attribution the licence requires; the two link lists sit side by side even on phones. Spacing follows Tailwind's 4px steps: sheets are padded 16px by 20px, steps are 8px apart on phones and 16px from `md`, and the question block and the working are 32px apart (40px from `md`).
 
 Every step and the answer share one three-track grid, so numbers, sheets and notes line up down the page:
 
@@ -411,9 +412,17 @@ Opened by a pencil action with a code icon. Each excerpt has a caption over a da
 
 Sheet 2 of the same pad: the sheet title "Sheet 2 · How well does it work?", a lede, and a run record on a dashed rule (date, corpus build, the models the run actually called, cost). Each question the evals answer is a raised sheet with its blue-pencil note in the margin from `lg` and above the working below it. Retrieval results are one small table per chunk size (modes down the side with their series markers, reranker off and on across): a thin bar in graphite (off) or rerank green (on) with the value in the data voice. The visitor's own setting, linked from an answer, sits on blue wash with a pencil "your settings". A section the run did not measure is a dashed box that says so and why, never an empty chart.
 
+## Hero (`/`)
+
+The pipeline page opens with a hero in two columns from `lg` (5:7): on the left the one Display headline, "Watch a RAG system work out an answer, step by step.", then the definition of RAG as a term and its definition (the term in the data voice, its expansion muted, the definition in body graphite), a short muted intro, and two actions: the primary "Try a question" (jumps to the sheet) and a pencil "Browse the corpus". On the right, the pipeline diagram is the hero's only picture, bounded by a 1px solid rule with 4px corners on bare paper. The hero keeps extra space below it (16px, 40px from `md`, on top of the page rhythm) so it reads as its own section before Sheet 1. Phones stack the two, so the diagram lands one scroll down. There is no image, eyebrow or metric strip; the real pipeline is the picture.
+
+## Share card
+
+`/og.png` is drawn at build time for link previews: the light pad, the site name in the data voice, the hero headline, and the eleven steps as ruled boxes joined by chevrons, numbered in the data voice and ending in "= Answer" with a blue-pencil "=". It is set in Recursive (static 400 and 700 instances of the prose and MONO cuts, vendored under `web/assets/fonts` with their OFL licence), and its colours are read from `globals.css`, so it never drifts from the tokens.
+
 ## Pipeline diagram
 
-Under the page's opening paragraph, a figure between dashed rules draws the whole system in two labelled rows: what was built once ahead of time (dashed boxes, not interactive), then every step a question goes through, as small boxes joined by chevrons, numbered like the steps below and linked to them. BM25 and vector search stack as one pair because they run side by side; the row ends in an "= Answer" box outlined like the answer sheet. The boxes follow the run: dashed while waiting or skipped, raised paper once done, blue pencil while running, a red edge on failure. With the agent on, the row follows the agentic order.
+In the hero's right column (see Hero), a figure draws the whole system in two labelled rows: what was built once ahead of time (dashed boxes, not interactive), then every step a question goes through, as small boxes joined by chevrons, numbered like the steps below and linked to them. BM25 and vector search stack as one pair because they run side by side; the row ends in an "= Answer" box outlined like the answer sheet. The boxes follow the run: dashed while waiting or skipped, raised paper once done, blue pencil while running, a red edge on failure. With the agent on, the row follows the agentic order. Below `lg` the "Built once, ahead of time" row, which is context rather than something to click, folds behind a pencil toggle, so on phones the steps a question takes come first.
 
 ## Formulas
 
@@ -422,6 +431,10 @@ Each step sheet carries its step as one line of relational algebra in a dashed b
 ## Corpus page (`/corpus`)
 
 Sheet 3 of the pad. A chunk-size switch and the article list (a native select on phones, a scrolling list from `lg`), then the chosen article on a raised sheet: its text with each chunk's start marked by its id in a small blue-pencil box, and any text held by two chunks at once on blue wash. The note above the text says which is true for this article and size: it never promises an overlap that is not there.
+
+## Coverage page (`/coverage`)
+
+Sheet 4 of the pad, "Is every line tested?", built like the evals report: a lede, then a record on dashed rules (tests per suite, the 100% rule, when CI checks it). Each package (the API, the eval runner, this website) is a raised sheet with its note in the margin: its source root and tool in the data voice, then lines and branches as a share with its counts and a thin graphite bar. A pencil fold, "All N files", opens a dense table of every file with its lines and branches as "covered of total" (a dash where a file has no branches). Anything short of 100% carries an amber warning mark and the words "below 100%", never colour alone, and shares are never rounded up. Every number comes from `web/lib/generated/coverage.json`, which CI rewrites from its own test run and fails if it differs.
 
 ## Question picker (replay)
 

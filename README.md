@@ -86,6 +86,7 @@ The Vercel project `highnet-rag` (team "highnet's projects") is linked to this r
 
 ## Changelog
 
+- **Hero, coverage page and SEO.** The pipeline page opens with a hero: a definition of RAG and the whole pipeline drawn beside it. A new `/coverage` page lists line and branch coverage for every file of the API, the eval runner and the website, taken from a real test run that CI re-checks on every change. The header stays in view on larger screens, the footer maps every page, and each page has its own title, description, canonical link and share card, with a sitemap and robots.txt.
 - **Pre-recorded questions only.** Visitors pick from 15 questions, each recorded once with the real models at every setting, and the page replays the recorded run: every number is real, and a visit calls no model and costs nothing. Changing a setting replays that setting's own run. `LIVE_QUERIES=true` brings free-text questions back.
 - **Corpus page and formulas.** `/corpus` shows every article with its chunk boundaries at each size. Each step now has one line of relational algebra; tap a symbol for its definition. Retrieval eval results (recall@k, MRR for all 18 configurations) are published on `/evals`.
 - **The whole pipeline, drawn.** The top of the page now shows a diagram of the system: the corpus built ahead of time, then every step a question takes, linked to its step below and filling in as the run streams.
