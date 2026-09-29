@@ -13,9 +13,16 @@ export const COPY = {
   },
   sheetLabel: 'Sheet 1',
   emptyTitle: 'Ask the corpus a question',
+  // The one term the whole site is about, defined before anything else on the page.
+  rag: {
+    term: 'RAG',
+    expansion: 'retrieval-augmented generation',
+    definition:
+      'A way to have a language model answer from a given set of documents rather than from memory. For each question, a search first retrieves the most relevant passages; the model then generates its answer from those passages alone and cites them.',
+  },
   // What the site is, for anyone arriving cold. Always shown at the top of the page.
   intro:
-    'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand Claude the best passages and ask it to answer from those alone, with citations. Every step runs live below, with its real timing, tokens and cost. Change a setting and ask again to see what changes.',
+    'highnet-rag shows, step by step, how one RAG system answers a question: it searches 35 Wikipedia articles, then hands Claude the best passages. Every step runs live below, with its real timing, tokens and cost. Change a setting and ask again to see what changes.',
   diagram: {
     title: 'The whole pipeline',
     offline: 'Built once, ahead of time',
@@ -48,9 +55,9 @@ export const COPY = {
     more: (n: number) => `${n} more`,
     fewer: 'Fewer',
     intro:
-      'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand Claude the best passages and ask it to answer from those alone, with citations. Each question below was run once for every setting with the real models; pick one and its run is replayed step by step, with its real timing, tokens and cost. Change a setting to replay that setting’s run.',
+      'highnet-rag shows, step by step, how one RAG system answers a question: it searches 35 Wikipedia articles, then hands Claude the best passages. Each question below was run once for every setting with the real models; pick one and its run is replayed step by step, with its real timing, tokens and cost. Change a setting to replay that setting’s run.',
     introIllustrative:
-      'highnet-rag shows, step by step, how a RAG system answers a question. The model does not answer from memory: we first search 35 Wikipedia articles, then hand the passages to the answer step and ask it to answer from those alone, with citations. Each question below was run once for every setting; pick one and its run is replayed step by step. Change a setting to replay that setting’s run.',
+      'highnet-rag shows, step by step, how one RAG system answers a question: it searches 35 Wikipedia articles, then hands the best passages to the answer step. Each question below was run once for every setting; pick one and its run is replayed step by step. Change a setting to replay that setting’s run.',
     recorded: (date: string) => `Recorded ${date}.`,
   },
   questionLabel: 'Your question',
