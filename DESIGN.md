@@ -276,7 +276,7 @@ One colour per retrieval series, for rank columns, chart series and badges: **BM
 
 ### Hierarchy
 
-- **Display** (650, clamp 2rem to 3rem, 1.05, -0.02em, balanced): the pipeline page's one headline, in the hero. Nothing else uses it.
+- **Display** (650, clamp 2rem to 3.5rem, 1.04, -0.02em, balanced): the pipeline page's one headline, in the hero. Nothing else uses it.
 - **Sheet title** (650, clamp 1.5rem to 2.25rem, 1.1, -0.01em, balanced): the question at the top of the sheet, preceded by "Sheet 1 ·" in the muted data voice.
 - **Step heading** (600, 1.125rem, 1.375): a step's title. Pending and skipped steps drop to 500 at 1rem in muted graphite; the compact phone row uses 1rem.
 - **Answer** (400, 1.125rem, 1.625, max 68ch): the result line in the answer sheet.
@@ -295,7 +295,7 @@ One colour per retrieval series, for rank columns, chart series and badges: **BM
 
 ## Layout
 
-The page is one centred column capped at 72rem, with 16px side padding on phones and 32px from `md`. The body is flat paper. The header holds the site name (a link home), the tagline from `lg`, the four pages and the theme switch; when space runs out the links wrap under the name instead of overlapping it. From `md` it stays at the top while the page scrolls, on paper, and draws its 1px `rule` underneath only once the page has moved under it (no shadow). On phones it scrolls away with the page, because wrapped to two rows it would take too much of a small screen; `scroll-padding-top` keeps linked steps clear of it from `md`. The footer sits above a solid rule: a site map (every page), the project links, and the site's name with the corpus attribution the licence requires; the two link lists sit side by side even on phones. Spacing follows Tailwind's 4px steps: sheets are padded 16px by 20px, steps are 8px apart on phones and 16px from `md`, and the question block and the working are 32px apart (40px from `md`).
+The page is one centred column capped at 72rem, with 16px side padding on phones and 32px from `md`. The body is flat paper. The header holds the site name (a link home), the tagline from `lg` (except on the pipeline page, whose hero headline already says it), the four pages and the theme switch; when space runs out the links wrap under the name instead of overlapping it. From `md` it stays at the top while the page scrolls, on paper, and draws its 1px `rule` underneath only once the page has moved under it (no shadow). On phones it scrolls away with the page, because wrapped to two rows it would take too much of a small screen; `scroll-padding-top` keeps linked steps clear of it from `md`. The footer sits above a solid rule: a site map (every page), the project links, and the site's name with the corpus attribution the licence requires; the two link lists sit side by side even on phones. Spacing follows Tailwind's 4px steps: sheets are padded 16px by 20px, steps are 8px apart on phones and 16px from `md`, and the question block and the working are 32px apart (40px from `md`).
 
 Every step and the answer share one three-track grid, so numbers, sheets and notes line up down the page:
 
@@ -414,15 +414,15 @@ Sheet 2 of the same pad: the sheet title "Sheet 2 · How well does it work?", a 
 
 ## Hero (`/`)
 
-The pipeline page opens with a hero in two columns from `lg` (5:7): on the left the one Display headline, "Watch a RAG system work out an answer, step by step.", then the definition of RAG as a term and its definition (the term in the data voice, its expansion muted, the definition in body graphite), a short muted intro, and two actions: the primary "Try a question" (jumps to the sheet) and a pencil "Browse the corpus". On the right, the pipeline diagram is the hero's only picture, bounded by a 1px solid rule with 4px corners on bare paper. Phones stack the two, so the diagram lands one scroll down. There is no image, eyebrow or metric strip; the real pipeline is the picture.
+The pipeline page opens with a hero in two columns from `lg` (5:7): on the left the one Display headline, "Watch a RAG system work out an answer, step by step.", then the definition of RAG as a term and its definition (the term in the data voice, its expansion muted, the definition in body graphite), a short muted intro, and two actions: the primary "Try a question" (jumps to the sheet) and a pencil "Browse the corpus". On the right, the pipeline diagram is the hero's only picture, bounded by a 1px solid rule with 4px corners on bare paper. The hero keeps extra space below it (16px, 40px from `md`, on top of the page rhythm) so it reads as its own section before Sheet 1. Phones stack the two, so the diagram lands one scroll down. There is no image, eyebrow or metric strip; the real pipeline is the picture.
 
 ## Share card
 
-`/og.png` is drawn at build time for link previews: the light pad, the site name and tagline, the hero headline, and the eleven steps as ruled boxes ending in "= Answer" with a blue-pencil "=". Its colours are read from `globals.css`, so it never drifts from the tokens.
+`/og.png` is drawn at build time for link previews: the light pad, the site name in the data voice, the hero headline, and the eleven steps as ruled boxes joined by chevrons, numbered in the data voice and ending in "= Answer" with a blue-pencil "=". It is set in Recursive (static 400 and 700 instances of the prose and MONO cuts, vendored under `web/assets/fonts` with their OFL licence), and its colours are read from `globals.css`, so it never drifts from the tokens.
 
 ## Pipeline diagram
 
-In the hero's right column (see Hero), a figure draws the whole system in two labelled rows: what was built once ahead of time (dashed boxes, not interactive), then every step a question goes through, as small boxes joined by chevrons, numbered like the steps below and linked to them. BM25 and vector search stack as one pair because they run side by side; the row ends in an "= Answer" box outlined like the answer sheet. The boxes follow the run: dashed while waiting or skipped, raised paper once done, blue pencil while running, a red edge on failure. With the agent on, the row follows the agentic order.
+In the hero's right column (see Hero), a figure draws the whole system in two labelled rows: what was built once ahead of time (dashed boxes, not interactive), then every step a question goes through, as small boxes joined by chevrons, numbered like the steps below and linked to them. BM25 and vector search stack as one pair because they run side by side; the row ends in an "= Answer" box outlined like the answer sheet. The boxes follow the run: dashed while waiting or skipped, raised paper once done, blue pencil while running, a red edge on failure. With the agent on, the row follows the agentic order. Below `lg` the "Built once, ahead of time" row, which is context rather than something to click, folds behind a pencil toggle, so on phones the steps a question takes come first.
 
 ## Formulas
 

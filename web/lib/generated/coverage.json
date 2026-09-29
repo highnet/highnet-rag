@@ -389,12 +389,12 @@
         "root": "web",
         "totals": {
           "lines": {
-            "covered": 1162,
-            "total": 1162
+            "covered": 1169,
+            "total": 1169
           },
           "branches": {
-            "covered": 1001,
-            "total": 1001
+            "covered": 1005,
+            "total": 1005
           }
         },
         "empty_files": 2,
@@ -446,12 +446,12 @@
           {
             "path": "app/og.png/route.tsx",
             "lines": {
-              "covered": 9,
-              "total": 9
+              "covered": 15,
+              "total": 15
             },
             "branches": {
-              "covered": 0,
-              "total": 0
+              "covered": 2,
+              "total": 2
             }
           },
           {
@@ -655,8 +655,8 @@
           {
             "path": "components/pipeline/PipelineDiagram.tsx",
             "lines": {
-              "covered": 18,
-              "total": 18
+              "covered": 19,
+              "total": 19
             },
             "branches": {
               "covered": 19,
@@ -1132,8 +1132,8 @@
               "total": 3
             },
             "branches": {
-              "covered": 4,
-              "total": 4
+              "covered": 6,
+              "total": 6
             }
           },
           {

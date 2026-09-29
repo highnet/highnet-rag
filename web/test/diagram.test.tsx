@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { PipelineDiagram } from '@/components/pipeline/PipelineDiagram';
@@ -30,6 +30,9 @@ describe('pipeline diagram', () => {
     );
     expect(screen.getAllByRole('link')).toHaveLength(STAGE_ORDER.length);
     expect(screen.getByText(COPY.diagram.offlineSteps[0])).toBeInTheDocument();
+    // Below lg the corpus build folds behind a pencil toggle, so the question's steps come first.
+    fireEvent.click(screen.getByRole('button', { name: COPY.diagram.offline }));
+    expect(screen.getAllByText(COPY.diagram.offlineSteps[0])).toHaveLength(2);
     expect(screen.getByText(COPY.diagram.agentOff)).toBeInTheDocument();
   });
 

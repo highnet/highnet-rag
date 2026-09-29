@@ -17,7 +17,7 @@ const PipelineHero = ({ intro, diagram }: PipelineHeroProps) => {
   return (
     <section
       aria-labelledby="hero-title"
-      className="grid items-start gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
+      className="grid items-start gap-x-12 gap-y-8 pb-4 md:pb-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
     >
       <div className="space-y-5">
         <Typography variant="display" id="hero-title">

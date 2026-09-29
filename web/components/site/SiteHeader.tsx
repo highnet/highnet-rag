@@ -25,9 +25,12 @@ const SiteHeader = ({ current }: SiteHeaderProps) => {
           >
             {COPY.siteName}
           </Link>
-          <Typography variant="small" color="muted" as="span" className="hidden lg:inline">
-            {COPY.tagline}
-          </Typography>
+          {/* On the pipeline page the hero's headline says it; the tagline would repeat it. */}
+          {current !== 'pipeline' && (
+            <Typography variant="small" color="muted" as="span" className="hidden lg:inline">
+              {COPY.tagline}
+            </Typography>
+          )}
         </div>
         <div className="-ml-1.5 flex flex-wrap items-center gap-1 sm:gap-3">
           <nav aria-label={COPY.nav.label}>
