@@ -33,6 +33,9 @@ describe('pipeline view (smoke)', () => {
   it('shows the pipeline shape before the first run', async () => {
     render(<PipelineExplorer />);
     await screen.findByText(COPY.settings.topK);
+    // The page opens by defining the term it is about.
+    expect(screen.getAllByRole('term')[0]).toHaveTextContent(COPY.rag.term);
+    expect(screen.getAllByRole('definition')[0]).toHaveTextContent(COPY.rag.definition);
     for (const stage of STAGE_ORDER) {
       expect(screen.getByRole('listitem', { name: STAGES[stage].title })).toBeInTheDocument();
     }
