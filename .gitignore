@@ -11,7 +11,9 @@ node_modules/
 !.yarn/versions
 
 # testing
-coverage/
+# Test coverage reports (anchored: web/app/coverage and web/components/coverage are source)
+/coverage/
+/web/coverage/
 .nyc_output
 
 # next.js
